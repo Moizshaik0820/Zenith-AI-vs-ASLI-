@@ -17,18 +17,18 @@
   font-size: clamp(2rem, 5vw, 3.2rem);
   font-weight: 900;
   letter-spacing: -0.02em;
-  color: var(--zenith-purple);
+  color: #e11d48;
   margin-bottom: 0.5rem;
 }
 
 .player-salute {
   font-size: 1.25rem;
-  color: var(--text-dim);
+  color: #e11d48;
   font-weight: 700;
 }
 
 .player-nickname-glow {
-  color: var(--text-main);
+  color: #e11d48;
   font-weight: 900;
 }
 

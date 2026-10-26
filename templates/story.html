@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+  /* Hacker Green Matrix Canvas Background */
+  .matrix-code-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.55;
+  }
+
+  .story-page-stage {
+    position: relative;
+    z-index: 2;
+    min-height: calc(100dvh - 56px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .story-container {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .story-nav-bar {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 0.75rem;
+  }
+
+  .story-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 0.4rem 0.85rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: var(--radius-pill);
+    transition: all 0.2s ease;
+  }
+
+  .story-back-btn:hover {
+    background: #7c3aed;
+    border-color: #7c3aed;
+    transform: translateX(-3px);
+  }
+
+  .story-heading {
+    font-family: var(--font-chunky, 'Lilita One', sans-serif);
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    font-weight: 900;
+    color: #ffffff;
+    margin: 0 0 0.3rem 0;
+    letter-spacing: 0.02em;
+  }
+
+  .story-subtext {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    margin: 0 0 1rem 0;
+    line-height: 1.45;
+  }
+
+  .canvas-preview-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 1.25rem;
+  }
+
+  #resultStoryCanvas {
+    max-width: 290px;
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    background: #0e0b1f;
+  }
+
+  .story-actions-stack {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    margin-bottom: 2rem;
+  }
+
+  .btn-story-action {
+    width: 100%;
+    padding: 0.85rem 1.2rem;
+    font-size: 0.98rem;
+    font-weight: 800;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+  }
+
+  .btn-story-primary {
+    background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
+    border: none;
+    color: #ffffff !important;
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
+  }
+
+  .btn-story-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(124, 58, 237, 0.6);
+  }
+
+  .btn-story-secondary {
+    background: rgba(23, 19, 48, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #ffffff !important;
+  }
+
+  .btn-story-secondary:hover {
+    background: rgba(124, 58, 237, 0.25);
+    border-color: #a855f7;
+    transform: translateY(-2px);
+  }
+
+  .btn-story-play-again {
+    background: #e11d48 !important; /* RED PLAY AGAIN */
+    border: none;
+    color: #ffffff !important;
+    box-shadow: 0 6px 20px rgba(225, 29, 72, 0.4);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+  }
+
+  .btn-story-play-again:hover {
+    background: #be123c !important;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(225, 29, 72, 0.6);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hacker Green Matrix Digital Rain Background Canvas -->
+<canvas id="matrixCanvas" class="matrix-code-canvas" aria-hidden="true"></canvas>
+
+<section class="story-page-stage">
+  <div class="story-container">
+
+    <!-- Back to Score Link -->
+    <div class="story-nav-bar">
+      <a href="{{ url_for('pages.results', session_id=session_id) }}" class="story-back-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span>Back to Score</span>
+      </a>
+    </div>
+
+    <!-- Heading -->
+    <h1 class="story-heading">Your Official Instagram Story Card</h1>
+    <p class="story-subtext">
+      High-resolution 9:16 format with verified Zenith School of AI campus credentials.
+    </p>
+
+    <!-- 9:16 Instagram Story Canvas -->
+    <div class="canvas-preview-container">
+      <canvas 
+        id="resultStoryCanvas"
+        data-nickname="{{ standing.nickname }}"
+        data-score="{{ standing.score }}"
+        data-correct="{{ standing.correct_count }}"
+        data-incorrect="{{ standing.incorrect_count }}"
+        data-unanswered="{{ standing.unanswered_count }}"
+        data-accuracy="{{ standing.accuracy_pct }}"
+        data-rank="{{ standing.rank }}"
+        data-total-players="{{ standing.total_players }}"
+        data-compliment="{{ standing.compliment }}"
+      ></canvas>
+    </div>
+
+    <!-- Actions Stack: Download, Share with Friends, Share to Instagram, Leaderboard, Play Again -->
+    <div class="story-actions-stack">
+      <button type="button" class="btn-story-action btn-story-primary" id="downloadCardBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        <span>Download Story Graphic (PNG)</span>
+      </button>
+
+      <button type="button" class="btn-story-action btn-story-secondary" id="shareFriendsBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+        <span>Share with Friends</span>
+      </button>
+
+      <button type="button" class="btn-story-action btn-story-secondary" id="shareInstaBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+        <span>Share to Instagram Story</span>
+      </button>
+
+      <a href="{{ url_for('pages.leaderboard') }}?session_id={{ session_id }}" class="btn-story-action btn-story-secondary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        <span>View Leaderboard</span>
+      </a>
+
+      <button type="button" class="btn-story-action btn-story-play-again" id="playAgainBtn">
+        PLAY AGAIN
+      </button>
+    </div>
+
+  </div>
+</section>
+
+<!-- Instagram Story Step-by-Step Guide Modal -->
+<div class="modal-overlay" id="instaGuideModal">
+  <div class="modal-card-custom" style="text-align:left;">
+    <h3 style="color:#e11d48; font-size:1.25rem; font-weight:800; margin:0 0 0.85rem 0;">
+      How to Post to Your Instagram Story
+    </h3>
+    <ol style="color:#cbd5e1; line-height:1.65; padding-left:1.2rem; font-size:0.9rem; margin-bottom:1.2rem;">
+      <li>Tap <strong>"Download Story Graphic (PNG)"</strong> to save your card to your photos.</li>
+      <li>Open your <strong>Instagram App</strong> and swipe right to create a new Story.</li>
+      <li>Select the downloaded card from your gallery.</li>
+      <li>Tag <strong>@zenith_school_of_ai</strong> and challenge your friends: <em>"Do you trust your eyes?"</em></li>
+    </ol>
+    <div style="text-align:right;">
+      <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('instaGuideModal').classList.remove('active')">
+        Got it!
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/story.js') }}"></script>
+{% endblock %}

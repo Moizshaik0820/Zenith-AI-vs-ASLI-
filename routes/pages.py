@@ -89,6 +89,22 @@ def results(session_id):
         campaign_url=Config.CAMPAIGN_URL
     )
 
+@pages_bp.route("/story/<session_id>")
+def story(session_id):
+    standing = LeaderboardService.get_player_standing(session_id)
+    if not standing:
+        return redirect(url_for("pages.index"))
+        
+    return render_template(
+        "story.html",
+        title="Official Instagram Story Card | AI vs ASLI",
+        session_id=session_id,
+        standing=standing,
+        instagram_handle=Config.INSTAGRAM_HANDLE,
+        instagram_url=Config.INSTAGRAM_URL,
+        campaign_url=Config.CAMPAIGN_URL
+    )
+
 @pages_bp.route("/leaderboard")
 def leaderboard():
     return render_template(

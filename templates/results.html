@@ -2,172 +2,573 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/results.css') }}">
+<style>
+  /* Hacker Green Matrix Canvas in Background */
+  .matrix-code-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.55;
+  }
+
+  /* Single-screen locked stage (Zero Scroll on Desktop & Mobile) */
+  .results-locked-stage {
+    position: relative;
+    z-index: 2;
+    height: calc(100dvh - 56px);
+    max-height: calc(100dvh - 56px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .results-inner-card-wrap {
+    width: 100%;
+    max-width: 580px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Header Salute */
+  .results-header-banner {
+    text-align: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .game-over-title {
+    font-family: var(--font-chunky, 'Lilita One', sans-serif);
+    font-size: clamp(2rem, 5.5vw, 2.8rem);
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    color: #e11d48 !important; /* RED GAME OVER */
+    margin: 0 0 0.15rem 0;
+    text-shadow: 0 0 20px rgba(225, 29, 72, 0.45);
+    line-height: 1.05;
+  }
+
+  .player-salute {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #e11d48 !important; /* RED USERNAME / SALUTE */
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+
+  .player-nickname-glow {
+    color: #e11d48 !important;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* Blurred Initial Score Card Stage */
+  .blurred-score-card {
+    position: relative;
+    width: 100%;
+    background: rgba(14, 11, 31, 0.92);
+    border: 1.5px solid #ffffff !important; /* WHITE BORDER */
+    border-radius: 20px;
+    padding: 1.25rem 1.15rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(12px);
+    text-align: center;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .card-blur-content {
+    filter: blur(14px);
+    user-select: none;
+    pointer-events: none;
+    transition: filter 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .blurred-score-card.revealed .card-blur-content {
+    filter: blur(0px);
+    pointer-events: auto;
+    user-select: auto;
+  }
+
+  .reveal-overlay-prompt {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 8, 24, 0.88);
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.1rem;
+    z-index: 20;
+    padding: 1.5rem;
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+  }
+
+  .blurred-score-card.revealed .reveal-overlay-prompt {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .reveal-heading {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .btn-reveal-score {
+    background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
+    color: #ffffff !important;
+    font-weight: 800;
+    font-size: 1.05rem;
+    padding: 0.85rem 1.8rem;
+    border: none;
+    border-radius: var(--radius-pill);
+    box-shadow: 0 6px 25px rgba(124, 58, 237, 0.5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-reveal-score:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.65);
+  }
+
+  /* Score Hero Display (Inside Revealed Card) */
+  .score-hero-display {
+    margin: 0 0 0.85rem 0;
+    padding: 0.95rem 1rem;
+    background: rgba(22, 17, 44, 0.9);
+    border-radius: 16px;
+    border: 1.5px solid #ffffff !important; /* WHITE BORDER */
+  }
+
+  .final-score-title-red {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #e11d48 !important; /* RED FINAL DETECTION SCORE */
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+
+  .final-score-number {
+    font-family: var(--font-chunky, 'Lilita One', sans-serif);
+    font-size: clamp(2.8rem, 7.5vw, 3.8rem);
+    font-weight: 900;
+    color: #a855f7;
+    line-height: 1;
+    text-shadow: 0 0 25px rgba(168, 85, 247, 0.4);
+  }
+
+  .final-score-max {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    font-weight: 800;
+    margin-top: 0.2rem;
+  }
+
+  /* Compliment Box */
+  .personalized-compliment-box {
+    margin-top: 0.65rem;
+    padding: 0.65rem 0.9rem;
+    background: rgba(14, 11, 31, 0.85);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+  }
+
+  .personalized-compliment {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #f1f5f9;
+    line-height: 1.38;
+    margin: 0;
+  }
+
+  /* Metrics Grid (Small Boxes with WHITE Border) */
+  .metrics-dashboard-compact {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.55rem;
+    margin: 0.75rem 0 0.4rem;
+  }
+
+  .metrics-row-sub {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.55rem;
+    margin-bottom: 0.55rem;
+  }
+
+  .metric-tile-white {
+    background: rgba(22, 17, 44, 0.85);
+    padding: 0.65rem 0.45rem;
+    border-radius: 12px;
+    border: 1.5px solid #ffffff !important; /* ALL SMALL BOXES BORDER WHITE */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .metric-tile-val {
+    font-size: 1.25rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 0.15rem;
+  }
+
+  .metric-tile-val.correct { color: #22c55e; }
+  .metric-tile-val.incorrect { color: #ef4444; }
+  .metric-tile-val.rank { color: #a855f7; }
+
+  .metric-tile-label {
+    font-size: 0.65rem;
+    color: #cbd5e1;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+
+  /* Action shortcut pill to Story */
+  .btn-story-shortcut {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 100%;
+    margin-top: 0.65rem;
+    padding: 0.72rem 1.2rem;
+    font-size: 0.92rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    background: linear-gradient(135deg, #7C3AED 0%, #E11D48 100%);
+    border: none;
+    border-radius: var(--radius-pill);
+    color: #ffffff !important;
+    text-decoration: none;
+    box-shadow: 0 4px 18px rgba(124, 58, 237, 0.35);
+    transition: all 0.2s ease;
+  }
+
+  .btn-story-shortcut:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(225, 29, 72, 0.5);
+  }
+
+  /* MANDATORY INSTAGRAM FOLLOW POPUP MODAL (White border, Red title, Official IG Icon) */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(3, 7, 18, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    padding: 1rem;
+  }
+
+  .modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .modal-card-custom {
+    background: #0f0d22;
+    border: 2px solid #ffffff !important; /* WHITE BORDER */
+    border-radius: 20px;
+    padding: 1.6rem 1.4rem;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.75);
+    box-sizing: border-box;
+  }
+
+  .modal-insta-title-red {
+    color: #e11d48 !important; /* RED TITLE */
+    font-family: var(--font-chunky, 'Lilita One', sans-serif);
+    font-size: 1.45rem;
+    font-weight: 900;
+    margin: 0.6rem 0 1.25rem 0;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-insta-follow {
+    width: 100%;
+    padding: 0.85rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 800;
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    border: none;
+    border-radius: var(--radius-pill);
+    color: #ffffff !important;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(220, 39, 67, 0.4);
+    transition: transform 0.2s ease;
+  }
+
+  .btn-insta-follow:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn-unlock-score {
+    width: 100%;
+    padding: 0.8rem 1.2rem;
+    font-size: 0.95rem;
+    font-weight: 800;
+    background: #22c55e;
+    border: none;
+    border-radius: var(--radius-pill);
+    color: #ffffff !important;
+    cursor: pointer;
+    margin-top: 0.65rem;
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.35);
+  }
+
+  /* 5-Second Story Promo Modal */
+  .story-promo-card {
+    background: #0f0d22;
+    border: 2px solid #ffffff !important; /* WHITE BORDER */
+    border-radius: 20px;
+    padding: 1.5rem 1.35rem;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.8);
+  }
+
+  .story-promo-title-red {
+    color: #e11d48 !important; /* RED TITLE */
+    font-family: var(--font-chunky, 'Lilita One', sans-serif);
+    font-size: 1.4rem;
+    font-weight: 900;
+    margin: 0.4rem 0 0.5rem 0;
+  }
+
+  .btn-view-story-cta {
+    display: block;
+    width: 100%;
+    padding: 0.85rem 1.2rem;
+    font-size: 1rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #7C3AED 0%, #E11D48 100%);
+    border: none;
+    border-radius: var(--radius-pill);
+    color: #ffffff !important;
+    text-decoration: none;
+    box-shadow: 0 6px 20px rgba(225, 29, 72, 0.45);
+    margin-top: 1rem;
+    box-sizing: border-box;
+    transition: transform 0.2s ease;
+  }
+
+  .btn-dismiss-story {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: var(--text-dim);
+    padding: 0.55rem 1.1rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 0.65rem;
+    width: 100%;
+  }
+
+  @media (max-width: 600px) {
+    .results-locked-stage {
+      height: calc(100dvh - 56px);
+      max-height: calc(100dvh - 56px);
+      padding: 0.35rem 0.65rem;
+    }
+    .game-over-title {
+      font-size: 1.95rem;
+    }
+    .player-salute {
+      font-size: 0.95rem;
+    }
+    .blurred-score-card {
+      padding: 0.85rem 0.75rem;
+      border-radius: 18px;
+    }
+    .score-hero-display {
+      padding: 0.7rem 0.6rem;
+      margin-bottom: 0.55rem;
+    }
+    .final-score-number {
+      font-size: 2.6rem;
+    }
+    .personalized-compliment {
+      font-size: 0.78rem;
+    }
+    .metric-tile-white {
+      padding: 0.5rem 0.35rem;
+    }
+    .metric-tile-val {
+      font-size: 1.15rem;
+    }
+    .metric-tile-label {
+      font-size: 0.6rem;
+    }
+  }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="results-arena">
+<!-- Hacker Green Matrix Digital Rain Background Canvas -->
+<canvas id="matrixCanvas" class="matrix-code-canvas" aria-hidden="true"></canvas>
 
-  <!-- Header Salute -->
-  <div class="results-header-banner">
-    <h1 class="game-over-title" data-i18n="results_game_over">GAME OVER</h1>
-    <p class="player-salute">
-      <span data-i18n="results_good_job">GOOD JOB,</span> <span class="player-nickname-glow">{{ standing.nickname }}</span>!
-    </p>
-  </div>
+<section class="results-locked-stage">
+  <div class="results-inner-card-wrap">
 
-  <!-- Blurred Initial Card with Reveal Trigger -->
-  <div class="blurred-score-card" id="blurredScoreCard">
-
-    <!-- Blur Shield with Action Button -->
-    <div class="reveal-overlay-prompt" id="revealPromptOverlay">
-      <h2 class="reveal-heading" data-i18n="results_score_ready">Your score is ready to reveal.</h2>
-      <button type="button" class="btn btn-primary btn-lg btn-pill" id="revealScoreBtn" data-i18n="results_btn_reveal">
-        SCORE & STANDINGS
-      </button>
+    <!-- Header Salute (Red GAME OVER & Red Username) -->
+    <div class="results-header-banner">
+      <h1 class="game-over-title" data-i18n="results_game_over">GAME OVER</h1>
+      <p class="player-salute">
+        <span data-i18n="results_good_job">GOOD JOB,</span> <span class="player-nickname-glow">{{ standing.nickname }}</span>!
+      </p>
     </div>
 
-    <!-- Protected Content (Hidden behind blur until Instagram Follow is triggered) -->
-    <div class="card-blur-content" id="cardBlurContent">
-      <div class="score-hero-display">
-        <span style="font-size:0.85rem; font-weight:800; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em;">FINAL DETECTION SCORE</span>
-        <div class="final-score-number">{{ standing.score }}</div>
-        <div class="final-score-max">OUT OF 1,500 POINTS</div>
-        
-        <!-- Compliment Box with Safe Bounds -->
-        <div class="personalized-compliment-box">
-          <p class="personalized-compliment">"{{ standing.compliment }}"</p>
-        </div>
+    <!-- Blurred Initial Card with Reveal Trigger (Image 2) -->
+    <div class="blurred-score-card" id="blurredScoreCard">
+
+      <!-- Blur Shield with Action Button -->
+      <div class="reveal-overlay-prompt" id="revealPromptOverlay">
+        <h2 class="reveal-heading" data-i18n="results_score_ready">Your score is ready to reveal.</h2>
+        <button type="button" class="btn-reveal-score" id="revealScoreBtn" data-i18n="results_btn_reveal">
+          VIEW SCORE & STANDINGS
+        </button>
       </div>
 
-      <!-- Metrics Grid (SPEED BONUS REMOVED!) -->
-      <div class="metrics-dashboard">
-        <div class="metric-tile">
-          <div class="metric-tile-val correct">{{ standing.correct_count }} / 10</div>
-          <div class="metric-tile-label">Correct Hits</div>
+      <!-- Protected Content: Fits on One Screen with Zero Scroll (Image 4) -->
+      <div class="card-blur-content" id="cardBlurContent">
+
+        <!-- Final Detection Score Card (White Border, Red Label) -->
+        <div class="score-hero-display">
+          <span class="final-score-title-red">FINAL DETECTION SCORE</span>
+          <div class="final-score-number">{{ standing.score }}</div>
+          <div class="final-score-max">OUT OF 600 POINTS</div>
+          
+          <!-- Compliment Box -->
+          <div class="personalized-compliment-box">
+            <p class="personalized-compliment">"{{ standing.compliment }}"</p>
+          </div>
         </div>
 
-        <div class="metric-tile">
-          <div class="metric-tile-val incorrect">{{ standing.incorrect_count }}</div>
-          <div class="metric-tile-label">Fooled by AI</div>
+        <!-- Metrics Dashboard: Correct Hits, Fooled by AI, Unanswered (All Small Boxes with WHITE Border) -->
+        <div class="metrics-dashboard-compact">
+          <div class="metric-tile-white">
+            <div class="metric-tile-val correct">{{ standing.correct_count }} / 6</div>
+            <div class="metric-tile-label">Correct Hits</div>
+          </div>
+
+          <div class="metric-tile-white">
+            <div class="metric-tile-val incorrect">{{ standing.incorrect_count }}</div>
+            <div class="metric-tile-label">Fooled by AI</div>
+          </div>
+
+          <div class="metric-tile-white">
+            <div class="metric-tile-val">{{ standing.unanswered_count }}</div>
+            <div class="metric-tile-label">Unanswered</div>
+          </div>
         </div>
 
-        <div class="metric-tile">
-          <div class="metric-tile-val">{{ standing.unanswered_count }}</div>
-          <div class="metric-tile-label">Unanswered</div>
+        <!-- Accuracy & Global Rank (White Border) -->
+        <div class="metrics-row-sub">
+          <div class="metric-tile-white">
+            <div class="metric-tile-val correct">{{ standing.accuracy_pct }}%</div>
+            <div class="metric-tile-label">Accuracy</div>
+          </div>
+
+          <div class="metric-tile-white">
+            <div class="metric-tile-val rank">#{{ standing.rank }}</div>
+            <div class="metric-tile-label">Global Rank</div>
+          </div>
         </div>
 
-        <div class="metric-tile">
-          <div class="metric-tile-val correct">{{ standing.accuracy_pct }}%</div>
-          <div class="metric-tile-label">Accuracy</div>
-        </div>
+        <!-- Quick Shortcut to Official Story Card -->
+        <a href="{{ url_for('pages.story', session_id=session_id) }}" class="btn-story-shortcut" id="btnOpenStoryCard">
+          📸 VIEW YOUR OFFICIAL IG STORY CARD →
+        </a>
 
-        <div class="metric-tile">
-          <div class="metric-tile-val rank">#{{ standing.rank }}</div>
-          <div class="metric-tile-label">Global Rank</div>
-        </div>
       </div>
     </div>
+
   </div>
+</section>
 
-  <!-- Zenith Instagram Section -->
-  <div class="instagram-promo-section">
-    <div class="insta-promo-left">
-      <img src="{{ url_for('api.get_instagram_qr') }}" alt="Zenith Instagram QR Code" class="insta-qr-thumb">
-      <div class="insta-promo-copy">
-        <h4>Follow Zenith School of AI on Instagram</h4>
-        <p>Follow <strong>@zenith_school_of_ai</strong> and share your score card to get featured on campus stories!</p>
-      </div>
-    </div>
-    <a href="https://www.instagram.com/zenith_school_of_ai?utm_source=ig_web_button_share_sheet&mdxt=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
-      Open @zenith_school_of_ai →
-    </a>
-  </div>
-
-  <!-- 9:16 Instagram Story Canvas Preview -->
-  <div class="story-card-preview-section">
-    <h3>Your Official Instagram Story Card</h3>
-    <p style="color:var(--text-dim); font-size:0.9rem;">
-      High-resolution 9:16 format with verified Zenith School of AI campus credentials.
-    </p>
-
-    <div class="canvas-preview-container">
-      <canvas 
-        id="resultStoryCanvas"
-        data-nickname="{{ standing.nickname }}"
-        data-score="{{ standing.score }}"
-        data-correct="{{ standing.correct_count }}"
-        data-incorrect="{{ standing.incorrect_count }}"
-        data-unanswered="{{ standing.unanswered_count }}"
-        data-accuracy="{{ standing.accuracy_pct }}"
-        data-rank="{{ standing.rank }}"
-        data-total-players="{{ standing.total_players }}"
-        data-compliment="{{ standing.compliment }}"
-      ></canvas>
-    </div>
-
-    <!-- Actions -->
-    <div class="results-actions-grid">
-      <button type="button" class="btn btn-primary" id="downloadCardBtn" data-i18n="results_download_btn">
-        Download Story Graphic (PNG)
-      </button>
-      <button type="button" class="btn btn-secondary" id="shareFriendsBtn" data-i18n="results_share_friends">
-        Share with Friends
-      </button>
-      <button type="button" class="btn btn-secondary" id="shareInstaBtn" data-i18n="results_share_insta">
-        Share to Instagram Story
-      </button>
-      <a href="{{ url_for('pages.leaderboard') }}?session_id={{ session_id }}" class="btn btn-secondary" data-i18n="results_leaderboard_btn">
-        View Leaderboard
-      </a>
-      <button type="button" class="btn btn-coral" id="playAgainBtn" data-i18n="results_play_again">
-        PLAY AGAIN
-      </button>
-    </div>
-  </div>
-
-</div>
-
-<!-- MANDATORY INSTAGRAM FOLLOW POPUP MODAL -->
+<!-- MANDATORY INSTAGRAM FOLLOW POPUP MODAL (White border, Red Title, Official IG Colors, Description Removed) -->
 <div class="modal-overlay" id="followInstagramModal">
-  <div class="modal-card" style="text-align:center;">
-    <div style="margin-bottom:0.5rem;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--zenith-purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></div>
-    <h3 style="color:var(--zenith-purple); font-size:1.5rem; font-weight:900; margin-bottom:0.75rem;">
-      Follow Zenith School of AI
-    </h3>
-    <p style="color:var(--text-dim); font-size:1rem; line-height:1.6; margin-bottom:1.5rem;" data-i18n="results_insta_prompt">
-      Follow <strong>@zenith_school_of_ai</strong> on Instagram to unlock your final score report & global standings!
-    </p>
+  <div class="modal-card-custom">
+    <!-- Official Instagram Gradient SVG Icon -->
+    <div style="margin-bottom:0.25rem;">
+      <svg width="52" height="52" viewBox="0 0 24 24" fill="none" style="display:inline-block;">
+        <defs>
+          <linearGradient id="instaGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#f09433"/>
+            <stop offset="25%" stop-color="#e6683c"/>
+            <stop offset="50%" stop-color="#dc2743"/>
+            <stop offset="75%" stop-color="#cc2366"/>
+            <stop offset="100%" stop-color="#bc1888"/>
+          </linearGradient>
+        </defs>
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke="url(#instaGrad)" stroke-width="2.2"/>
+        <circle cx="12" cy="12" r="4" stroke="url(#instaGrad)" stroke-width="2.2"/>
+        <circle cx="17.5" cy="6.5" r="1.3" fill="url(#instaGrad)"/>
+      </svg>
+    </div>
 
-    <div style="display:flex; flex-direction:column; gap:0.75rem;">
-      <button type="button" class="btn btn-primary btn-lg" id="btnGoToInstagram" data-i18n="results_btn_insta">
+    <!-- Title in RED -->
+    <h3 class="modal-insta-title-red">Follow Zenith School of AI</h3>
+
+    <!-- Description text removed as explicitly requested -->
+
+    <div style="display:flex; flex-direction:column; gap:0.6rem;">
+      <button type="button" class="btn-insta-follow" id="btnGoToInstagram">
         Follow @zenith_school_of_ai →
       </button>
       
-      <button type="button" class="btn btn-secondary" id="btnConfirmFollowed" style="display:none;" data-i18n="results_btn_i_followed">
+      <button type="button" class="btn-unlock-score" id="btnConfirmFollowed" style="display:none;">
         I Followed! Reveal My Score ✨
       </button>
     </div>
   </div>
 </div>
 
-<!-- Instagram Story Step-by-Step Guide Modal -->
-<div class="modal-overlay" id="instaGuideModal">
-  <div class="modal-card">
-    <button type="button" class="modal-close-btn" id="closeInstaGuideBtn">&times;</button>
-    <h3 style="color:var(--zenith-purple); font-size:1.3rem; font-weight:800; margin-bottom:1rem;">
-      How to Post to Your Instagram Story
-    </h3>
-    <ol style="color:var(--text-dim); line-height:1.7; padding-left:1.2rem; font-size:0.95rem;">
-      <li>Tap <strong>"Download Story Graphic (PNG)"</strong> to save your card to your photos.</li>
-      <li>Open your <strong>Instagram App</strong> and swipe right to create a new Story.</li>
-      <li>Select the downloaded card from your gallery.</li>
-      <li>Tag <strong>@zenith_school_of_ai</strong> and challenge your friends: <em>"Do you trust your eyes?"</em></li>
-    </ol>
-    <div style="margin-top:1.5rem; text-align:right;">
-      <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('instaGuideModal').classList.remove('active')">
-        Got it!
-      </button>
-    </div>
+<!-- 5-SECOND IG STORY POPUP MODAL -->
+<div class="modal-overlay" id="storyPromoModal">
+  <div class="story-promo-card">
+    <div style="font-size:2.4rem; margin-bottom:0.25rem;">📸</div>
+    <h3 class="story-promo-title-red">Your IG Story is Ready!</h3>
+    <p style="color:var(--text-dim); font-size:0.9rem; line-height:1.5; margin:0.35rem 0 0.85rem;">
+      Download and share your verified Zenith School of AI detection credentials on your Instagram Story!
+    </p>
+
+    <a href="{{ url_for('pages.story', session_id=session_id) }}" class="btn-view-story-cta">
+      VIEW YOUR IG STORY CARD 🚀
+    </a>
+
+    <button type="button" class="btn-dismiss-story" id="btnDismissStoryModal">
+      Dismiss
+    </button>
   </div>
 </div>
 {% endblock %}

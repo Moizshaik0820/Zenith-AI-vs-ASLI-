@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   {% block extra_css %}{% endblock %}
 </head>
-<body class="{% if request.path in ['/', '/nickname', '/modes'] or request.path.startswith('/game') or request.path.startswith('/lobby') or request.path.startswith('/join') %}locked-viewport-body home-locked-body{% endif %}">
+<body class="{% if request.path in ['/', '/nickname', '/modes'] or request.path.startswith('/game') or request.path.startswith('/lobby') or request.path.startswith('/join') or request.path.startswith('/results') or request.path.startswith('/story') %}locked-viewport-body home-locked-body{% endif %}">
 
   <!-- Minimal & Modern Navigation Bar -->
   <header class="site-header">
@@ -176,7 +176,7 @@
     <div class="loading-microcopy" id="loadingMicrocopy">Scanning reality...</div>
   </div>
 
-  {% if request.path not in ['/', '/nickname', '/modes'] and not request.path.startswith('/game') and not request.path.startswith('/lobby') and not request.path.startswith('/join') %}
+  {% if request.path not in ['/', '/nickname', '/modes'] and not request.path.startswith('/game') and not request.path.startswith('/lobby') and not request.path.startswith('/join') and not request.path.startswith('/results') and not request.path.startswith('/story') %}
   <!-- Comprehensive Website Footer (Displayed on Secondary Pages Only) -->
   <footer class="site-footer">
     <div class="container footer-grid">
