@@ -66,22 +66,21 @@ class SoundEffects {
   }
 
   click() {
-    this.playTone(880, "square", 0.04, 0.08);
+    this.playTone(800, "triangle", 0.05, 0.05);
   }
 
   tick() {
-    this.playTone(440, "square", 0.03, 0.05);
+    this.playTone(600, "sine", 0.04, 0.03);
   }
 
   correct() {
     if (this.muted) return;
     this.init();
     if (!this.ctx) return;
-    // 8-Bit Coin Pickup / Level Up Chime
-    [659.25, 880.00, 1318.51].forEach((freq, idx) => {
+    [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
       setTimeout(() => {
-        this.playTone(freq, "square", 0.12, 0.1);
-      }, idx * 65);
+        this.playTone(freq, "sine", 0.25, 0.12);
+      }, idx * 75);
     });
   }
 
@@ -89,11 +88,10 @@ class SoundEffects {
     if (this.muted) return;
     this.init();
     if (!this.ctx) return;
-    // 8-Bit Low Glitch Buzzer
-    [160, 110].forEach((freq, idx) => {
+    [220, 180].forEach((freq, idx) => {
       setTimeout(() => {
-        this.playTone(freq, "sawtooth", 0.18, 0.12);
-      }, idx * 100);
+        this.playTone(freq, "sawtooth", 0.2, 0.15);
+      }, idx * 120);
     });
   }
 
@@ -101,12 +99,11 @@ class SoundEffects {
     if (this.muted) return;
     this.init();
     if (!this.ctx) return;
-    // 8-Bit Victory Fanfare
-    const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+    const notes = [440, 554.37, 659.25, 880];
     notes.forEach((freq, i) => {
       setTimeout(() => {
-        this.playTone(freq, "square", 0.25, 0.12);
-      }, i * 90);
+        this.playTone(freq, "triangle", 0.4, 0.15);
+      }, i * 140);
     });
   }
 }

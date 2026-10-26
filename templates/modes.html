@@ -3,138 +3,88 @@
 {% block extra_css %}
 <style>
   .modes-section {
-    padding: 2.5rem 0 4.5rem;
+    padding: 2rem 0 4rem;
   }
   .breadcrumb-bar {
     margin-bottom: 1.5rem;
-    font-family: var(--font-pixel);
-    font-size: 0.7rem;
-    letter-spacing: 0.05em;
+    font-size: 0.9rem;
+    font-weight: 700;
   }
   .breadcrumb-bar a {
-    color: var(--pixel-cyan);
+    color: var(--zenith-purple);
     text-decoration: none;
   }
   .breadcrumb-bar a:hover {
-    color: var(--arcade-yellow);
     text-decoration: underline;
   }
   .modes-header {
     text-align: center;
     margin-bottom: 2.5rem;
   }
-  .modes-badge {
-    display: inline-block;
-    font-family: var(--font-pixel);
-    font-size: 0.65rem;
-    color: var(--pixel-cyan);
-    background: rgba(34, 211, 238, 0.12);
-    border: 1px solid var(--pixel-cyan);
-    padding: 0.3rem 0.8rem;
-    margin-bottom: 0.8rem;
-    letter-spacing: 0.08em;
-  }
   .modes-title {
-    font-family: var(--font-pixel);
-    font-size: clamp(1.4rem, 4vw, 2.2rem);
-    margin-bottom: 0.6rem;
-    color: var(--arcade-yellow);
-    text-shadow: 2px 2px 0 #000;
-    letter-spacing: 0.04em;
+    font-size: 2.4rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
   }
   .modes-subtitle {
-    font-family: var(--font-mono);
-    font-size: 1.3rem;
+    font-size: 1.05rem;
     color: var(--text-dim);
   }
   .modes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
     gap: 2rem;
-    max-width: 1100px;
+    max-width: 1080px;
     margin: 0 auto;
   }
   .mode-card {
     background: var(--bg-surface);
-    border: 3px solid var(--arcade-blue);
-    border-radius: var(--radius-sm);
-    padding: 2.2rem 1.8rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 2.4rem 2rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 5px 5px 0 #000;
-    position: relative;
-    transition: all 0.2s;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow-subtle);
   }
   .mode-card:hover {
-    border-color: var(--pixel-cyan);
-    transform: translate(-3px, -3px);
-    box-shadow: 8px 8px 0 #000, 0 0 20px rgba(34, 211, 238, 0.2);
-  }
-  .mode-card.featured-card {
-    border-color: var(--arcade-yellow);
-    box-shadow: 5px 5px 0 #000, 0 0 20px rgba(255, 212, 71, 0.2);
-  }
-  .mode-card.featured-card:hover {
-    box-shadow: 8px 8px 0 #000, 0 0 30px rgba(255, 212, 71, 0.35);
-  }
-  .mode-slot-badge {
-    position: absolute;
-    top: 10px;
-    right: 12px;
-    font-family: var(--font-pixel);
-    font-size: 0.6rem;
-    padding: 0.2rem 0.5rem;
-    border: 1px solid var(--border-subtle);
-    background: #040c1d;
-    color: var(--text-dim);
-    letter-spacing: 0.05em;
-  }
-  .mode-card.featured-card .mode-slot-badge {
-    border-color: var(--arcade-yellow);
-    color: var(--arcade-yellow);
-    background: rgba(255, 212, 71, 0.15);
+    transform: translateY(-5px);
+    border-color: var(--zenith-purple);
+    box-shadow: var(--shadow-card);
   }
   .mode-card-header {
     display: block;
   }
   .mode-icon-circle {
-    width: 60px;
-    height: 60px;
-    border-radius: var(--radius-sm);
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem;
-    margin-bottom: 1.2rem;
-    background: #040c1d;
-    border: 2px solid var(--arcade-blue);
-    box-shadow: 3px 3px 0 #000;
+    font-size: 2rem;
+    margin-bottom: 1.4rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
   }
   .mode-name {
-    font-family: var(--font-pixel);
-    font-size: 1.15rem;
-    margin-bottom: 0.8rem;
+    font-size: 1.45rem;
+    font-weight: 900;
+    margin-bottom: 0.75rem;
     color: var(--text-main);
-    letter-spacing: 0.04em;
-    line-height: 1.4;
-  }
-  .mode-card.featured-card .mode-name {
-    color: var(--arcade-yellow);
-    text-shadow: 1px 1px 0 #000;
   }
   .mode-desc {
     color: var(--text-dim);
-    font-family: var(--font-mono);
-    font-size: 1.25rem;
-    line-height: 1.5;
-    margin-bottom: 1.5rem;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    margin-bottom: 1.8rem;
     flex-grow: 1;
   }
   .mode-features-list {
     list-style: none;
-    font-family: var(--font-mono);
-    font-size: 1.15rem;
+    font-size: 0.88rem;
     color: var(--text-muted);
     margin-bottom: 2rem;
     display: flex;
@@ -142,104 +92,51 @@
     gap: 0.5rem;
   }
   .mode-features-list li::before {
-    content: "■";
-    color: var(--pixel-cyan);
+    content: "▹";
+    color: var(--zenith-purple);
     margin-right: 0.5rem;
-    font-size: 0.75rem;
-  }
-  .mode-card.featured-card .mode-features-list li::before {
-    color: var(--arcade-yellow);
-  }
-  .mode-card .btn {
-    width: 100%;
-    text-align: center;
-    font-family: var(--font-pixel);
-    font-size: 0.85rem;
-    letter-spacing: 0.04em;
-    padding: 0.9rem 1.2rem;
-  }
-
-  /* Join Code Box inside Card C */
-  .join-room-box {
-    margin-top: 1.25rem;
-    padding-top: 1.25rem;
-    border-top: 2px dashed rgba(34, 211, 238, 0.25);
-  }
-  .join-room-label {
-    display: block;
-    font-family: var(--font-pixel);
-    font-size: 0.65rem;
-    color: var(--pixel-cyan);
-    margin-bottom: 0.6rem;
-    letter-spacing: 0.05em;
-  }
-  .room-input-group {
-    display: flex;
-    gap: 0.5rem;
-  }
-  .room-code-input {
-    flex: 1;
-    background: #040c1d;
-    border: 2px solid var(--arcade-blue);
-    border-radius: var(--radius-sm);
-    padding: 0.65rem 0.8rem;
-    color: var(--arcade-yellow);
-    font-family: var(--font-pixel);
-    font-size: 0.85rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    box-shadow: inset 2px 2px 0 #000;
-  }
-  .room-code-input:focus {
-    outline: none;
-    border-color: var(--pixel-cyan);
-    box-shadow: inset 2px 2px 0 #000, 0 0 10px rgba(34, 211, 238, 0.35);
-  }
-  .room-join-btn {
-    font-family: var(--font-pixel) !important;
-    font-size: 0.75rem !important;
-    padding: 0.65rem 1rem !important;
-    width: auto !important;
-    flex-shrink: 0;
+    font-weight: bold;
   }
 
   /* Responsive Mobile View: Hide Heavy Paragraphs/Lists, Show Clean Compact Action Buttons in Vertical Stack */
   @media (max-width: 768px) {
     .modes-section {
-      padding: 1.25rem 0 3rem;
+      padding: 1rem 0 2.5rem;
     }
     .modes-header {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
     }
     .modes-title {
-      font-size: 1.3rem;
-      margin-bottom: 0.3rem;
+      font-size: 1.6rem;
+      margin-bottom: 0.25rem;
     }
     .modes-subtitle {
-      font-size: 1.05rem;
+      font-size: 0.88rem;
     }
     .modes-grid {
       grid-template-columns: 1fr;
-      gap: 1rem;
+      gap: 0.85rem;
     }
     .mode-card {
-      padding: 1.2rem;
+      padding: 1.1rem 1.1rem;
+      border-radius: 16px;
     }
     .mode-card-header {
       display: flex;
       align-items: center;
-      gap: 0.8rem;
+      gap: 0.75rem;
       margin-bottom: 0.75rem;
     }
     .mode-icon-circle {
-      width: 44px;
-      height: 44px;
-      font-size: 1.3rem;
+      width: 42px;
+      height: 42px;
+      font-size: 1.35rem;
       margin-bottom: 0;
       flex-shrink: 0;
+      border-radius: 10px;
     }
     .mode-name {
-      font-size: 0.95rem;
+      font-size: 1.2rem;
       margin-bottom: 0;
     }
     /* Strictly hide long descriptions and bullet point features on mobile as requested */
@@ -247,13 +144,14 @@
     .mode-features-list {
       display: none !important;
     }
-    .mode-card .btn {
+    .mode-card .btn-lg {
       padding: 0.85rem 1rem;
-      font-size: 0.8rem;
+      font-size: 1rem;
+      width: 100%;
     }
     .join-room-box {
-      margin-top: 0.85rem;
-      padding-top: 0.85rem;
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
     }
   }
 </style>
@@ -264,19 +162,17 @@
   <div class="container">
     <!-- Website Breadcrumb -->
     <div class="breadcrumb-bar">
-      <a href="{{ url_for('pages.index') }}">← HOME</a> / <a href="{{ url_for('pages.nickname') }}">CODENAME</a> / <span style="color:var(--text-dim);">STAGE SELECT</span>
+      <a href="{{ url_for('pages.index') }}">← Home</a> / <a href="{{ url_for('pages.nickname') }}">Codename</a> / <span style="color:var(--text-dim);">Select Arena</span>
     </div>
 
     <div class="modes-header">
-      <div class="modes-badge">MISSION SELECTION</div>
-      <h1 class="modes-title" data-i18n="modes_title">SELECT CHALLENGE ARENA</h1>
+      <h1 class="modes-title" data-i18n="modes_title">Select Challenge Arena</h1>
       <p class="modes-subtitle" data-i18n="modes_subtitle">Compete solo, host an auditorium event, or challenge your squad.</p>
     </div>
 
     <div class="modes-grid">
       <!-- Card A: Big Screen Host -->
       <div class="mode-card">
-        <span class="mode-slot-badge">AUDITORIUM</span>
         <div>
           <div class="mode-card-header">
             <div class="mode-icon-circle">📽️</div>
@@ -293,13 +189,12 @@
           </ul>
         </div>
         <button type="button" class="btn btn-secondary btn-lg" id="btnLaunchHost" data-i18n="mode_big_btn">
-          HOST BIG SCREEN ▶
+          Launch Big Screen Session
         </button>
       </div>
 
-      <!-- Card B: Play Alone (Solo Quest) - Featured -->
-      <div class="mode-card featured-card">
-        <span class="mode-slot-badge">★ 1P SOLO</span>
+      <!-- Card B: Play Alone (Solo) -->
+      <div class="mode-card" style="border-color: var(--zenith-purple); box-shadow: 0 4px 25px rgba(124, 58, 237, 0.15);">
         <div>
           <div class="mode-card-header">
             <div class="mode-icon-circle">🧠</div>
@@ -309,20 +204,19 @@
             Test your own instincts against 10 randomized AI vs ASLI items. Fast responses earn up to 50 speed bonus points per question. Save your record to the global leaderboard.
           </p>
           <ul class="mode-features-list">
-            <li>10 balanced challenges across Img, Aud, Vid</li>
+            <li>10 balanced challenges across Image, Audio, Video</li>
             <li>Interactive zoom & waveform analysis</li>
             <li>Speed bonus scoring system (up to 1,500 pts)</li>
-            <li>Downloadable 9:16 Instagram Story card</li>
+            <li>Downloadable 9:16 Instagram Story report</li>
           </ul>
         </div>
         <a href="{{ url_for('pages.solo_game') }}" class="btn btn-primary btn-lg" data-i18n="mode_solo_btn">
-          START SOLO CHALLENGE →
+          Start Solo Challenge →
         </a>
       </div>
 
       <!-- Card C: Play With Friends -->
       <div class="mode-card">
-        <span class="mode-slot-badge">2P+ SQUAD</span>
         <div>
           <div class="mode-card-header">
             <div class="mode-icon-circle">👥</div>
@@ -339,17 +233,17 @@
         </div>
 
         <div>
-          <button type="button" class="btn btn-coral btn-lg" id="btnCreateFriendRoom" data-i18n="mode_friends_btn">
-            CREATE CO-OP ROOM
+          <button type="button" class="btn btn-coral btn-lg" style="width: 100%;" id="btnCreateFriendRoom" data-i18n="mode_friends_btn">
+            Create a Room
           </button>
 
           <!-- Fully Responsive Join Code Box -->
           <div class="join-room-box">
-            <span class="join-room-label" data-i18n="mode_have_code">HAVE A ROOM CODE?</span>
+            <span style="font-size:0.8rem; font-weight:800; color:var(--text-dim);" data-i18n="mode_have_code">HAVE A ROOM CODE?</span>
             <div class="room-input-group">
               <input type="text" id="manualRoomCodeInput" class="room-code-input" placeholder="CODE" maxlength="8">
               <button type="button" class="btn btn-secondary room-join-btn" id="btnJoinManualRoom" data-i18n="mode_join_btn">
-                JOIN
+                Join
               </button>
             </div>
           </div>

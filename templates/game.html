@@ -30,7 +30,7 @@
 
     <!-- Media Container -->
     <div class="media-container" id="mediaViewport" aria-label="Media Analysis Area">
-      <div style="font-family:var(--font-mono); color:var(--text-muted); font-size:1.2rem;">LOADING CHALLENGE MEDIA...</div>
+      <div style="color:var(--text-muted); font-size:0.95rem;">Loading challenge media...</div>
     </div>
 
     <!-- Dual AI vs ASLI Large Buttons -->
@@ -52,37 +52,37 @@
 
   {% elif mode == 'host' %}
   <!-- BIG SCREEN HOST VIEW -->
-  <div style="background:var(--bg-surface); padding:1.2rem 1.6rem; border-radius:var(--radius-sm); margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; border:3px solid var(--arcade-blue); box-shadow:5px 5px 0 #000;">
+  <div style="background:var(--bg-surface); padding:1rem 1.5rem; border-radius:var(--radius-md); margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; border:1px solid var(--border-subtle); box-shadow:var(--shadow-subtle);">
     <div>
-      <span style="font-family:var(--font-pixel); font-size:0.65rem; color:var(--pixel-cyan); text-transform:uppercase; letter-spacing:0.05em;">AUDITORIUM HOST SESSION</span>
-      <h2 style="font-family:var(--font-pixel); font-size:clamp(1.2rem, 3vw, 1.6rem); color:var(--arcade-yellow); margin-top:0.3rem; text-shadow:2px 2px 0 #000;">ROOM: {{ room_code }}</h2>
+      <span style="font-size:0.8rem; color:var(--text-dim); text-transform:uppercase; font-weight:800;">Big Screen Auditorium Session</span>
+      <h2 style="font-size:1.6rem; font-weight:900; color:var(--zenith-purple);">ROOM CODE: {{ room_code }}</h2>
     </div>
     <div style="display:flex; align-items:center; gap:1.5rem;">
       <div style="text-align:right;">
-        <span style="font-family:var(--font-pixel); font-size:0.6rem; color:var(--text-dim);">PLAYERS</span>
-        <div id="liveParticipantCount" style="font-family:var(--font-pixel); font-size:1.4rem; color:var(--pixel-cyan);">0</div>
+        <span style="font-size:0.8rem; color:var(--text-dim); font-weight:800;">PARTICIPANTS</span>
+        <div id="liveParticipantCount" style="font-size:1.4rem; font-weight:900; color:var(--text-main);">0</div>
       </div>
-      <button type="button" class="btn btn-primary btn-sm" id="btnHostStartMatch" style="font-family:var(--font-pixel); font-size:0.8rem; padding:0.65rem 1.1rem;">
+      <button type="button" class="btn btn-primary btn-sm" id="btnHostStartMatch">
         START MATCH ▶
       </button>
     </div>
   </div>
 
   <div id="multiplayerArena">
-    <div style="text-align:center; padding:2.5rem 1.5rem; background:var(--bg-surface); border-radius:var(--radius-sm); border:3px solid var(--arcade-blue); box-shadow:6px 6px 0 #000;">
-      <h3 style="font-family:var(--font-pixel); font-size:clamp(1.1rem, 3vw, 1.6rem); margin-bottom:1rem; color:var(--arcade-yellow); text-shadow:2px 2px 0 #000;">SCAN TO JOIN CHALLENGE</h3>
-      <p style="font-family:var(--font-mono); color:var(--text-dim); margin-bottom:1.8rem; font-size:1.35rem;">
-        Open phone camera or visit: <strong style="color:var(--text-main);">{{ request.host }}</strong> with code: <strong style="font-family:var(--font-pixel); color:var(--pixel-cyan); font-size:1.2rem; display:inline-block; margin-left:0.3rem;">{{ room_code }}</strong>
+    <div style="text-align:center; padding:3rem 1.5rem; background:var(--bg-surface); border-radius:var(--radius-lg); border:1px solid var(--border-subtle); box-shadow:var(--shadow-subtle);">
+      <h3 style="font-size:1.8rem; font-weight:900; margin-bottom:1rem; color:var(--text-main);">Scan to Join the Challenge</h3>
+      <p style="color:var(--text-dim); margin-bottom:2rem; font-size:1.1rem;">
+        Open your phone camera or visit: <strong>{{ request.host }}</strong> and enter code: <strong style="color:var(--zenith-purple); font-size:1.4rem;">{{ room_code }}</strong>
       </p>
 
-      <div style="display:inline-block; padding:1rem; background:#fff; border-radius:var(--radius-sm); border:3px solid var(--arcade-blue); margin-bottom:2rem; box-shadow:4px 4px 0 #000;">
+      <div style="display:inline-block; padding:1.2rem; background:#fff; border-radius:18px; border:2px solid var(--border-subtle); margin-bottom:2rem; box-shadow:var(--shadow-subtle);">
         <img src="/api/qr/{{ room_code }}" alt="Scan QR code to join" style="width:240px; height:240px; display:block;">
       </div>
 
       <div style="max-width:600px; margin:0 auto;">
-        <h4 style="font-family:var(--font-pixel); font-size:0.75rem; color:var(--pixel-cyan); margin-bottom:0.8rem; letter-spacing:0.05em;">CONNECTED PLAYERS:</h4>
+        <h4 style="font-size:0.95rem; color:var(--text-dim); margin-bottom:0.8rem; text-transform:uppercase; font-weight:800;">Connected Students & Detectives:</h4>
         <div id="lobbyPlayersList" style="display:flex; flex-wrap:wrap; gap:0.6rem; justify-content:center;">
-          <span style="font-family:var(--font-mono); color:var(--text-muted); font-size:1.15rem;">Waiting for players to connect...</span>
+          <span style="color:var(--text-muted); font-size:0.9rem;">Waiting for participants to connect...</span>
         </div>
       </div>
     </div>
@@ -91,12 +91,12 @@
   {% elif mode == 'room_player' %}
   <!-- PARTICIPANT CONTROLLER VIEW -->
   <div id="multiplayerArena">
-    <div style="text-align:center; padding:3rem 1.2rem; background:var(--bg-surface); border-radius:var(--radius-sm); border:3px solid var(--arcade-blue); box-shadow:6px 6px 0 #000;">
+    <div style="text-align:center; padding:3rem 1rem; background:var(--bg-surface); border-radius:var(--radius-lg); border:1px solid var(--border-subtle); box-shadow:var(--shadow-subtle);">
       <div style="font-size:3rem; margin-bottom:1rem;">📱</div>
-      <h2 style="font-family:var(--font-pixel); font-size:1.4rem; margin-bottom:0.8rem; color:var(--arcade-yellow); text-shadow:2px 2px 0 #000;">ROOM {{ room_code }}</h2>
-      <p style="font-family:var(--font-mono); font-size:1.3rem; color:var(--text-dim); margin-bottom:2rem;">Look up at the stage/projector screen. The questions will appear there!</p>
-      <div style="background:#040c1d; padding:1rem 1.5rem; border-radius:var(--radius-sm); display:inline-block; font-family:var(--font-pixel); font-size:0.75rem; color:var(--pixel-cyan); border:2px solid var(--arcade-blue); box-shadow:3px 3px 0 #000;">
-        STATUS: WAITING FOR HOST TO START...
+      <h2 style="font-size:1.8rem; font-weight:900; margin-bottom:0.5rem; color:var(--text-main);">Connected to Room {{ room_code }}</h2>
+      <p style="color:var(--text-dim); margin-bottom:2rem;">Look up at the stage/projector screen. The questions will appear there!</p>
+      <div style="background:var(--bg-card); padding:1rem; border-radius:12px; display:inline-block; font-weight:800; color:var(--zenith-purple); border:1px solid var(--border-subtle);">
+        Status: Waiting for host to launch the match...
       </div>
     </div>
   </div>
