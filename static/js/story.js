@@ -6,7 +6,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("resultStoryCanvas");
   const downloadBtn = document.getElementById("downloadCardBtn");
-  const shareFriendsBtn = document.getElementById("shareFriendsBtn");
   const shareInstaBtn = document.getElementById("shareInstaBtn");
   const playAgainBtn = document.getElementById("playAgainBtn");
   const instaGuideModal = document.getElementById("instaGuideModal");
@@ -47,9 +46,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // 2. Share with Friends
-  if (shareFriendsBtn) {
-    shareFriendsBtn.addEventListener("click", async () => {
+  // 2. Share to Instagram Story
+  if (shareInstaBtn) {
+    shareInstaBtn.addEventListener("click", async () => {
       if (window.soundFx) window.soundFx.click();
       if (navigator.share) {
         try {
@@ -61,50 +60,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 text: `I scored ${sessionData.score}/600 on AI vs ASLI by Zenith School of AI! Do you trust your eyes?`,
                 files: filesArray
               });
-            } else {
-              await navigator.share({
-                title: "AI vs ASLI Challenge",
-                text: `I scored ${sessionData.score}/600 on AI vs ASLI! Test your detection skills:`,
-                url: window.location.origin
-              });
+              return;
             }
+            if (instaGuideModal) instaGuideModal.classList.add("active");
           });
         } catch (err) {
-          if (err.name !== "AbortError") copyShareLink();
+          if (instaGuideModal) instaGuideModal.classList.add("active");
         }
       } else {
-        copyShareLink();
+        if (instaGuideModal) instaGuideModal.classList.add("active");
       }
     });
   }
 
-  // 3. Instagram Story Guide Modal
-  if (shareInstaBtn) {
-    shareInstaBtn.addEventListener("click", () => {
-      if (window.soundFx) window.soundFx.click();
-      if (instaGuideModal) {
-        instaGuideModal.classList.add("active");
-      }
-    });
-  }
-
-  // 4. Play Again
+  // 3. Play Again
   if (playAgainBtn) {
     playAgainBtn.addEventListener("click", () => {
       if (window.soundFx) window.soundFx.click();
       window.location.href = "/nickname";
     });
-  }
-
-  function copyShareLink() {
-    const textToCopy = `I scored ${sessionData.score}/600 on AI vs ASLI by Zenith School of AI! Do you trust your eyes? Try the challenge here: ${window.location.origin}`;
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(textToCopy).then(() => {
-        if (window.showToast) window.showToast("Challenge link copied to clipboard!");
-      });
-    } else {
-      if (window.showToast) window.showToast("Link: " + window.location.origin);
-    }
   }
 });
 

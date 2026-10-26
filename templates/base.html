@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   {% block extra_css %}{% endblock %}
 </head>
-<body class="{% if request.path in ['/', '/nickname', '/modes'] or request.path.startswith('/game') or request.path.startswith('/lobby') or request.path.startswith('/join') or request.path.startswith('/results') or request.path.startswith('/story') %}locked-viewport-body home-locked-body{% endif %}">
+<body class="{% if request.path in ['/', '/nickname', '/modes'] or request.path.startswith('/game') or request.path.startswith('/lobby') or request.path.startswith('/join') or request.path.startswith('/results') %}locked-viewport-body home-locked-body{% endif %}">
 
   <!-- Minimal & Modern Navigation Bar -->
   <header class="site-header">

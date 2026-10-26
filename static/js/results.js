@@ -66,13 +66,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.soundFx) window.soundFx.fanfare();
     if (window.showToast) window.showToast("Score & Reality Report Unlocked! 🎉");
 
-    // Start 5-Second Timer for IG Story Popup Modal
+    // Start 10-Second Timer for IG Story Popup Modal (after 10s of seeing scoreboard)
     setTimeout(() => {
       if (storyModal) {
         storyModal.classList.add("active");
         if (window.soundFx) window.soundFx.pop();
       }
-    }, 5000);
+    }, 10000);
   }
 
   // Dismiss Story Promo Modal

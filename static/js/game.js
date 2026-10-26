@@ -39,11 +39,12 @@ class GameEngine {
     this.btnAsli = document.getElementById("btnAnswerAsli");
     this.feedbackDrawerEl = document.getElementById("feedbackDrawer");
 
+    // Button clicks disabled: ONLY SWIPING registers answers as requested!
     if (this.btnAi) {
-      this.btnAi.addEventListener("click", () => this.handleAnswer("AI"));
+      this.btnAi.style.cursor = "default";
     }
     if (this.btnAsli) {
-      this.btnAsli.addEventListener("click", () => this.handleAnswer("ASLI"));
+      this.btnAsli.style.cursor = "default";
     }
 
     this.swipeableCard = document.getElementById("swipeableCard");
@@ -144,6 +145,7 @@ class GameEngine {
       this.resetCardTransform();
     };
 
+    // Touch swipe listeners (Mobile)
     this.swipeableCard.addEventListener("touchstart", (e) => {
       if (e.touches.length === 1) {
         onStart(e.touches[0].clientX, e.touches[0].clientY);
@@ -158,6 +160,25 @@ class GameEngine {
 
     this.swipeableCard.addEventListener("touchend", onEnd);
     this.swipeableCard.addEventListener("touchcancel", onEnd);
+
+    // Mouse drag swipe listeners (Desktop)
+    let isMouseDown = false;
+    this.swipeableCard.addEventListener("mousedown", (e) => {
+      if (e.target.closest("#btnLoupeZoom")) return;
+      isMouseDown = true;
+      onStart(e.clientX, e.clientY);
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      if (isMouseDown) onMove(e.clientX, e.clientY);
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (isMouseDown) {
+        isMouseDown = false;
+        onEnd();
+      }
+    });
   }
 
   resetCardTransform() {

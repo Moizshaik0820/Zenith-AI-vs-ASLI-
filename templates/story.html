@@ -2,6 +2,15 @@
 
 {% block extra_css %}
 <style>
+  /* Enable Natural Smooth Page Scrolling on Story Page */
+  html, body {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    position: static !important;
+  }
+
   /* Hacker Green Matrix Canvas Background */
   .matrix-code-canvas {
     position: fixed;
@@ -17,19 +26,19 @@
   .story-page-stage {
     position: relative;
     z-index: 2;
-    min-height: calc(100dvh - 56px);
+    min-height: calc(100vh - 56px);
+    height: auto !important;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1rem;
+    padding: 1.25rem 1rem 4rem 1rem;
     box-sizing: border-box;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow-y: visible !important;
   }
 
   .story-container {
     width: 100%;
-    max-width: 480px;
+    max-width: 460px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -41,7 +50,7 @@
     width: 100%;
     display: flex;
     justify-content: flex-start;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.85rem;
   }
 
   .story-back-btn {
@@ -52,7 +61,7 @@
     font-weight: 800;
     color: #ffffff;
     text-decoration: none;
-    padding: 0.4rem 0.85rem;
+    padding: 0.45rem 0.95rem;
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-pill);
@@ -65,19 +74,22 @@
     transform: translateX(-3px);
   }
 
+  /* Heading in RED as requested */
   .story-heading {
     font-family: var(--font-chunky, 'Lilita One', sans-serif);
-    font-size: clamp(1.5rem, 5vw, 2rem);
+    font-size: clamp(1.6rem, 5.5vw, 2.2rem);
     font-weight: 900;
-    color: #ffffff;
-    margin: 0 0 0.3rem 0;
+    color: #e11d48 !important; /* RED HEADING */
+    margin: 0 0 0.35rem 0;
     letter-spacing: 0.02em;
+    text-shadow: 0 0 20px rgba(225, 29, 72, 0.35);
   }
 
+  /* Subtitle text */
   .story-subtext {
-    font-size: 0.88rem;
-    color: var(--text-dim);
-    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    margin: 0 0 1.25rem 0;
     line-height: 1.45;
   }
 
@@ -85,7 +97,7 @@
     display: flex;
     justify-content: center;
     width: 100%;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
   }
 
   #resultStoryCanvas {
@@ -93,23 +105,25 @@
     width: 100%;
     height: auto;
     border-radius: 16px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
-    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85);
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
     background: #0e0b1f;
+    display: block;
   }
 
+  /* Exactly 3 buttons: Download, Share, and Play Again */
   .story-actions-stack {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
+    gap: 0.75rem;
     margin-bottom: 2rem;
   }
 
   .btn-story-action {
     width: 100%;
-    padding: 0.85rem 1.2rem;
-    font-size: 0.98rem;
+    padding: 0.9rem 1.25rem;
+    font-size: 1rem;
     font-weight: 800;
     border-radius: var(--radius-pill);
     cursor: pointer;
@@ -117,7 +131,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem;
+    gap: 0.45rem;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     box-sizing: border-box;
   }
@@ -135,13 +149,14 @@
   }
 
   .btn-story-secondary {
-    background: rgba(23, 19, 48, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(23, 19, 48, 0.9);
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
     color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   }
 
   .btn-story-secondary:hover {
-    background: rgba(124, 58, 237, 0.25);
+    background: rgba(124, 58, 237, 0.3);
     border-color: #a855f7;
     transform: translateY(-2px);
   }
@@ -150,7 +165,7 @@
     background: #e11d48 !important; /* RED PLAY AGAIN */
     border: none;
     color: #ffffff !important;
-    box-shadow: 0 6px 20px rgba(225, 29, 72, 0.4);
+    box-shadow: 0 6px 20px rgba(225, 29, 72, 0.45);
     font-weight: 900;
     letter-spacing: 0.05em;
   }
@@ -178,7 +193,7 @@
       </a>
     </div>
 
-    <!-- Heading -->
+    <!-- Heading in RED as requested -->
     <h1 class="story-heading">Your Official Instagram Story Card</h1>
     <p class="story-subtext">
       High-resolution 9:16 format with verified Zenith School of AI campus credentials.
@@ -200,28 +215,21 @@
       ></canvas>
     </div>
 
-    <!-- Actions Stack: Download, Share with Friends, Share to Instagram, Leaderboard, Play Again -->
+    <!-- Actions Stack: Exactly Download, Share, and Play Again -->
     <div class="story-actions-stack">
+      <!-- 1. Download -->
       <button type="button" class="btn-story-action btn-story-primary" id="downloadCardBtn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
         <span>Download Story Graphic (PNG)</span>
       </button>
 
-      <button type="button" class="btn-story-action btn-story-secondary" id="shareFriendsBtn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-        <span>Share with Friends</span>
-      </button>
-
+      <!-- 2. Share -->
       <button type="button" class="btn-story-action btn-story-secondary" id="shareInstaBtn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
         <span>Share to Instagram Story</span>
       </button>
 
-      <a href="{{ url_for('pages.leaderboard') }}?session_id={{ session_id }}" class="btn-story-action btn-story-secondary">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-        <span>View Leaderboard</span>
-      </a>
-
+      <!-- 3. Play Again -->
       <button type="button" class="btn-story-action btn-story-play-again" id="playAgainBtn">
         PLAY AGAIN
       </button>
