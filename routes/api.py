@@ -296,7 +296,9 @@ def get_room_leaderboard(room_code):
 @api_bp.route("/qr/<room_code>", methods=["GET"])
 def get_room_qr(room_code):
     """Generates dynamic QR code PNG image pointing to the player join page."""
-    join_url = f"{request.host_url.rstrip('/')}/join/{room_code.upper()}"
+    proto = request.headers.get("X-Forwarded-Proto", request.scheme)
+    host = request.headers.get("X-Forwarded-Host", request.host)
+    join_url = f"{proto}://{host}/join/{room_code.upper()}"
     buf = MediaService.generate_qr_png_bytes(join_url)
     return send_file(buf, mimetype="image/png")
 

@@ -54,6 +54,7 @@ except Exception:
 
 from flask import Flask, render_template
 from flask_socketio import SocketIO
+from werkzeug.middleware.proxy_fix import ProxyFix
 from config import Config
 from models import init_db, seed_demo_leaderboard
 from services.question_service import QuestionService
@@ -73,6 +74,9 @@ def create_app():
     # Register blueprints (Admin removed as requested)
     app.register_blueprint(pages_bp)
     app.register_blueprint(api_bp)
+
+    # Reverse proxy support (Render / HTTPS)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
     
     # Error handlers
     @app.errorhandler(404)

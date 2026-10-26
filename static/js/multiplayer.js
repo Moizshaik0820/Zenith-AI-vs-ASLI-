@@ -7,7 +7,7 @@ class MultiplayerManager {
     this.mode = mode; // 'host', 'room_player', or 'lobby'
     this.roomCode = roomCode ? roomCode.toUpperCase() : null;
     this.playerId = localStorage.getItem("zenith_player_id");
-    this.nickname = localStorage.getItem("zenith_nickname") || "Player";
+    this.nickname = localStorage.getItem("zenith_nickname") || "";
     this.socket = null;
     this.currentQuestion = null;
     this.hasAnsweredCurrent = false;
@@ -17,25 +17,179 @@ class MultiplayerManager {
   }
 
   init() {
-    if (!this.playerId) {
-      window.location.href = "/nickname";
+    if (this.mode === "room_player") {
+      // Direct QR-code or link joiner flow:
+      // If user has not set a name yet, prompt them immediately without losing the room code!
+      if (!this.playerId || !this.nickname || this.nickname === "Player") {
+        this.renderQuickNameEntry();
+        return;
+      }
+      this.renderWaitingRoom();
+      this.connectAndJoin();
       return;
     }
 
-    // Connect to Socket.IO
-    this.socket = io({ transports: ["websocket", "polling"] });
+    if (!this.playerId) {
+      const returnRoom = this.roomCode ? `?room=${this.roomCode}` : '';
+      window.location.href = `/nickname${returnRoom}`;
+      return;
+    }
 
-    this.socket.on("connect", () => {
-      console.log("Connected to Zenith Multiplayer Network");
+    this.connectAndJoin();
+  }
+
+  connectAndJoin() {
+    if (!this.socket) {
+      // Connect to Socket.IO
+      this.socket = io({ transports: ["websocket", "polling"] });
+
+      this.socket.on("connect", () => {
+        console.log("Connected to Zenith Multiplayer Network");
+        if (this.roomCode) {
+          this.joinRoom();
+        }
+      });
+
+      this.bindSocketEvents();
+    } else if (this.socket.connected) {
       if (this.roomCode) {
         this.joinRoom();
       }
+    }
+  }
+
+  renderQuickNameEntry() {
+    const arena = document.getElementById("multiplayerArena");
+    if (!arena) return;
+
+    arena.innerHTML = `
+      <div style="max-width:440px; margin:1rem auto; text-align:center; padding:2rem 1.5rem; background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-lg); box-shadow:var(--shadow-card);">
+        <div style="display:inline-flex; align-items:center; gap:0.5rem; background:rgba(124,58,237,0.12); color:var(--zenith-purple); font-weight:800; font-size:0.85rem; padding:0.4rem 1rem; border-radius:9999px; border:1px solid var(--zenith-purple); margin-bottom:1.25rem;">
+          🎯 JOINING ROOM: <strong style="letter-spacing:0.05em;">${this.roomCode}</strong>
+        </div>
+
+        <h2 style="font-size:1.75rem; font-weight:900; margin-bottom:0.4rem; color:var(--text-main);">
+          Enter Your Name
+        </h2>
+        <p style="color:var(--text-dim); font-size:0.92rem; margin-bottom:1.5rem; line-height:1.5;">
+          Enter your name or detective codename to jump right into the live challenge!
+        </p>
+
+        <form id="quickJoinForm" style="display:flex; flex-direction:column; gap:1.1rem; text-align:left;">
+          <div>
+            <label style="display:block; font-size:0.8rem; font-weight:800; color:var(--text-dim); margin-bottom:0.4rem; text-transform:uppercase;">
+              Your Name / Codename
+            </label>
+            <input type="text" id="quickJoinInput" placeholder="e.g. Rahul, Sneha, CyberHawk" maxlength="25" required autofocus value="${(this.nickname && this.nickname !== 'Player') ? this.nickname : ''}" style="width:100%; font-size:1.15rem; font-weight:700; text-align:left; padding:0.85rem 1rem; border-radius:12px; border:2px solid var(--border-subtle); background:var(--bg-card); color:var(--text-main); box-sizing:border-box;">
+          </div>
+
+          <div>
+            <div style="font-size:0.75rem; font-weight:800; color:var(--text-dim); margin-bottom:0.45rem; text-transform:uppercase;">Or Pick Quick Suggestion:</div>
+            <div id="quickChipsContainer" style="display:flex; flex-wrap:wrap; gap:0.4rem;">
+              <button type="button" class="btn btn-secondary btn-sm quick-chip" style="font-size:0.8rem; padding:0.35rem 0.65rem;">⚡ Optic Phantom</button>
+              <button type="button" class="btn btn-secondary btn-sm quick-chip" style="font-size:0.8rem; padding:0.35rem 0.65rem;">🧠 Neural Ninja</button>
+              <button type="button" class="btn btn-secondary btn-sm quick-chip" style="font-size:0.8rem; padding:0.35rem 0.65rem;">🔍 Pattern Pilot</button>
+              <button type="button" class="btn btn-secondary btn-sm quick-chip" style="font-size:0.8rem; padding:0.35rem 0.65rem;">👁️ Bio Sentinel</button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg" id="btnConfirmQuickJoin" style="margin-top:0.4rem; width:100%; font-size:1.15rem; padding:0.95rem; border-radius:14px; box-shadow:0 4px 20px rgba(124,58,237,0.4);">
+            JOIN ROOM 🚀
+          </button>
+        </form>
+      </div>
+    `;
+
+    const form = document.getElementById("quickJoinForm");
+    const input = document.getElementById("quickJoinInput");
+    const submitBtn = document.getElementById("btnConfirmQuickJoin");
+
+    document.querySelectorAll(".quick-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        input.value = chip.textContent.replace(/^[^\w]+/, "").trim();
+        input.focus();
+      });
     });
 
-    this.bindSocketEvents();
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = input.value.trim();
+      if (!name) {
+        window.showToast("Please enter your name!", true);
+        input.focus();
+        return;
+      }
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Joining Room...";
+
+      fetch("/api/player/init", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nickname: name,
+          player_id: this.playerId || localStorage.getItem("zenith_player_id") || null
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          this.playerId = data.player_id;
+          this.nickname = data.nickname;
+          try {
+            localStorage.setItem("zenith_player_id", data.player_id);
+            localStorage.setItem("zenith_nickname", data.nickname);
+          } catch (err) {}
+          window.soundFx.click();
+          this.renderWaitingRoom();
+          this.connectAndJoin();
+        } else {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "JOIN ROOM 🚀";
+          window.showToast(data.error || "Failed to set name", true);
+        }
+      })
+      .catch(err => {
+        console.error("Join error:", err);
+        submitBtn.disabled = false;
+        submitBtn.textContent = "JOIN ROOM 🚀";
+        window.showToast("Connection issue. Please retry.", true);
+      });
+    });
+  }
+
+  renderWaitingRoom() {
+    const arena = document.getElementById("multiplayerArena");
+    if (!arena) return;
+
+    arena.innerHTML = `
+      <div style="text-align:center; padding:2.5rem 1.5rem; background:var(--bg-surface); border-radius:var(--radius-lg); border:1px solid var(--border-subtle); box-shadow:var(--shadow-subtle); max-width:540px; margin:1rem auto;">
+        <div style="font-size:3.5rem; margin-bottom:0.75rem;">⚡</div>
+        <h2 style="font-size:1.75rem; font-weight:900; margin-bottom:0.5rem; color:var(--text-main);">
+          Connected to Room <span style="color:var(--zenith-purple);">${this.roomCode}</span>
+        </h2>
+        <div style="display:inline-flex; align-items:center; gap:0.5rem; background:rgba(124,58,237,0.1); border:1px solid var(--zenith-purple); color:var(--zenith-purple); padding:0.4rem 1rem; border-radius:9999px; font-weight:800; font-size:0.95rem; margin-bottom:1.5rem;">
+          <span>Player:</span> <strong id="displayName">${this.nickname}</strong>
+          <button type="button" id="btnChangePlayerName" style="background:none; border:none; color:var(--text-dim); text-decoration:underline; cursor:pointer; font-size:0.82rem; margin-left:0.4rem; font-weight:700;">(Change)</button>
+        </div>
+        <p style="color:var(--text-dim); margin-bottom:1.8rem; font-size:1rem; line-height:1.6;">
+          Look up at the stage/projector screen!<br>The questions and media will appear there.
+        </p>
+        <div style="background:var(--bg-card); padding:1rem 1.5rem; border-radius:12px; display:inline-block; font-weight:800; color:var(--zenith-purple); border:1px solid var(--border-subtle);">
+          Status: Waiting for host to launch the match...
+        </div>
+      </div>
+    `;
+
+    const changeBtn = document.getElementById("btnChangePlayerName");
+    if (changeBtn) {
+      changeBtn.addEventListener("click", () => {
+        this.renderQuickNameEntry();
+      });
+    }
   }
 
   joinRoom() {
+    if (!this.socket || !this.roomCode) return;
     this.socket.emit("join_room", {
       room_code: this.roomCode,
       player_id: this.playerId,

@@ -66,8 +66,14 @@ document.addEventListener("DOMContentLoaded", () => {
           localStorage.setItem("zenith_player_id", data.player_id);
           localStorage.setItem("zenith_nickname", data.nickname);
           window.soundFx.click();
-          // Forward to mode selection
-          window.location.href = "/modes";
+          
+          const urlParams = new URLSearchParams(window.location.search);
+          const targetRoom = urlParams.get("room") || urlParams.get("room_code");
+          if (targetRoom) {
+            window.location.href = `/join/${targetRoom.toUpperCase()}`;
+          } else {
+            window.location.href = "/modes";
+          }
         } else {
           submitBtn.disabled = false;
           submitBtn.textContent = "Use this name";
