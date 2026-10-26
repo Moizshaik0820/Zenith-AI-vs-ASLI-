@@ -3,18 +3,21 @@
 {% block extra_css %}
 <style>
   .nickname-section {
-    padding: 2rem 0 4rem;
+    padding: 2.5rem 0 4.5rem;
+    position: relative;
   }
   .breadcrumb-bar {
     margin-bottom: 1.5rem;
-    font-size: 0.9rem;
-    font-weight: 700;
+    font-family: var(--font-pixel);
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
   }
   .breadcrumb-bar a {
-    color: var(--zenith-purple);
+    color: var(--pixel-cyan);
     text-decoration: none;
   }
   .breadcrumb-bar a:hover {
+    color: var(--arcade-yellow);
     text-decoration: underline;
   }
   .nickname-card-wrap {
@@ -23,112 +26,203 @@
   }
   .nickname-card {
     background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: 2.8rem 2.2rem;
-    max-width: 540px;
+    border: 3px solid var(--arcade-blue);
+    border-radius: var(--radius-sm);
+    padding: 2.5rem 2.2rem;
+    max-width: 580px;
     width: 100%;
-    box-shadow: var(--shadow-card);
+    box-shadow: 6px 6px 0 #000000, 0 0 25px rgba(34, 211, 238, 0.12);
     text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .nickname-card::before {
+    content: "1P SELECT";
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-family: var(--font-pixel);
+    font-size: 0.6rem;
+    color: var(--arcade-yellow);
+    background: rgba(255, 212, 71, 0.12);
+    border: 1px solid var(--arcade-yellow);
+    padding: 0.2rem 0.5rem;
+    letter-spacing: 0.05em;
   }
   .nickname-title {
-    font-size: 2rem;
-    font-weight: 900;
-    margin-bottom: 0.5rem;
-    color: var(--text-main);
+    font-family: var(--font-pixel);
+    font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+    margin-bottom: 0.8rem;
+    color: var(--arcade-yellow);
+    text-shadow: 2px 2px 0 #000;
+    letter-spacing: 0.05em;
   }
   .nickname-subtitle {
-    font-size: 1rem;
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
     color: var(--text-dim);
     margin-bottom: 2rem;
+    line-height: 1.4;
   }
   .suggestions-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.85rem;
-    font-size: 0.85rem;
-    font-weight: 800;
-    color: var(--text-dim);
+    margin-bottom: 1rem;
+    font-family: var(--font-pixel);
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    color: var(--pixel-cyan);
+    border-bottom: 2px dashed rgba(34, 211, 238, 0.25);
+    padding-bottom: 0.5rem;
   }
   .refresh-btn {
-    background: transparent;
-    border: none;
-    color: var(--zenith-purple);
+    background: var(--bg-card);
+    border: 2px solid var(--arcade-blue);
+    color: var(--arcade-yellow);
     cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 800;
+    font-family: var(--font-pixel);
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-    transition: transform 0.2s;
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    box-shadow: 2px 2px 0 #000;
+    transition: all 0.15s;
+  }
+  .refresh-btn:hover {
+    background: var(--arcade-blue);
+    border-color: var(--pixel-cyan);
+    color: var(--pixel-cyan);
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 #000;
+  }
+  .refresh-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 #000;
   }
   .refresh-btn.spinning {
-    transform: rotate(360deg);
+    animation: pixelSpin 0.4s steps(8) infinite;
+  }
+  @keyframes pixelSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
   .nickname-pills-row {
     display: flex;
-    gap: 0.6rem;
+    gap: 0.75rem;
     flex-wrap: wrap;
     justify-content: center;
     margin-bottom: 2rem;
   }
   .nickname-pill-btn {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
+    background: #040c1d;
+    border: 2px solid var(--arcade-blue);
     color: var(--text-main);
-    padding: 0.6rem 1.2rem;
-    border-radius: var(--radius-pill);
-    font-size: 0.95rem;
-    font-weight: 700;
+    padding: 0.75rem 1.1rem;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-pixel);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
     cursor: pointer;
-    transition: all 0.2s;
+    box-shadow: 3px 3px 0 #000;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
   }
-  .nickname-pill-btn:hover, .nickname-pill-btn.active {
-    background: var(--zenith-purple);
-    border-color: var(--zenith-purple);
-    color: #fff;
-    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.35);
-    transform: translateY(-2px);
+  .nickname-pill-btn::before {
+    content: "▶";
+    font-size: 0.6rem;
+    color: var(--pixel-cyan);
+    opacity: 0.7;
+  }
+  .nickname-pill-btn:hover {
+    border-color: var(--pixel-cyan);
+    color: var(--pixel-cyan);
+    background: var(--arcade-blue);
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 #000;
+  }
+  .nickname-pill-btn.active {
+    background: var(--arcade-blue);
+    border-color: var(--arcade-yellow);
+    color: var(--arcade-yellow);
+    box-shadow: 3px 3px 0 var(--arcade-yellow), 0 0 12px rgba(255, 212, 71, 0.4);
+    transform: translate(-1px, -1px);
+  }
+  .nickname-pill-btn.active::before {
+    color: var(--arcade-yellow);
+    opacity: 1;
   }
   .input-label {
     text-align: left;
     display: block;
-    font-size: 0.85rem;
-    font-weight: 800;
-    color: var(--text-dim);
-    margin-bottom: 0.5rem;
+    font-family: var(--font-pixel);
+    font-size: 0.66rem;
+    letter-spacing: 0.05em;
+    color: var(--pixel-cyan);
+    margin-bottom: 0.6rem;
   }
   .custom-name-input {
     width: 100%;
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    padding: 0.9rem 1.25rem;
-    color: var(--text-main);
-    font-size: 1.05rem;
+    background: #040c1d;
+    border: 2px solid var(--arcade-blue);
+    border-radius: var(--radius-sm);
+    padding: 0.9rem 1.1rem;
+    color: var(--arcade-yellow);
+    font-family: var(--font-mono);
+    font-size: 1.35rem;
     font-weight: 700;
+    letter-spacing: 0.05em;
     margin-bottom: 1.5rem;
-    transition: border-color 0.2s;
+    box-shadow: inset 3px 3px 0 #000;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .custom-name-input::placeholder {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
   }
   .custom-name-input:focus {
     outline: none;
-    border-color: var(--zenith-purple);
-    box-shadow: 0 0 15px var(--ai-glow);
+    border-color: var(--pixel-cyan);
+    box-shadow: inset 3px 3px 0 #000, 0 0 15px rgba(34, 211, 238, 0.4);
   }
   .identity-preview-box {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    padding: 1rem;
+    background: rgba(18, 59, 122, 0.25);
+    border: 2px dashed var(--arcade-blue);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.2rem;
     margin-bottom: 1.8rem;
-    font-size: 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
     color: var(--text-dim);
   }
   .identity-preview-box strong {
-    color: var(--zenith-purple);
-    font-weight: 900;
-    font-size: 1.1rem;
+    display: inline-block;
+    margin-top: 0.3rem;
+    color: var(--arcade-yellow);
+    font-family: var(--font-pixel);
+    font-size: 1.05rem;
+    letter-spacing: 0.05em;
+    text-shadow: 2px 2px 0 #000;
+  }
+  #confirmNicknameBtn {
+    width: 100%;
+    font-family: var(--font-pixel);
+    font-size: 0.95rem;
+    letter-spacing: 0.05em;
+    padding: 1rem 1.5rem;
+  }
+  #confirmNicknameBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--bg-card);
+    color: var(--text-muted);
+    border-color: var(--border-subtle);
+    box-shadow: none;
   }
 </style>
 {% endblock %}
@@ -138,46 +232,46 @@
   <div class="container">
     <!-- Breadcrumb -->
     <div class="breadcrumb-bar">
-      <a href="{{ url_for('pages.index') }}">← Home</a> / <span style="color:var(--text-dim);">Player Codename</span>
+      <a href="{{ url_for('pages.index') }}">← HOME</a> / <span style="color:var(--text-dim);">PLAYER SELECT</span>
     </div>
 
     <div class="nickname-card-wrap">
       <div class="nickname-card">
-        <h1 class="nickname-title" data-i18n="nick_title">Choose Your Identity</h1>
+        <h1 class="nickname-title" data-i18n="nick_title">CHOOSE YOUR PLAYER</h1>
         <p class="nickname-subtitle" data-i18n="nick_subtitle">Every detective needs a codename in the neural matrix.</p>
 
         <!-- Suggested Nicknames -->
         <div class="suggestions-header">
-          <span data-i18n="nick_suggestions">AI SUGGESTIONS</span>
+          <span data-i18n="nick_suggestions">⚡ DETECTIVE ROSTER</span>
           <button type="button" class="refresh-btn" id="refreshNicknamesBtn" title="Generate 3 new suggestions" data-i18n="nick_refresh">
-            🔄 Refresh
+            🎲 REROLL
           </button>
         </div>
 
         <div class="nickname-pills-row" id="nicknameSuggestions">
-          <div style="color:var(--text-muted); font-size:0.85rem;">Generating codenames...</div>
+          <div style="font-family:var(--font-mono); color:var(--text-muted); font-size:1.1rem;">INITIALIZING ROSTER...</div>
         </div>
 
         <!-- Custom Form -->
         <form id="nicknameForm">
-          <label for="customNicknameInput" class="input-label" data-i18n="nick_custom_label">OR ENTER A CUSTOM CODENAME</label>
+          <label for="customNicknameInput" class="input-label" data-i18n="nick_custom_label">OR TYPE CUSTOM CODENAME</label>
           <input 
             type="text" 
             id="customNicknameInput" 
             class="custom-name-input" 
-            placeholder="e.g. CyberSleuth"
+            placeholder="e.g. CYBERSLEUTH"
             maxlength="25"
             autocomplete="off"
             required
           >
 
           <div class="identity-preview-box">
-            <span data-i18n="nick_preview_lead">This name will represent you in the arena and on the leaderboard:</span><br>
-            <strong id="previewNicknameText">Your Nickname</strong>
+            <span data-i18n="nick_preview_lead">Arena & Leaderboard Badge:</span><br>
+            <strong id="previewNicknameText">PLAYER_1</strong>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-lg" id="confirmNicknameBtn" style="width: 100%;" data-i18n="nick_btn_submit">
-            Use this name →
+          <button type="submit" class="btn btn-primary btn-lg" id="confirmNicknameBtn" data-i18n="nick_btn_submit">
+            LOCK IN PLAYER →
           </button>
         </form>
       </div>

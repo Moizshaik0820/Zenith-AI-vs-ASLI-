@@ -3,30 +3,50 @@
 {% block extra_css %}
 <style>
   .lobby-section {
-    padding: 3rem 0;
+    padding: 2.5rem 0 4.5rem;
   }
   .lobby-card {
     background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
+    border: 3px solid var(--arcade-blue);
+    border-radius: var(--radius-sm);
     padding: 2.5rem 2rem;
     max-width: 680px;
     margin: 0 auto;
     text-align: center;
-    box-shadow: var(--shadow-subtle);
+    box-shadow: 6px 6px 0 #000, 0 0 25px rgba(34, 211, 238, 0.15);
+  }
+  .lobby-header-badge {
+    display: inline-block;
+    font-family: var(--font-pixel);
+    font-size: 0.65rem;
+    color: var(--pixel-cyan);
+    background: rgba(34, 211, 238, 0.12);
+    border: 1px solid var(--pixel-cyan);
+    padding: 0.3rem 0.8rem;
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.08em;
+  }
+  .lobby-title {
+    font-family: var(--font-pixel);
+    font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+    color: var(--arcade-yellow);
+    text-shadow: 2px 2px 0 #000;
+    margin-bottom: 1rem;
+    letter-spacing: 0.04em;
   }
   .lobby-room-badge {
     display: inline-block;
-    background: rgba(0, 240, 255, 0.15);
-    border: 1px solid var(--ai-cyan);
-    color: var(--ai-cyan);
-    font-size: 2.2rem;
-    font-weight: 900;
-    letter-spacing: 0.1em;
-    padding: 0.5rem 1.8rem;
-    border-radius: var(--radius-md);
-    margin: 1rem 0 1.5rem;
-    box-shadow: 0 0 20px var(--ai-glow);
+    background: #040c1d;
+    border: 3px solid var(--pixel-cyan);
+    color: var(--arcade-yellow);
+    font-family: var(--font-pixel);
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    letter-spacing: 0.12em;
+    padding: 0.6rem 2rem;
+    border-radius: var(--radius-sm);
+    margin: 0.5rem 0 1.5rem;
+    box-shadow: 4px 4px 0 #000, 0 0 20px rgba(34, 211, 238, 0.35);
+    text-shadow: 2px 2px 0 #000;
   }
   .lobby-actions-row {
     display: flex;
@@ -35,32 +55,51 @@
     flex-wrap: wrap;
     margin-bottom: 2rem;
   }
+  .lobby-actions-row .btn {
+    font-family: var(--font-pixel);
+    font-size: 0.72rem;
+    padding: 0.6rem 1rem;
+    letter-spacing: 0.04em;
+  }
   .players-box {
-    background: var(--bg-card);
-    border-radius: var(--radius-md);
+    background: #040c1d;
+    border: 2px solid var(--arcade-blue);
+    border-radius: var(--radius-sm);
     padding: 1.5rem;
     margin-bottom: 2rem;
     text-align: left;
+    box-shadow: 3px 3px 0 #000;
   }
   .players-header {
     display: flex;
     justify-content: space-between;
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--text-dim);
+    font-family: var(--font-pixel);
+    font-size: 0.72rem;
+    color: var(--pixel-cyan);
     margin-bottom: 1rem;
-    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px dashed rgba(34, 211, 238, 0.25);
+    padding-bottom: 0.5rem;
   }
   .lobby-player-badge {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid var(--border-subtle);
+    background: var(--arcade-blue);
+    border: 2px solid var(--pixel-cyan);
     padding: 0.5rem 1rem;
-    border-radius: var(--radius-pill);
+    border-radius: var(--radius-sm);
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    font-weight: 700;
-    margin: 0.25rem;
+    font-family: var(--font-pixel);
+    font-size: 0.72rem;
+    color: var(--arcade-yellow);
+    margin: 0.3rem;
+    box-shadow: 2px 2px 0 #000;
+  }
+  #btnStartFriendMatch {
+    font-family: var(--font-pixel);
+    font-size: 0.95rem;
+    letter-spacing: 0.05em;
+    padding: 1rem 1.5rem;
   }
 </style>
 {% endblock %}
@@ -69,33 +108,33 @@
 <section class="lobby-section">
   <div class="container">
     <div class="lobby-card">
-      <span style="font-size:0.85rem; font-weight:700; color:var(--text-dim); text-transform:uppercase;">MULTIPLAYER LOBBY</span>
-      <h1 style="font-size:1.8rem; font-weight:800; margin-top:0.3rem;">Share with Your Friends</h1>
+      <div class="lobby-header-badge">MULTIPLAYER LOBBY</div>
+      <h1 class="lobby-title">ASSEMBLE YOUR SQUAD</h1>
 
       <div class="lobby-room-badge" id="displayRoomCode">{{ room_code }}</div>
 
       <div class="lobby-actions-row">
         <button type="button" class="btn btn-secondary btn-sm" id="btnCopyCode">
-          📋 Copy Code
+          📋 COPY CODE
         </button>
         <button type="button" class="btn btn-secondary btn-sm" id="btnShareLink">
-          🔗 Share Join Link
+          🔗 SHARE LINK
         </button>
         <button type="button" class="btn btn-secondary btn-sm" id="btnToggleQr">
-          📱 Show QR Code
+          📱 SHOW QR
         </button>
       </div>
 
       <!-- QR Code Container (toggleable) -->
       <div id="qrDropdownWrap" style="display:none; margin-bottom:2rem;">
-        <img src="/api/qr/{{ room_code }}" alt="Room QR Code" style="width:200px; height:200px; border-radius:12px; border:1px solid var(--border-subtle); background:#fff; padding:8px;">
-        <p style="font-size:0.85rem; color:var(--text-dim); margin-top:0.5rem;">Scan using phone camera to join immediately</p>
+        <img src="/api/qr/{{ room_code }}" alt="Room QR Code" style="width:200px; height:200px; border-radius:4px; border:3px solid var(--arcade-blue); background:#fff; padding:8px; box-shadow:4px 4px 0 #000;">
+        <p style="font-family:var(--font-mono); font-size:1.2rem; color:var(--text-dim); margin-top:0.6rem;">Scan using phone camera to join instantly</p>
       </div>
 
       <!-- Connected Players -->
       <div class="players-box">
         <div class="players-header">
-          <span>Connected Squad</span>
+          <span>CONNECTED DETECTIVES</span>
           <span id="liveParticipantCount">1</span>
         </div>
         <div id="lobbyPlayersList" style="display:flex; flex-wrap:wrap;">
