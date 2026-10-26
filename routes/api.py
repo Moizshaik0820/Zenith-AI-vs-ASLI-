@@ -117,7 +117,15 @@ def get_game_question(session_id, index):
         return jsonify({"error": "Game session not found"}), 404
         
     questions_list = json.loads(sess["questions_sequence"])
-    if index < 0 or index >= len(questions_list):
+    if index >= len(questions_list):
+        return jsonify({
+            "status": "game_over",
+            "is_game_over": True,
+            "session_id": session_id,
+            "message": "All questions completed"
+        }), 200
+
+    if index < 0:
         return jsonify({"error": "Question index out of range"}), 400
         
     q_id = questions_list[index]
@@ -206,7 +214,8 @@ def submit_answer(session_id):
         new_index = sess["current_question_index"] + 1
         
         questions_list = json.loads(sess["questions_sequence"])
-        is_game_over = (new_index >= len(questions_list))
+        is_last_in_seq = bool(question_id in questions_list and questions_list.index(question_id) >= len(questions_list) - 1)
+        is_game_over = bool(new_index >= len(questions_list) or is_last_in_seq)
         
         status = "completed" if is_game_over else "in_progress"
         completed_at = "CURRENT_TIMESTAMP" if is_game_over else None

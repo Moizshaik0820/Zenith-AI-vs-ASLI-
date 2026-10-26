@@ -78,7 +78,7 @@ class MediaService:
         )
         qr.add_data(data)
         qr.make(fit=True)
-        img = qr.make_image(fill_color="#00f0ff", back_color="#0d1322").convert("RGB")
+        img = qr.make_image(fill_color="#000000", back_color="#ffffff").convert("RGB")
         buf = io.BytesIO()
         img.save(buf, format="PNG")
         buf.seek(0)

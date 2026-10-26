@@ -63,6 +63,7 @@ class GameEngine {
   }
 
   startSoloSession() {
+    this.isAdvancing = false;
     fetch("/api/game/solo/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -75,6 +76,9 @@ class GameEngine {
     .then(data => {
       if (data.status === "success") {
         this.sessionId = data.session_id;
+        try {
+          localStorage.setItem("zenith_last_session_id", data.session_id);
+        } catch (e) {}
         this.totalQuestions = data.total_questions;
         this.currentIndex = data.current_index;
         this.currentQuestion = data.question;
@@ -90,6 +94,7 @@ class GameEngine {
   }
 
   renderQuestion(q) {
+    this.isAdvancing = false;
     this.isAnsweringLocked = false;
     this.clearIntervals();
     this.feedbackDrawerEl.style.display = "none";
@@ -389,22 +394,25 @@ class GameEngine {
 
     const isHinglish = window.i18n && window.i18n.currentLang === "hi";
     const isUnanswered = res.is_unanswered;
+    const isLastQuestion = (this.currentIndex >= this.totalQuestions - 1) || Boolean(res.is_game_over);
     let statusClass = res.is_correct ? "correct" : (isUnanswered ? "unanswered" : "incorrect");
     let statusText = res.is_correct 
       ? (isHinglish ? "🎯 Sahi Pehchaana! (Correct)" : "🎯 Spot On! Correct Detection") 
       : (isUnanswered ? (isHinglish ? "⌛ Time Khatam Ho Gaya!" : "⌛ Time Expired!") : (isHinglish ? "❌ AI Ne Dhokha De Diya!" : "❌ Deceived by the Fake!"));
 
-    const nextBtnText = res.is_game_over 
-      ? (isHinglish ? "FINAL RESULTS DEKHO" : "VIEW FINAL RESULTS")
+    const nextBtnText = isLastQuestion 
+      ? (isHinglish ? "FINAL RESULTS DEKHO →" : "VIEW FINAL RESULTS →")
       : (isHinglish ? "AGLA SAWAAL →" : "NEXT QUESTION →");
 
-    const autoAdvanceText = isHinglish ? "Auto-advancing in 10s..." : "Auto-advancing in 10s...";
+    const autoAdvanceText = isLastQuestion 
+      ? (isHinglish ? "Results aa rahe hain 10s mein..." : "Showing results in 10s...")
+      : (isHinglish ? "Agla sawaal 10s mein..." : "Auto-advancing in 10s...");
 
     this.feedbackDrawerEl.innerHTML = `
       <div class="feedback-status-row">
         <div class="feedback-status-title ${statusClass}">${statusText}</div>
       </div>
-      <p class="feedback-explanation"><strong>Verification:</strong> ${res.explanation}</p>
+      <p class="feedback-explanation"><strong>Verification:</strong> ${res.explanation || ""}</p>
       <div class="feedback-next-row">
         <span class="auto-timer-note" id="autoAdvanceNote">${autoAdvanceText}</span>
         <button type="button" class="btn btn-primary btn-sm" id="nextQuestionBtn">
@@ -416,30 +424,51 @@ class GameEngine {
     this.feedbackDrawerEl.style.display = "block";
 
     const btnNext = document.getElementById("nextQuestionBtn");
-    btnNext.addEventListener("click", () => {
-      this.advanceToNext(res.is_game_over);
-    });
+    if (btnNext) {
+      btnNext.addEventListener("click", () => {
+        this.advanceToNext(isLastQuestion);
+      });
+    }
 
     let countdown = 10;
     const noteEl = document.getElementById("autoAdvanceNote");
+    if (this.autoAdvanceTimeout) {
+      clearInterval(this.autoAdvanceTimeout);
+      this.autoAdvanceTimeout = null;
+    }
     const interval = setInterval(() => {
       countdown--;
-      if (noteEl) noteEl.textContent = `Auto-advancing in ${countdown}s...`;
+      if (noteEl) {
+        noteEl.textContent = isLastQuestion 
+          ? (isHinglish ? `Results aa rahe hain ${countdown}s mein...` : `Showing results in ${countdown}s...`)
+          : (isHinglish ? `Agla sawaal ${countdown}s mein...` : `Auto-advancing in ${countdown}s...`);
+      }
       if (countdown <= 0) {
         clearInterval(interval);
-        this.advanceToNext(res.is_game_over);
+        this.advanceToNext(isLastQuestion);
       }
     }, 1000);
     this.autoAdvanceTimeout = interval;
   }
 
   advanceToNext(isGameOver) {
+    if (this.isAdvancing) return;
+    this.isAdvancing = true;
+
     if (this.autoAdvanceTimeout) {
       clearInterval(this.autoAdvanceTimeout);
       this.autoAdvanceTimeout = null;
     }
 
-    if (isGameOver) {
+    const btnNext = document.getElementById("nextQuestionBtn");
+    if (btnNext) {
+      btnNext.disabled = true;
+      btnNext.style.pointerEvents = "none";
+    }
+
+    const shouldFinish = isGameOver || (this.currentIndex >= (this.totalQuestions - 1));
+
+    if (shouldFinish) {
       window.showLoadingScreen(1200, [
         "Reviewing your instincts...",
         "Comparing your answers...",
@@ -451,18 +480,29 @@ class GameEngine {
     }
 
     this.currentIndex++;
+    if (this.currentIndex >= this.totalQuestions) {
+      window.location.href = `/results/${this.sessionId}`;
+      return;
+    }
+
     fetch(`/api/game/${this.sessionId}/question/${this.currentIndex}`)
       .then(res => res.json())
       .then(data => {
-        if (data.status === "success") {
+        if (data.status === "success" && data.question) {
           this.currentQuestion = data.question;
           this.renderQuestion(this.currentQuestion);
+        } else if (data.status === "game_over" || data.is_game_over) {
+          window.location.href = `/results/${this.sessionId}`;
         } else {
           window.showToast("Failed to load next question", true);
         }
       })
       .catch(err => {
         console.error("Next question error:", err);
+        window.showToast("Connection issue, retrying...", true);
+      })
+      .finally(() => {
+        this.isAdvancing = false;
       });
   }
 
