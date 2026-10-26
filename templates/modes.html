@@ -54,6 +54,9 @@
     border-color: var(--zenith-purple);
     box-shadow: var(--shadow-card);
   }
+  .mode-card-header {
+    display: block;
+  }
   .mode-icon-circle {
     width: 64px;
     height: 64px;
@@ -94,6 +97,63 @@
     margin-right: 0.5rem;
     font-weight: bold;
   }
+
+  /* Responsive Mobile View: Hide Heavy Paragraphs/Lists, Show Clean Compact Action Buttons in Vertical Stack */
+  @media (max-width: 768px) {
+    .modes-section {
+      padding: 1rem 0 2.5rem;
+    }
+    .modes-header {
+      margin-bottom: 1.25rem;
+    }
+    .modes-title {
+      font-size: 1.6rem;
+      margin-bottom: 0.25rem;
+    }
+    .modes-subtitle {
+      font-size: 0.88rem;
+    }
+    .modes-grid {
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+    }
+    .mode-card {
+      padding: 1.1rem 1.1rem;
+      border-radius: 16px;
+    }
+    .mode-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .mode-icon-circle {
+      width: 42px;
+      height: 42px;
+      font-size: 1.35rem;
+      margin-bottom: 0;
+      flex-shrink: 0;
+      border-radius: 10px;
+    }
+    .mode-name {
+      font-size: 1.2rem;
+      margin-bottom: 0;
+    }
+    /* Strictly hide long descriptions and bullet point features on mobile as requested */
+    .mode-desc,
+    .mode-features-list {
+      display: none !important;
+    }
+    .mode-card .btn-lg {
+      padding: 0.85rem 1rem;
+      font-size: 1rem;
+      width: 100%;
+    }
+    .join-room-box {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+    }
+  }
 </style>
 {% endblock %}
 
@@ -114,8 +174,10 @@
       <!-- Card A: Big Screen Host -->
       <div class="mode-card">
         <div>
-          <div class="mode-icon-circle">📽️</div>
-          <h2 class="mode-name" data-i18n="mode_big_title">Play on Big Screen</h2>
+          <div class="mode-card-header">
+            <div class="mode-icon-circle">📽️</div>
+            <h2 class="mode-name" data-i18n="mode_big_title">Play on Big Screen</h2>
+          </div>
           <p class="mode-desc" data-i18n="mode_big_desc">
             Designed for college auditoriums, classrooms, and stage projectors. Host the questions on the big screen while students answer on their phones via QR code.
           </p>
@@ -134,8 +196,10 @@
       <!-- Card B: Play Alone (Solo) -->
       <div class="mode-card" style="border-color: var(--zenith-purple); box-shadow: 0 4px 25px rgba(124, 58, 237, 0.15);">
         <div>
-          <div class="mode-icon-circle">🧠</div>
-          <h2 class="mode-name" data-i18n="mode_solo_title">Play Alone</h2>
+          <div class="mode-card-header">
+            <div class="mode-icon-circle">🧠</div>
+            <h2 class="mode-name" data-i18n="mode_solo_title">Play Alone</h2>
+          </div>
           <p class="mode-desc" data-i18n="mode_solo_desc">
             Test your own instincts against 10 randomized AI vs ASLI items. Fast responses earn up to 50 speed bonus points per question. Save your record to the global leaderboard.
           </p>
@@ -154,8 +218,10 @@
       <!-- Card C: Play With Friends -->
       <div class="mode-card">
         <div>
-          <div class="mode-icon-circle">👥</div>
-          <h2 class="mode-name" data-i18n="mode_friends_title">Play With Friends</h2>
+          <div class="mode-card-header">
+            <div class="mode-icon-circle">👥</div>
+            <h2 class="mode-name" data-i18n="mode_friends_title">Play With Friends</h2>
+          </div>
           <p class="mode-desc" data-i18n="mode_friends_desc">
             Create a custom room with a unique code, invite your friends via QR or shareable link, and compete head-to-head in real time.
           </p>

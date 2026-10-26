@@ -175,6 +175,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Mobile Quick Preferences Popover Controller
+  const prefTrigger = document.getElementById("mobilePrefTriggerBtn");
+  const prefPopover = document.getElementById("mobileVerticalPopover");
+  if (prefTrigger && prefPopover) {
+    prefTrigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      prefPopover.classList.toggle("active");
+    });
+    document.addEventListener("click", (e) => {
+      if (!prefPopover.contains(e.target) && e.target !== prefTrigger) {
+        prefPopover.classList.remove("active");
+      }
+    });
+  }
+
   // Universal 3-Line Menu Drawer Controller
   const menuBtn = document.getElementById("siteMenuToggle");
   const drawer = document.getElementById("siteNavDrawer");

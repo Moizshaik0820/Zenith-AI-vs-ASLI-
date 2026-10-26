@@ -23,22 +23,57 @@
         </div>
       </a>
 
-      <!-- Right: Home Nav Link + 3 Quick Icon Controls + Three-Line Hamburger Icon -->
+      <!-- Right: Home Nav Link + Quick Controls + Three-Line Hamburger Icon -->
       <div class="header-nav-group">
         <a href="{{ url_for('pages.index') }}" class="nav-item-home" data-i18n="nav_home">Home</a>
 
-        <!-- Compact Icon-Only Controls (No text, intuitive icons) -->
-        <button type="button" class="nav-icon-btn lang-toggle-btn" title="Toggle Language (English / Hinglish)" aria-label="Toggle Language">
-          <span class="btn-icon">🇮🇳</span>
-        </button>
+        <!-- Desktop Quick Icon Controls (Screens > 680px) -->
+        <div class="nav-desktop-controls">
+          <button type="button" class="nav-icon-btn lang-toggle-btn" title="Toggle Language (English / Hinglish)" aria-label="Toggle Language">
+            <span class="btn-icon">🇮🇳</span>
+          </button>
 
-        <button type="button" class="nav-icon-btn theme-toggle-btn" title="Toggle Display Theme (Dark / Light)" aria-label="Toggle Theme">
-          <span class="btn-icon">🌙</span>
-        </button>
+          <button type="button" class="nav-icon-btn theme-toggle-btn" title="Toggle Display Theme (Dark / Light)" aria-label="Toggle Theme">
+            <span class="btn-icon">🌙</span>
+          </button>
 
-        <button type="button" class="nav-icon-btn sound-toggle-btn" title="Toggle Audio FX" aria-label="Toggle Sound">
-          <span class="btn-icon">🔊</span>
-        </button>
+          <button type="button" class="nav-icon-btn sound-toggle-btn" title="Toggle Audio FX" aria-label="Toggle Sound">
+            <span class="btn-icon">🔊</span>
+          </button>
+        </div>
+
+        <!-- Mobile Quick Vertical Options Button (Screens <= 680px) -->
+        <div class="nav-mobile-options-wrap">
+          <button type="button" class="nav-icon-btn mobile-pref-trigger-btn" id="mobilePrefTriggerBtn" title="Preferences (Language, Theme, Sound)" aria-label="Quick Preferences">
+            <span class="btn-icon">⚙️</span>
+          </button>
+
+          <!-- Vertical Dropdown Options Menu for Mobile -->
+          <div class="mobile-vertical-popover" id="mobileVerticalPopover">
+            <div class="popover-title">QUICK OPTIONS</div>
+            <button type="button" class="vertical-popover-item lang-toggle-btn">
+              <span class="popover-item-icon">🇮🇳</span>
+              <div class="popover-item-text">
+                <span class="popover-item-label">Language</span>
+                <span class="popover-item-val lang-status-text">English / Hinglish</span>
+              </div>
+            </button>
+            <button type="button" class="vertical-popover-item theme-toggle-btn">
+              <span class="popover-item-icon btn-icon">🌙</span>
+              <div class="popover-item-text">
+                <span class="popover-item-label">Display Theme</span>
+                <span class="popover-item-val theme-status-text">Light Mode</span>
+              </div>
+            </button>
+            <button type="button" class="vertical-popover-item sound-toggle-btn">
+              <span class="popover-item-icon btn-icon">🔊</span>
+              <div class="popover-item-text">
+                <span class="popover-item-label">Sound FX</span>
+                <span class="popover-item-val sound-status-text">Enabled</span>
+              </div>
+            </button>
+          </div>
+        </div>
 
         <!-- 3-Line Hamburger Button (Squircle design matching user image 2) -->
         <button type="button" class="menu-hamburger-btn" id="siteMenuToggle" aria-label="Open Navigation Menu" aria-expanded="false">
