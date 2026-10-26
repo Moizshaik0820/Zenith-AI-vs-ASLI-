@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+  .nickname-section {
+    padding: 2rem 0 4rem;
+  }
+  .breadcrumb-bar {
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  .breadcrumb-bar a {
+    color: var(--zenith-purple);
+    text-decoration: none;
+  }
+  .breadcrumb-bar a:hover {
+    text-decoration: underline;
+  }
+  .nickname-card-wrap {
+    display: flex;
+    justify-content: center;
+  }
+  .nickname-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 2.8rem 2.2rem;
+    max-width: 540px;
+    width: 100%;
+    box-shadow: var(--shadow-card);
+    text-align: center;
+  }
+  .nickname-title {
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+  }
+  .nickname-subtitle {
+    font-size: 1rem;
+    color: var(--text-dim);
+    margin-bottom: 2rem;
+  }
+  .suggestions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.85rem;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--text-dim);
+  }
+  .refresh-btn {
+    background: transparent;
+    border: none;
+    color: var(--zenith-purple);
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: transform 0.2s;
+  }
+  .refresh-btn.spinning {
+    transform: rotate(360deg);
+  }
+  .nickname-pills-row {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+  .nickname-pill-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-main);
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nickname-pill-btn:hover, .nickname-pill-btn.active {
+    background: var(--zenith-purple);
+    border-color: var(--zenith-purple);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.35);
+    transform: translateY(-2px);
+  }
+  .input-label {
+    text-align: left;
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+  }
+  .custom-name-input {
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 0.9rem 1.25rem;
+    color: var(--text-main);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    transition: border-color 0.2s;
+  }
+  .custom-name-input:focus {
+    outline: none;
+    border-color: var(--zenith-purple);
+    box-shadow: 0 0 15px var(--ai-glow);
+  }
+  .identity-preview-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    margin-bottom: 1.8rem;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+  }
+  .identity-preview-box strong {
+    color: var(--zenith-purple);
+    font-weight: 900;
+    font-size: 1.1rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="nickname-section">
+  <div class="container">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-bar">
+      <a href="{{ url_for('pages.index') }}">← Home</a> / <span style="color:var(--text-dim);">Player Codename</span>
+    </div>
+
+    <div class="nickname-card-wrap">
+      <div class="nickname-card">
+        <h1 class="nickname-title" data-i18n="nick_title">Choose Your Identity</h1>
+        <p class="nickname-subtitle" data-i18n="nick_subtitle">Every detective needs a codename in the neural matrix.</p>
+
+        <!-- Suggested Nicknames -->
+        <div class="suggestions-header">
+          <span data-i18n="nick_suggestions">AI SUGGESTIONS</span>
+          <button type="button" class="refresh-btn" id="refreshNicknamesBtn" title="Generate 3 new suggestions" data-i18n="nick_refresh">
+            🔄 Refresh
+          </button>
+        </div>
+
+        <div class="nickname-pills-row" id="nicknameSuggestions">
+          <div style="color:var(--text-muted); font-size:0.85rem;">Generating codenames...</div>
+        </div>
+
+        <!-- Custom Form -->
+        <form id="nicknameForm">
+          <label for="customNicknameInput" class="input-label" data-i18n="nick_custom_label">OR ENTER A CUSTOM CODENAME</label>
+          <input 
+            type="text" 
+            id="customNicknameInput" 
+            class="custom-name-input" 
+            placeholder="e.g. CyberSleuth"
+            maxlength="25"
+            autocomplete="off"
+            required
+          >
+
+          <div class="identity-preview-box">
+            <span data-i18n="nick_preview_lead">This name will represent you in the arena and on the leaderboard:</span><br>
+            <strong id="previewNicknameText">Your Nickname</strong>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg" id="confirmNicknameBtn" style="width: 100%;" data-i18n="nick_btn_submit">
+            Use this name →
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/nickname.js') }}"></script>
+{% endblock %}

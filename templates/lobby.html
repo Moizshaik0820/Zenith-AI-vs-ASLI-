@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+  .lobby-section {
+    padding: 3rem 0;
+  }
+  .lobby-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 2rem;
+    max-width: 680px;
+    margin: 0 auto;
+    text-align: center;
+    box-shadow: var(--shadow-subtle);
+  }
+  .lobby-room-badge {
+    display: inline-block;
+    background: rgba(0, 240, 255, 0.15);
+    border: 1px solid var(--ai-cyan);
+    color: var(--ai-cyan);
+    font-size: 2.2rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    padding: 0.5rem 1.8rem;
+    border-radius: var(--radius-md);
+    margin: 1rem 0 1.5rem;
+    box-shadow: 0 0 20px var(--ai-glow);
+  }
+  .lobby-actions-row {
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+  .players-box {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: left;
+  }
+  .players-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+  }
+  .lobby-player-badge {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border-subtle);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-pill);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    margin: 0.25rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="lobby-section">
+  <div class="container">
+    <div class="lobby-card">
+      <span style="font-size:0.85rem; font-weight:700; color:var(--text-dim); text-transform:uppercase;">MULTIPLAYER LOBBY</span>
+      <h1 style="font-size:1.8rem; font-weight:800; margin-top:0.3rem;">Share with Your Friends</h1>
+
+      <div class="lobby-room-badge" id="displayRoomCode">{{ room_code }}</div>
+
+      <div class="lobby-actions-row">
+        <button type="button" class="btn btn-secondary btn-sm" id="btnCopyCode">
+          📋 Copy Code
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnShareLink">
+          🔗 Share Join Link
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnToggleQr">
+          📱 Show QR Code
+        </button>
+      </div>
+
+      <!-- QR Code Container (toggleable) -->
+      <div id="qrDropdownWrap" style="display:none; margin-bottom:2rem;">
+        <img src="/api/qr/{{ room_code }}" alt="Room QR Code" style="width:200px; height:200px; border-radius:12px; border:1px solid var(--border-subtle); background:#000;">
+        <p style="font-size:0.85rem; color:var(--text-dim); margin-top:0.5rem;">Scan using phone camera to join immediately</p>
+      </div>
+
+      <!-- Connected Players -->
+      <div class="players-box">
+        <div class="players-header">
+          <span>Connected Squad</span>
+          <span id="liveParticipantCount">1</span>
+        </div>
+        <div id="lobbyPlayersList" style="display:flex; flex-wrap:wrap;">
+          <!-- Dynamically filled by multiplayer.js -->
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-primary btn-lg" id="btnStartFriendMatch" style="width:100%;">
+        START CHALLENGE MATCH ▶
+      </button>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='js/multiplayer.js') }}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const roomCode = "{{ room_code }}";
+    const mp = new MultiplayerManager("lobby", roomCode);
+    mp.init();
+
+    const btnCopy = document.getElementById("btnCopyCode");
+    const btnShare = document.getElementById("btnShareLink");
+    const btnQr = document.getElementById("btnToggleQr");
+    const qrWrap = document.getElementById("qrDropdownWrap");
+    const btnStart = document.getElementById("btnStartFriendMatch");
+
+    const joinUrl = `${window.location.origin}/join/${roomCode}`;
+
+    if (btnCopy) {
+      btnCopy.addEventListener("click", () => {
+        navigator.clipboard.writeText(roomCode);
+        window.showToast("Room code copied!");
+      });
+    }
+
+    if (btnShare) {
+      btnShare.addEventListener("click", () => {
+        if (navigator.share) {
+          navigator.share({
+            title: "Join my AI vs ASLI squad!",
+            text: `Join my AI vs ASLI challenge room: ${roomCode}`,
+            url: joinUrl
+          }).catch(() => {});
+        } else {
+          navigator.clipboard.writeText(joinUrl);
+          window.showToast("Join link copied to clipboard!");
+        }
+      });
+    }
+
+    if (btnQr && qrWrap) {
+      btnQr.addEventListener("click", () => {
+        qrWrap.style.display = qrWrap.style.display === "none" ? "block" : "none";
+      });
+    }
+
+    if (btnStart) {
+      btnStart.addEventListener("click", () => {
+        window.soundFx.click();
+        window.location.href = `/game/host/${roomCode}`;
+      });
+    }
+  });
+</script>
+{% endblock %}

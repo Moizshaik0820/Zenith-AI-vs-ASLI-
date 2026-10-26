@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+  .modes-section {
+    padding: 2rem 0 4rem;
+  }
+  .breadcrumb-bar {
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  .breadcrumb-bar a {
+    color: var(--zenith-purple);
+    text-decoration: none;
+  }
+  .breadcrumb-bar a:hover {
+    text-decoration: underline;
+  }
+  .modes-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .modes-title {
+    font-size: 2.4rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+  }
+  .modes-subtitle {
+    font-size: 1.05rem;
+    color: var(--text-dim);
+  }
+  .modes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+    gap: 2rem;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+  .mode-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 2.4rem 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow-subtle);
+  }
+  .mode-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--zenith-purple);
+    box-shadow: var(--shadow-card);
+  }
+  .mode-icon-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 1.4rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+  }
+  .mode-name {
+    font-size: 1.45rem;
+    font-weight: 900;
+    margin-bottom: 0.75rem;
+    color: var(--text-main);
+  }
+  .mode-desc {
+    color: var(--text-dim);
+    font-size: 0.98rem;
+    line-height: 1.6;
+    margin-bottom: 1.8rem;
+    flex-grow: 1;
+  }
+  .mode-features-list {
+    list-style: none;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .mode-features-list li::before {
+    content: "▹";
+    color: var(--zenith-purple);
+    margin-right: 0.5rem;
+    font-weight: bold;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="modes-section">
+  <div class="container">
+    <!-- Website Breadcrumb -->
+    <div class="breadcrumb-bar">
+      <a href="{{ url_for('pages.index') }}">← Home</a> / <a href="{{ url_for('pages.nickname') }}">Codename</a> / <span style="color:var(--text-dim);">Select Arena</span>
+    </div>
+
+    <div class="modes-header">
+      <h1 class="modes-title" data-i18n="modes_title">Select Challenge Arena</h1>
+      <p class="modes-subtitle" data-i18n="modes_subtitle">Compete solo, host an auditorium event, or challenge your squad.</p>
+    </div>
+
+    <div class="modes-grid">
+      <!-- Card A: Big Screen Host -->
+      <div class="mode-card">
+        <div>
+          <div class="mode-icon-circle">📽️</div>
+          <h2 class="mode-name" data-i18n="mode_big_title">Play on Big Screen</h2>
+          <p class="mode-desc" data-i18n="mode_big_desc">
+            Designed for college auditoriums, classrooms, and stage projectors. Host the questions on the big screen while students answer on their phones via QR code.
+          </p>
+          <ul class="mode-features-list">
+            <li>Stage projector synchronized view</li>
+            <li>QR code join for instant mobile entry</li>
+            <li>Live response counters without early spoilers</li>
+            <li>Auditorium podium leaderboard</li>
+          </ul>
+        </div>
+        <button type="button" class="btn btn-secondary btn-lg" id="btnLaunchHost" data-i18n="mode_big_btn">
+          Launch Big Screen Session
+        </button>
+      </div>
+
+      <!-- Card B: Play Alone (Solo) -->
+      <div class="mode-card" style="border-color: var(--zenith-purple); box-shadow: 0 4px 25px rgba(124, 58, 237, 0.15);">
+        <div>
+          <div class="mode-icon-circle">🧠</div>
+          <h2 class="mode-name" data-i18n="mode_solo_title">Play Alone</h2>
+          <p class="mode-desc" data-i18n="mode_solo_desc">
+            Test your own instincts against 10 randomized AI vs ASLI items. Fast responses earn up to 50 speed bonus points per question. Save your record to the global leaderboard.
+          </p>
+          <ul class="mode-features-list">
+            <li>10 balanced challenges across Image, Audio, Video</li>
+            <li>Interactive zoom & waveform analysis</li>
+            <li>Speed bonus scoring system (up to 1,500 pts)</li>
+            <li>Downloadable 9:16 Instagram Story report</li>
+          </ul>
+        </div>
+        <a href="{{ url_for('pages.solo_game') }}" class="btn btn-primary btn-lg" data-i18n="mode_solo_btn">
+          Start Solo Challenge →
+        </a>
+      </div>
+
+      <!-- Card C: Play With Friends -->
+      <div class="mode-card">
+        <div>
+          <div class="mode-icon-circle">👥</div>
+          <h2 class="mode-name" data-i18n="mode_friends_title">Play With Friends</h2>
+          <p class="mode-desc" data-i18n="mode_friends_desc">
+            Create a custom room with a unique code, invite your friends via QR or shareable link, and compete head-to-head in real time.
+          </p>
+          <ul class="mode-features-list">
+            <li>Real-time Socket.IO room synchronization</li>
+            <li>Host-controlled match start & advance</li>
+            <li>Live room leaderboard & winner podium</li>
+          </ul>
+        </div>
+
+        <div>
+          <button type="button" class="btn btn-coral btn-lg" style="width: 100%;" id="btnCreateFriendRoom" data-i18n="mode_friends_btn">
+            Create a Room
+          </button>
+
+          <!-- Fully Responsive Join Code Box -->
+          <div class="join-room-box">
+            <span style="font-size:0.8rem; font-weight:800; color:var(--text-dim);" data-i18n="mode_have_code">HAVE A ROOM CODE?</span>
+            <div class="room-input-group">
+              <input type="text" id="manualRoomCodeInput" class="room-code-input" placeholder="CODE" maxlength="8">
+              <button type="button" class="btn btn-secondary room-join-btn" id="btnJoinManualRoom" data-i18n="mode_join_btn">
+                Join
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const btnLaunchHost = document.getElementById("btnLaunchHost");
+    const btnCreateRoom = document.getElementById("btnCreateFriendRoom");
+    const btnJoinManual = document.getElementById("btnJoinManualRoom");
+    const manualInput = document.getElementById("manualRoomCodeInput");
+
+    const socket = io({ transports: ["websocket", "polling"] });
+
+    if (btnLaunchHost) {
+      btnLaunchHost.addEventListener("click", () => {
+        window.soundFx.click();
+        socket.emit("create_room", {
+          player_id: localStorage.getItem("zenith_player_id"),
+          nickname: localStorage.getItem("zenith_nickname") || "Host",
+          mode: "big_screen"
+        });
+      });
+    }
+
+    if (btnCreateRoom) {
+      btnCreateRoom.addEventListener("click", () => {
+        window.soundFx.click();
+        socket.emit("create_room", {
+          player_id: localStorage.getItem("zenith_player_id"),
+          nickname: localStorage.getItem("zenith_nickname") || "RoomHost",
+          mode: "friends"
+        });
+      });
+    }
+
+    socket.on("room_created", (data) => {
+      if (data.mode === "big_screen") {
+        window.location.href = `/game/host/${data.room_code}`;
+      } else {
+        window.location.href = `/lobby/${data.room_code}`;
+      }
+    });
+
+    if (btnJoinManual && manualInput) {
+      btnJoinManual.addEventListener("click", () => {
+        const code = manualInput.value.trim().toUpperCase();
+        if (!code) {
+          window.showToast("Enter a room code", true);
+          return;
+        }
+        window.location.href = `/join/${code}`;
+      });
+    }
+  });
+</script>
+{% endblock %}

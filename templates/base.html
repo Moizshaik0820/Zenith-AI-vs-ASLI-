@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title or "AI vs ASLI — Zenith School of AI" }}</title>
+  <meta name="description" content="AI vs ASLI is a college AI awareness and deepfake detection platform hosted by Zenith School of AI at K.R. Mangalam University. Test your biological instincts against generative AI.">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/zenith-logo.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- Official Website Navigation Bar -->
+  <header class="site-header">
+    <div class="site-nav-container">
+      <!-- Left: Official Zenith Logo & Brand Name -->
+      <a href="{{ url_for('pages.index') }}" class="site-brand" aria-label="Zenith School of AI Home">
+        <img src="{{ url_for('static', filename='images/zenith-logo.png') }}" alt="Zenith School of AI Crest Logo" class="site-logo">
+        <div class="site-brand-text">
+          <span class="site-org-name">ZENITH SCHOOL OF AI</span>
+          <span class="site-brand-title">AI vs ASLI</span>
+        </div>
+      </a>
+
+      <!-- Right: Home Nav Link + 3 Quick Icon Controls + Three-Line Hamburger Icon -->
+      <div class="header-nav-group">
+        <a href="{{ url_for('pages.index') }}" class="nav-item-home" data-i18n="nav_home">Home</a>
+
+        <!-- Compact Icon-Only Controls (No text, intuitive icons) -->
+        <button type="button" class="nav-icon-btn lang-toggle-btn" title="Toggle Language (English / Hinglish)" aria-label="Toggle Language">
+          <span class="btn-icon">🇮🇳</span>
+        </button>
+
+        <button type="button" class="nav-icon-btn theme-toggle-btn" title="Toggle Display Theme (Dark / Light)" aria-label="Toggle Theme">
+          <span class="btn-icon">🌙</span>
+        </button>
+
+        <button type="button" class="nav-icon-btn sound-toggle-btn" title="Toggle Audio FX" aria-label="Toggle Sound">
+          <span class="btn-icon">🔊</span>
+        </button>
+
+        <!-- 3-Line Hamburger Button (Squircle design matching user image 2) -->
+        <button type="button" class="menu-hamburger-btn" id="siteMenuToggle" aria-label="Open Navigation Menu" aria-expanded="false">
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Backdrop for Drawer -->
+    <div class="nav-drawer-backdrop" id="drawerBackdrop"></div>
+
+    <!-- Sliding Navigation Menu Drawer (Containing all pages, utilities & challenge CTA) -->
+    <aside class="site-nav-drawer" id="siteNavDrawer" aria-hidden="true">
+      <div class="drawer-header">
+        <div class="drawer-brand">
+          <img src="{{ url_for('static', filename='images/zenith-logo.png') }}" alt="Zenith Emblem" class="drawer-logo">
+          <div>
+            <span class="drawer-org-name">ZENITH SCHOOL OF AI</span>
+            <span class="drawer-sub">Media Discernment Lab</span>
+          </div>
+        </div>
+        <button type="button" class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close Navigation Menu">✕</button>
+      </div>
+
+      <!-- Navigation Pages Links -->
+      <nav class="drawer-nav-list" aria-label="Website Navigation">
+        <a href="{{ url_for('pages.index') }}" class="drawer-nav-item" data-i18n="nav_home">
+          <span class="nav-item-icon">🏠</span>
+          <span class="nav-item-label">Home</span>
+        </a>
+        <a href="{{ url_for('pages.index') }}#howItWorks" class="drawer-nav-item" data-i18n="btn_how_to_play">
+          <span class="nav-item-icon">📖</span>
+          <span class="nav-item-label">How to Play</span>
+        </a>
+        <a href="{{ url_for('pages.index') }}#fieldGuide" class="drawer-nav-item">
+          <span class="nav-item-icon">🔍</span>
+          <span class="nav-item-label">Detection Guide</span>
+        </a>
+        <a href="{{ url_for('pages.leaderboard') }}" class="drawer-nav-item" data-i18n="nav_leaderboard">
+          <span class="nav-item-icon">🏆</span>
+          <span class="nav-item-label">Leaderboard</span>
+        </a>
+        <a href="{{ url_for('pages.index') }}#aboutZenith" class="drawer-nav-item">
+          <span class="nav-item-icon">🎓</span>
+          <span class="nav-item-label">About Zenith</span>
+        </a>
+      </nav>
+
+      <div class="drawer-divider"></div>
+
+      <!-- Settings & Controls Section (Hinglish, Dark Mode, Sound FX) -->
+      <div class="drawer-settings-section">
+        <div class="drawer-section-title">PREFERENCES & CONTROLS</div>
+
+        <button type="button" class="drawer-action-btn lang-toggle-btn" title="Switch Language">
+          <span class="btn-icon">🇮🇳</span>
+          <span class="btn-text">Language: <strong class="lang-status-text">English / Hinglish</strong></span>
+        </button>
+
+        <button type="button" class="drawer-action-btn theme-toggle-btn" title="Toggle Theme">
+          <span class="btn-icon">🌙</span>
+          <span class="btn-text">Display: <strong class="theme-status-text">Light Mode</strong></span>
+        </button>
+
+        <button type="button" class="drawer-action-btn sound-toggle-btn" title="Toggle Sound FX">
+          <span class="btn-icon">🔊</span>
+          <span class="btn-text">Audio FX: <strong class="sound-status-text">Enabled</strong></span>
+        </button>
+      </div>
+
+      <!-- Primary Challenge Action Button -->
+      <div class="drawer-footer-cta">
+        <a href="{{ url_for('pages.nickname') }}" class="btn btn-primary btn-drawer-cta" data-i18n="btn_enter_challenge">
+          <span>🚀</span> ENTER THE CHALLENGE
+        </a>
+      </div>
+    </aside>
+  </header>
+
+  <!-- Main Website Body -->
+  <main class="site-main" id="mainContent">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Global Microcopy Loading Overlay -->
+  <div class="loading-overlay" id="globalLoadingOverlay" aria-live="assertive" role="alert">
+    <div class="loading-spinner-ring"></div>
+    <div class="loading-microcopy" id="loadingMicrocopy">Scanning reality...</div>
+  </div>
+
+  <!-- Comprehensive Website Footer -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <!-- Col 1: Brand & Mission -->
+      <div class="footer-col brand-col">
+        <div class="footer-logo-row">
+          <img src="{{ url_for('static', filename='images/zenith-logo.png') }}" alt="Zenith Emblem" class="site-logo">
+          <div>
+            <h3 class="footer-brand-title">ZENITH SCHOOL OF AI</h3>
+            <p class="footer-sub">K.R. Mangalam University // Gurugram</p>
+          </div>
+        </div>
+        <p class="footer-mission-text">
+          A university-led initiative to foster media literacy and deepfake discernment in the age of generative synthetic intelligence.
+        </p>
+        <div class="footer-badges-wrap">
+          <span class="univ-badge">B.Tech in AI + Mini-MBA</span>
+          <span class="univ-badge">One Degree. KRMU.</span>
+        </div>
+      </div>
+
+      <!-- Col 2: Quick Links -->
+      <div class="footer-col">
+        <h4 class="footer-heading">Challenge</h4>
+        <ul class="footer-links-list">
+          <li><a href="{{ url_for('pages.index') }}">Challenge Home</a></li>
+          <li><a href="{{ url_for('pages.nickname') }}">Select Codename</a></li>
+          <li><a href="{{ url_for('pages.leaderboard') }}">Hall of Fame</a></li>
+          <li><a href="{{ url_for('pages.index') }}#rulesPanel">Scoring Rules</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Education & Resources -->
+      <div class="footer-col">
+        <h4 class="footer-heading">Education</h4>
+        <ul class="footer-links-list">
+          <li><a href="{{ url_for('pages.index') }}#fieldGuide">Spotting AI Faces</a></li>
+          <li><a href="{{ url_for('pages.index') }}#fieldGuide">Detecting Voice Clones</a></li>
+          <li><a href="{{ url_for('pages.index') }}#fieldGuide">Video Artifact Analysis</a></li>
+          <li><a href="{{ url_for('pages.index') }}#aboutZenith">Academic Programs</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Official Community -->
+      <div class="footer-col">
+        <h4 class="footer-heading">Official Channels</h4>
+        <p class="footer-contact-text">Connect with Zenith School of AI first-years and faculty:</p>
+        <div class="footer-social-stack">
+          <a href="https://www.instagram.com/zenith_school_of_ai?utm_source=ig_web_button_share_sheet&mdxt=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" class="social-pill-link">
+            <span>📷</span> Instagram: <strong>@zenith_school_of_ai</strong>
+          </a>
+          <a href="https://zenithschool.ai/" target="_blank" rel="noopener noreferrer" class="social-pill-link">
+            <span>🌐</span> Website: <strong>zenithschool.ai</strong>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Legal & University Credit Bar -->
+    <div class="footer-bottom-bar">
+      <div class="container footer-bottom-inner">
+        <p>© 2026 Zenith School of AI — K.R. Mangalam University. Built by first-years with AI agents.</p>
+        <p class="footer-tagline-small">"Do you trust your eyes?"</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

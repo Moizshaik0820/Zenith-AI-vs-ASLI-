@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section style="padding: 5rem 1rem; text-align: center;">
+  <div class="container">
+    <div style="font-size: 4rem; font-weight: 900; color: var(--ai-cyan); margin-bottom: 1rem;">404</div>
+    <h1 style="font-size: 2rem; font-weight: 800; margin-bottom: 1rem;">Reality Distortion Detected</h1>
+    <p style="color: var(--text-dim); max-width: 500px; margin: 0 auto 2rem;">
+      The page or session you're searching for does not exist in this reality matrix.
+    </p>
+    <a href="{{ url_for('pages.index') }}" class="btn btn-primary">Return to Base</a>
+  </div>
+</section>
+{% endblock %}

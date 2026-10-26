@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="game-arena" {% if mode == 'solo' %}id="gameArenaSolo"{% endif %}>
+
+  {% if mode == 'solo' %}
+  <!-- SOLO PLAY VIEW (Points Badge Removed as requested!) -->
+  <div class="game-progress-header">
+    <span class="question-counter-badge" id="questionCounter">Question 1 of 10</span>
+    <!-- Note: Points are strictly hidden during questions -->
+  </div>
+
+  <div class="progress-segments-bar" id="progressSegmentsBar" aria-label="10 Question Progress Indicator">
+    {% for i in range(10) %}
+      <div class="progress-segment {% if i == 0 %}current{% endif %}" data-index="{{ i }}"></div>
+    {% endfor %}
+  </div>
+
+  <div class="question-card">
+    <div class="question-top-bar">
+      <span class="category-tag" id="categoryTag">ANALYSIS</span>
+      <div class="timer-box" id="timerBox">
+        <span>⏱️</span> <span id="timerDisplay">10.0s</span>
+      </div>
+    </div>
+
+    <!-- Media Container -->
+    <div class="media-container" id="mediaViewport" aria-label="Media Analysis Area">
+      <div style="color:var(--text-muted); font-size:0.95rem;">Loading challenge media...</div>
+    </div>
+
+    <!-- Dual AI vs ASLI Large Buttons -->
+    <div class="answers-row" id="answersRow">
+      <button type="button" class="answer-btn answer-btn-ai" id="btnAnswerAi">
+        AI
+        <span class="btn-subtext" data-i18n="btn_ai_sub">Synthetic / Deepfake</span>
+      </button>
+
+      <button type="button" class="answer-btn answer-btn-asli" id="btnAnswerAsli">
+        ASLI
+        <span class="btn-subtext" data-i18n="btn_asli_sub">Genuine / Authentic</span>
+      </button>
+    </div>
+
+    <!-- Immediate Feedback Drawer (NO POINTS DISPLAYED) -->
+    <div class="feedback-box" id="feedbackDrawer" style="display:none;"></div>
+  </div>
+
+  {% elif mode == 'host' %}
+  <!-- BIG SCREEN HOST VIEW -->
+  <div style="background:var(--bg-surface); padding:1rem 1.5rem; border-radius:var(--radius-md); margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; border:1px solid var(--border-subtle); box-shadow:var(--shadow-subtle);">
+    <div>
+      <span style="font-size:0.8rem; color:var(--text-dim); text-transform:uppercase; font-weight:800;">Big Screen Auditorium Session</span>
+      <h2 style="font-size:1.6rem; font-weight:900; color:var(--zenith-purple);">ROOM CODE: {{ room_code }}</h2>
+    </div>
+    <div style="display:flex; align-items:center; gap:1.5rem;">
+      <div style="text-align:right;">
+        <span style="font-size:0.8rem; color:var(--text-dim); font-weight:800;">PARTICIPANTS</span>
+        <div id="liveParticipantCount" style="font-size:1.4rem; font-weight:900; color:var(--text-main);">0</div>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" id="btnHostStartMatch">
+        START MATCH ▶
+      </button>
+    </div>
+  </div>
+
+  <div id="multiplayerArena">
+    <div style="text-align:center; padding:3rem 1.5rem; background:var(--bg-surface); border-radius:var(--radius-lg); border:1px solid var(--border-subtle); box-shadow:var(--shadow-subtle);">
+      <h3 style="font-size:1.8rem; font-weight:900; margin-bottom:1rem; color:var(--text-main);">Scan to Join the Challenge</h3>
+      <p style="color:var(--text-dim); margin-bottom:2rem; font-size:1.1rem;">
+        Open your phone camera or visit: <strong>play.zenith.ai</strong> and enter code: <strong style="color:var(--zenith-purple); font-size:1.4rem;">{{ room_code }}</strong>
+      </p>
+
+      <div style="display:inline-block; padding:1.2rem; background:#fff; border-radius:18px; border:2px solid var(--border-subtle); margin-bottom:2rem; box-shadow:var(--shadow-subtle);">
+        <img src="/api/qr/{{ room_code }}" alt="Scan QR code to join" style="width:240px; height:240px; display:block;">
+      </div>
+
+      <div style="max-width:600px; margin:0 auto;">
+        <h4 style="font-size:0.95rem; color:var(--text-dim); margin-bottom:0.8rem; text-transform:uppercase; font-weight:800;">Connected Students & Detectives:</h4>
+        <div id="lobbyPlayersList" style="display:flex; flex-wrap:wrap; gap:0.6rem; justify-content:center;">
+          <span style="color:var(--text-muted); font-size:0.9rem;">Waiting for participants to connect...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% elif mode == 'room_player' %}
+  <!-- PARTICIPANT CONTROLLER VIEW -->
+  <div id="multiplayerArena">
+    <div style="text-align:center; padding:3rem 1rem; background:var(--bg-surface); border-radius:var(--radius-lg); border:1px solid var(--border-subtle); box-shadow:var(--shadow-subtle);">
+      <div style="font-size:3rem; margin-bottom:1rem;">📱</div>
+      <h2 style="font-size:1.8rem; font-weight:900; margin-bottom:0.5rem; color:var(--text-main);">Connected to Room {{ room_code }}</h2>
+      <p style="color:var(--text-dim); margin-bottom:2rem;">Look up at the stage/projector screen. The questions will appear there!</p>
+      <div style="background:var(--bg-card); padding:1rem; border-radius:12px; display:inline-block; font-weight:800; color:var(--zenith-purple); border:1px solid var(--border-subtle);">
+        Status: Waiting for host to launch the match...
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if mode == 'solo' %}
+<script src="{{ url_for('static', filename='js/game.js') }}"></script>
+{% else %}
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='js/multiplayer.js') }}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const roomCode = "{{ room_code }}";
+    const mode = "{{ mode }}";
+    const mp = new MultiplayerManager(mode, roomCode);
+    mp.init();
+
+    const startBtn = document.getElementById("btnHostStartMatch");
+    if (startBtn) {
+      startBtn.addEventListener("click", () => {
+        window.soundFx.click();
+        mp.socket.emit("start_room_game", { room_code: roomCode });
+        startBtn.style.display = "none";
+      });
+    }
+  });
+</script>
+{% endif %}
+{% endblock %}

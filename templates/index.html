@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- 1. Hero Section -->
+<section class="hero-section">
+  <div class="container hero-container">
+    <div class="hero-badge" data-i18n="hero_badge">
+      <span>⚡</span> Zenith School of AI // K.R. Mangalam University
+    </div>
+
+    <h1 class="hero-main-title">
+      <span class="title-ai">AI</span>
+      <span class="title-vs">vs</span>
+      <span class="title-asli">ASLI</span>
+    </h1>
+
+    <h2 class="hero-tagline" data-i18n="hero_tagline">"Do you trust your eyes?"</h2>
+
+    <p class="hero-hook" data-i18n="hero_hook">
+      AI can fake a face, a voice, and even reality. Can you spot the difference?
+      Put your biological instincts to the test against cutting-edge synthetic images, neural audio clones, and deepfake videos.
+    </p>
+
+    <div class="hero-cta-group">
+      <a href="{{ url_for('pages.nickname') }}" class="btn btn-primary btn-lg btn-pill" data-i18n="btn_enter_challenge">
+        <span>🚀</span> ENTER THE CHALLENGE
+      </a>
+      <a href="#howItWorks" class="btn btn-secondary btn-lg btn-pill" data-i18n="btn_how_to_play">
+        <span>📖</span> How It Works
+      </a>
+    </div>
+
+    <!-- Quick Stats Ribbon -->
+    <div class="stats-ribbon">
+      <div class="stat-ribbon-item">
+        <span class="stat-ribbon-num">10</span>
+        <span class="stat-ribbon-lbl">Curated Challenges</span>
+      </div>
+      <div class="stat-ribbon-divider"></div>
+      <div class="stat-ribbon-item">
+        <span class="stat-ribbon-num">3</span>
+        <span class="stat-ribbon-lbl">Media Modalities (Img / Aud / Vid)</span>
+      </div>
+      <div class="stat-ribbon-divider"></div>
+      <div class="stat-ribbon-item">
+        <span class="stat-ribbon-num">1,500</span>
+        <span class="stat-ribbon-lbl">Max Score Ceiling</span>
+      </div>
+      <div class="stat-ribbon-divider"></div>
+      <div class="stat-ribbon-item">
+        <span class="stat-ribbon-num">100%</span>
+        <span class="stat-ribbon-lbl">Free College Initiative</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. How It Works Section -->
+<section class="section-block" id="howItWorks">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">CHALLENGE MECHANICS</span>
+      <h2 class="section-heading">How The Challenge Works</h2>
+      <p class="section-subtext">Three simple steps to test your deepfake discernment skills and join the campus leaderboard.</p>
+    </div>
+
+    <div class="steps-grid">
+      <!-- Step 1 -->
+      <div class="step-card">
+        <div class="step-badge">STEP 01</div>
+        <div class="step-icon">🕵️‍♂️</div>
+        <h3 class="step-title">Select Your Codename</h3>
+        <p class="step-text">
+          Generate an AI detective moniker or enter your personal custom codename. No registration or password required.
+        </p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-card">
+        <div class="step-badge">STEP 02</div>
+        <div class="step-icon">🔬</div>
+        <h3 class="step-title">Analyze The Tells</h3>
+        <p class="step-text">
+          Inspect 10 randomized samples. Use the full-resolution <strong>Magnifier tool</strong> on photos, listen to audio waveforms, and watch video physics.
+        </p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-card">
+        <div class="step-badge">STEP 03</div>
+        <div class="step-icon">📊</div>
+        <h3 class="step-title">Claim Your Story Card</h3>
+        <p class="step-text">
+          Unlock your verified accuracy report, see your ranking in the Hall of Fame, and download a vertical 9:16 Instagram Story card to challenge friends.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Detective Field Guide: Tips to Spot AI Tells -->
+<section class="section-block guide-bg" id="fieldGuide">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">AI DETECTION FIELD MANUAL</span>
+      <h2 class="section-heading">How To Spot Generative Media</h2>
+      <p class="section-subtext">Learn the subtle physical and acoustic anomalies that generative models struggle to simulate.</p>
+    </div>
+
+    <div class="guide-grid">
+      <!-- Guide 1: Image -->
+      <div class="guide-card">
+        <div class="guide-icon">📸</div>
+        <h3 class="guide-card-title">Synthetic Images</h3>
+        <ul class="guide-list">
+          <li><strong>Pupil Catchlights:</strong> Real camera lights reflect identical shapes in both eyes; AI often produces mismatched reflection geometries.</li>
+          <li><strong>Ear & Teeth Cartilage:</strong> Watch for blurred, merged earlobes or teeth that blend into solid surfaces without distinct dental margins.</li>
+          <li><strong>Vanishing Perspectives:</strong> Background windows, balustrades, and structural lines frequently bend or fail to meet at coherent vanishing points.</li>
+        </ul>
+      </div>
+
+      <!-- Guide 2: Audio -->
+      <div class="guide-card">
+        <div class="guide-icon">🎙️</div>
+        <h3 class="guide-card-title">Cloned Voice & Audio</h3>
+        <ul class="guide-list">
+          <li><strong>Breath Micro-Dynamics:</strong> Human speakers naturally inhale, pause, and exhale between clauses; neural TTS often speaks without breathing.</li>
+          <li><strong>Metallic Vocoder Timbre:</strong> Higher vocal frequencies often exhibit subtle robotic buzzing, digital quantization, or unnatural pitch flatness.</li>
+          <li><strong>Room Acoustics:</strong> Authentic audio contains natural room reverberation; synthetic clips often sound artificially dry and isolated.</li>
+        </ul>
+      </div>
+
+      <!-- Guide 3: Video -->
+      <div class="guide-card">
+        <div class="guide-icon">🎬</div>
+        <h3 class="guide-card-title">Generative Deepfake Video</h3>
+        <ul class="guide-list">
+          <li><strong>Temporal Consistency:</strong> AI video generators struggle with object permanence; background objects often morph frame-by-frame.</li>
+          <li><strong>Physical Momentum:</strong> Look at hair motion, water droplets, and vehicle wheel rotation to see if Newtonian inertia is physically respected.</li>
+          <li><strong>Facial Boundary Warping:</strong> Watch the jawline, neck transitions, and hairline during rapid head rotation for subtle flickering artifacts.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Interactive Dual Comparison Preview matching user image 3 -->
+    <div class="field-preview-box">
+      <div class="field-preview-header">
+        <h3 class="field-preview-title">Which image is AI?</h3>
+        <p class="field-preview-sub">Here are 2 images. One is AI-generated, the other one is real. Can you tell which one is AI? Test your skills with the circular magnifier!</p>
+      </div>
+
+      <div class="field-dual-images">
+        <!-- Sample 1 -->
+        <div class="field-image-card">
+          <div class="image-lens-wrapper" id="homeLensWrapper1">
+            <img src="{{ url_for('static', filename='images/sample-ai.jpg') }}" alt="Which image is AI - Sample A" class="question-media-img" id="homeSampleImg1">
+            <div class="magnifier-circle-loupe" id="homeLoupe1" aria-hidden="true"></div>
+          </div>
+          <div class="media-controls-bar">
+            <button type="button" class="lens-toggle-pill" id="homeLensToggle1" aria-label="Toggle Magnifier Lens">
+              <span>🔍</span>
+              <span class="lens-pill-text">ON</span>
+              <span class="lens-pill-switch"></span>
+            </button>
+            <span class="lens-hint-label">Hover or drag to inspect</span>
+          </div>
+        </div>
+
+        <!-- Sample 2 -->
+        <div class="field-image-card">
+          <div class="image-lens-wrapper" id="homeLensWrapper2">
+            <img src="{{ url_for('static', filename='images/sample-asli.jpg') }}" alt="Which image is AI - Sample B" class="question-media-img" id="homeSampleImg2">
+            <div class="magnifier-circle-loupe" id="homeLoupe2" aria-hidden="true"></div>
+          </div>
+          <div class="media-controls-bar">
+            <button type="button" class="lens-toggle-pill" id="homeLensToggle2" aria-label="Toggle Magnifier Lens">
+              <span>🔍</span>
+              <span class="lens-pill-text">ON</span>
+              <span class="lens-pill-switch"></span>
+            </button>
+            <span class="lens-hint-label">Hover or drag to inspect</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. Rules & Scoring Architecture -->
+<section class="section-block" id="rulesPanel">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">TRANSPARENT SYSTEM</span>
+      <h2 class="section-heading" data-i18n="rules_title">Challenge Rules & Scoring</h2>
+      <p class="section-subtext">Deterministic server-side scoring designed to reward both precision and speed.</p>
+    </div>
+
+    <div class="rules-grid">
+      <div class="rule-card">
+        <div class="rule-metric" data-i18n="rule_1_metric">10</div>
+        <div class="rule-desc" data-i18n="rule_1_desc">Questions per game across AI images, audio synthesis, and video deepfakes.</div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-metric" data-i18n="rule_2_metric">+100</div>
+        <div class="rule-desc" data-i18n="rule_2_desc">Base points awarded for every correct detection of AI or ASLI.</div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-metric" style="color:var(--zenith-purple);" data-i18n="rule_3_metric">+50</div>
+        <div class="rule-desc" data-i18n="rule_3_desc">Max speed bonus per correct answer. Faster decisions earn higher rewards.</div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-metric" data-i18n="rule_4_metric">15s / 10s</div>
+        <div class="rule-desc" data-i18n="rule_4_desc">15 seconds for images. For audio & video, 10s timer starts strictly after playback.</div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-metric" style="color:var(--zenith-purple);" data-i18n="rule_5_metric">1,500</div>
+        <div class="rule-desc" data-i18n="rule_5_desc">Maximum possible score: 10 x (100 base + 50 speed bonus).</div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-metric" data-i18n="rule_6_metric">0 pts</div>
+        <div class="rule-desc" data-i18n="rule_6_desc">No negative marking! Incorrect or unanswered questions simply score zero.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. About Zenith School of AI (KRMU) -->
+<section class="section-block about-bg" id="aboutZenith">
+  <div class="container about-container">
+    <div class="about-content">
+      <span class="section-eyebrow">ABOUT THE ORGANIZER</span>
+      <h2 class="section-heading">Zenith School of AI — K.R. Mangalam University</h2>
+      <p class="about-paragraph">
+        Zenith School of AI is an initiative at K.R. Mangalam University dedicated to preparing the next generation of artificial intelligence engineers, researchers, and entrepreneurial leaders.
+      </p>
+      <p class="about-paragraph">
+        Through our flagship <strong>B.Tech in Computer Science & Engineering (AI & ML) + Mini-MBA</strong> degree program, students learn both technical deep-learning architectures and commercial strategic leadership in one unified curriculum.
+      </p>
+      <div class="about-highlights-grid">
+        <div class="about-highlight-card">
+          <div class="about-highlight-icon">🎓</div>
+          <div class="about-highlight-title">One Degree. KRMU.</div>
+          <div class="about-highlight-desc">AI Engineering foundation paired with Mini-MBA business leadership.</div>
+        </div>
+        <div class="about-highlight-card">
+          <div class="about-highlight-icon">🤖</div>
+          <div class="about-highlight-title">Hands-On Innovation</div>
+          <div class="about-highlight-desc">Built and maintained by Zenith School of AI first-years with AI agents.</div>
+        </div>
+      </div>
+      <div style="margin-top:2rem;">
+        <a href="https://zenithschool.ai/" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+          Visit Zenith School of AI →
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. Bottom Call to Action Banner -->
+<section class="cta-banner-section">
+  <div class="container">
+    <div class="cta-banner-card">
+      <h2 class="cta-banner-title">Think Your Eyes Can't Be Fooled?</h2>
+      <p class="cta-banner-sub">Step into the reality matrix. Choose your codename and see if you can score 1,500 points.</p>
+      <a href="{{ url_for('pages.nickname') }}" class="btn btn-primary btn-lg btn-pill" data-i18n="btn_enter_challenge">
+        Enter The Challenge Now →
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

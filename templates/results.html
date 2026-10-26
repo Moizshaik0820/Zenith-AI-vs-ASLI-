@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/results.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="results-arena">
+
+  <!-- Header Salute -->
+  <div class="results-header-banner">
+    <h1 class="game-over-title" data-i18n="results_game_over">GAME OVER</h1>
+    <p class="player-salute">
+      <span data-i18n="results_good_job">GOOD JOB,</span> <span class="player-nickname-glow">{{ standing.nickname }}</span>!
+    </p>
+  </div>
+
+  <!-- Blurred Initial Card with Reveal Trigger -->
+  <div class="blurred-score-card" id="blurredScoreCard">
+
+    <!-- Blur Shield with Action Button -->
+    <div class="reveal-overlay-prompt" id="revealPromptOverlay">
+      <h2 class="reveal-heading" data-i18n="results_score_ready">Your score is ready to reveal.</h2>
+      <button type="button" class="btn btn-primary btn-lg btn-pill" id="revealScoreBtn" data-i18n="results_btn_reveal">
+        ✨ SCORE + STANDINGS
+      </button>
+    </div>
+
+    <!-- Protected Content (Hidden behind blur until Instagram Follow is triggered) -->
+    <div class="card-blur-content" id="cardBlurContent">
+      <div class="score-hero-display">
+        <span style="font-size:0.85rem; font-weight:800; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em;">FINAL DETECTION SCORE</span>
+        <div class="final-score-number">{{ standing.score }}</div>
+        <div class="final-score-max">OUT OF 1,500 POINTS</div>
+        
+        <!-- Compliment Box with Safe Bounds -->
+        <div class="personalized-compliment-box">
+          <p class="personalized-compliment">"{{ standing.compliment }}"</p>
+        </div>
+      </div>
+
+      <!-- Metrics Grid (SPEED BONUS REMOVED!) -->
+      <div class="metrics-dashboard">
+        <div class="metric-tile">
+          <div class="metric-tile-val correct">{{ standing.correct_count }} / 10</div>
+          <div class="metric-tile-label">Correct Hits</div>
+        </div>
+
+        <div class="metric-tile">
+          <div class="metric-tile-val incorrect">{{ standing.incorrect_count }}</div>
+          <div class="metric-tile-label">Fooled by AI</div>
+        </div>
+
+        <div class="metric-tile">
+          <div class="metric-tile-val">{{ standing.unanswered_count }}</div>
+          <div class="metric-tile-label">Unanswered</div>
+        </div>
+
+        <div class="metric-tile">
+          <div class="metric-tile-val correct">{{ standing.accuracy_pct }}%</div>
+          <div class="metric-tile-label">Accuracy</div>
+        </div>
+
+        <div class="metric-tile">
+          <div class="metric-tile-val rank">#{{ standing.rank }}</div>
+          <div class="metric-tile-label">Global Rank</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zenith Instagram Section -->
+  <div class="instagram-promo-section">
+    <div class="insta-promo-left">
+      <img src="{{ url_for('api.get_instagram_qr') }}" alt="Zenith Instagram QR Code" class="insta-qr-thumb">
+      <div class="insta-promo-copy">
+        <h4>Follow Zenith School of AI on Instagram</h4>
+        <p>Follow <strong>@zenith_school_of_ai</strong> and share your score card to get featured on campus stories!</p>
+      </div>
+    </div>
+    <a href="https://www.instagram.com/zenith_school_of_ai?utm_source=ig_web_button_share_sheet&mdxt=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
+      Open @zenith_school_of_ai →
+    </a>
+  </div>
+
+  <!-- 9:16 Instagram Story Canvas Preview -->
+  <div class="story-card-preview-section">
+    <h3>Your Official Instagram Story Card</h3>
+    <p style="color:var(--text-dim); font-size:0.9rem;">
+      High-resolution 9:16 format with verified Zenith School of AI campus credentials.
+    </p>
+
+    <div class="canvas-preview-container">
+      <canvas 
+        id="resultStoryCanvas"
+        data-nickname="{{ standing.nickname }}"
+        data-score="{{ standing.score }}"
+        data-correct="{{ standing.correct_count }}"
+        data-incorrect="{{ standing.incorrect_count }}"
+        data-unanswered="{{ standing.unanswered_count }}"
+        data-accuracy="{{ standing.accuracy_pct }}"
+        data-rank="{{ standing.rank }}"
+        data-total-players="{{ standing.total_players }}"
+        data-compliment="{{ standing.compliment }}"
+      ></canvas>
+    </div>
+
+    <!-- Actions -->
+    <div class="results-actions-grid">
+      <button type="button" class="btn btn-primary" id="downloadCardBtn" data-i18n="results_download_btn">
+        📥 Download Story Graphic (PNG)
+      </button>
+      <button type="button" class="btn btn-secondary" id="shareFriendsBtn" data-i18n="results_share_friends">
+        📤 Share with Friends
+      </button>
+      <button type="button" class="btn btn-secondary" id="shareInstaBtn" data-i18n="results_share_insta">
+        📸 Share to Instagram Story
+      </button>
+      <a href="{{ url_for('pages.leaderboard') }}?session_id={{ session_id }}" class="btn btn-secondary" data-i18n="results_leaderboard_btn">
+        🏆 View Leaderboard
+      </a>
+      <button type="button" class="btn btn-coral" id="playAgainBtn" data-i18n="results_play_again">
+        🔄 PLAY AGAIN
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- MANDATORY INSTAGRAM FOLLOW POPUP MODAL -->
+<div class="modal-overlay" id="followInstagramModal">
+  <div class="modal-card" style="text-align:center;">
+    <div style="font-size:3rem; margin-bottom:0.5rem;">📸</div>
+    <h3 style="color:var(--zenith-purple); font-size:1.5rem; font-weight:900; margin-bottom:0.75rem;">
+      Follow Zenith School of AI
+    </h3>
+    <p style="color:var(--text-dim); font-size:1rem; line-height:1.6; margin-bottom:1.5rem;" data-i18n="results_insta_prompt">
+      Follow <strong>@zenith_school_of_ai</strong> on Instagram to unlock your final score report & global standings!
+    </p>
+
+    <div style="display:flex; flex-direction:column; gap:0.75rem;">
+      <button type="button" class="btn btn-primary btn-lg" id="btnGoToInstagram" data-i18n="results_btn_insta">
+        Follow @zenith_school_of_ai →
+      </button>
+      
+      <button type="button" class="btn btn-secondary" id="btnConfirmFollowed" style="display:none;" data-i18n="results_btn_i_followed">
+        I Followed! Reveal My Score ✨
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Instagram Story Step-by-Step Guide Modal -->
+<div class="modal-overlay" id="instaGuideModal">
+  <div class="modal-card">
+    <button type="button" class="modal-close-btn" id="closeInstaGuideBtn">&times;</button>
+    <h3 style="color:var(--zenith-purple); font-size:1.3rem; font-weight:800; margin-bottom:1rem;">
+      How to Post to Your Instagram Story
+    </h3>
+    <ol style="color:var(--text-dim); line-height:1.7; padding-left:1.2rem; font-size:0.95rem;">
+      <li>Tap <strong>"Download Story Graphic (PNG)"</strong> to save your card to your photos.</li>
+      <li>Open your <strong>Instagram App</strong> and swipe right to create a new Story.</li>
+      <li>Select the downloaded card from your gallery.</li>
+      <li>Tag <strong>@zenith_school_of_ai</strong> and challenge your friends: <em>"Do you trust your eyes?"</em></li>
+    </ol>
+    <div style="margin-top:1.5rem; text-align:right;">
+      <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('instaGuideModal').classList.remove('active')">
+        Got it!
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/results.js') }}"></script>
+{% endblock %}
