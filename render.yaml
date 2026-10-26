@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: ai-vs-asli
+    runtime: python
+    region: singapore
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: FLASK_DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ZENITH_INSTAGRAM_URL
+        value: "https://www.instagram.com/zenith_school_of_ai?utm_source=ig_web_button_share_sheet&mdxt=ZDNlZDc0MzIxNw=="
+      - key: CAMPAIGN_URL
+        value: "https://zenithschool.ai/"

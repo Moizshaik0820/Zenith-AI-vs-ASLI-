@@ -1,0 +1,32 @@
+# Python virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Local logs
+*.log
+server.log
+server_stdout.log
+server_stderr.log
+runner_init.log
+crash.log
+
+# SQLite Database
+instance/*.db
+!instance/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment variables
+.env
