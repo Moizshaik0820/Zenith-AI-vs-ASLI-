@@ -32,26 +32,36 @@
     margin-bottom: 0.5rem;
   }
 
+  /* White button with purple hover background */
   .compact-back-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
     font-size: 0.85rem;
     font-weight: 700;
-    color: var(--text-dim);
+    color: #ffffff !important;
     text-decoration: none;
-    padding: 0.3rem 0.75rem;
+    padding: 0.35rem 0.85rem;
     border-radius: var(--radius-pill);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.22);
+    transition: all 0.22s ease;
+  }
+
+  .compact-back-btn svg {
+    stroke: #ffffff !important;
   }
 
   .compact-back-btn:hover {
-    color: #ffffff;
-    background: rgba(139, 92, 246, 0.2);
-    border-color: rgba(139, 92, 246, 0.4);
+    color: #ffffff !important;
+    background: #7c3aed !important;
+    border-color: #a855f7 !important;
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.5);
     transform: translateX(-2px);
+  }
+
+  .compact-back-btn:hover svg {
+    stroke: #ffffff !important;
   }
 
   /* Red ASLI Gradient Title */

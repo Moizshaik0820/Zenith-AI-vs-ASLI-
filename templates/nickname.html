@@ -15,6 +15,7 @@
     z-index: 1;
   }
 
+  /* Shifted up to give ample breathing room for the bottom meme */
   .nickname-card-wrap {
     width: 100%;
     max-width: 480px;
@@ -23,6 +24,7 @@
     align-items: center;
     position: relative;
     z-index: 2;
+    margin-top: -3.5rem;
   }
 
   .nickname-compact-nav {
@@ -32,26 +34,36 @@
     margin-bottom: 0.65rem;
   }
 
+  /* White button with purple hover background */
   .compact-back-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
     font-size: 0.85rem;
     font-weight: 700;
-    color: var(--text-dim);
+    color: #ffffff !important;
     text-decoration: none;
-    padding: 0.35rem 0.75rem;
+    padding: 0.35rem 0.85rem;
     border-radius: var(--radius-pill);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.22);
+    transition: all 0.22s ease;
+  }
+
+  .compact-back-btn svg {
+    stroke: #ffffff !important;
   }
 
   .compact-back-btn:hover {
-    color: #ffffff;
-    background: rgba(139, 92, 246, 0.2);
-    border-color: rgba(139, 92, 246, 0.4);
+    color: #ffffff !important;
+    background: #7c3aed !important;
+    border-color: #a855f7 !important;
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.5);
     transform: translateX(-2px);
+  }
+
+  .compact-back-btn:hover svg {
+    stroke: #ffffff !important;
   }
 
   .nickname-card {
@@ -59,7 +71,7 @@
     backdrop-filter: blur(16px);
     border: 1.5px solid rgba(139, 92, 246, 0.35);
     border-radius: 24px;
-    padding: 2rem 2rem 1.8rem;
+    padding: 1.9rem 2rem 1.7rem;
     width: 100%;
     box-shadow: 0 16px 45px rgba(0, 0, 0, 0.65), 0 0 35px rgba(124, 58, 237, 0.2);
     text-align: center;
@@ -213,6 +225,74 @@
     transform: translateY(1px);
   }
 
+  /* Jesus Peeking Meme on Bottom Left (Flush with left border, transparent cutout) */
+  .nickname-jesus-meme-popup {
+    position: fixed;
+    left: 0;
+    bottom: calc(0px + env(safe-area-inset-bottom, 0px));
+    z-index: 10;
+    width: clamp(140px, 30vw, 215px);
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    overflow: visible;
+    opacity: 0;
+    transform: translateY(100px) scale(0.9);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nickname-jesus-meme-popup.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .nickname-jesus-meme-popup.dismissed {
+    opacity: 0;
+    transform: translateY(90px) scale(0.85);
+  }
+
+  .nickname-jesus-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    background: transparent;
+    filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.65));
+    user-select: none;
+    -webkit-user-drag: none;
+    margin-left: -2px;
+    margin-bottom: -2px;
+  }
+
+  .nickname-jesus-close-btn {
+    align-self: flex-end;
+    margin-right: 16px;
+    margin-bottom: 2px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(225, 29, 72, 0.92);
+    color: #ffffff;
+    border: 1.5px solid rgba(255, 255, 255, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    transition: transform 0.15s ease, background 0.15s ease;
+    z-index: 20;
+    pointer-events: auto;
+  }
+
+  .nickname-jesus-close-btn:hover {
+    transform: scale(1.15);
+    background: #be123c;
+  }
+
   /* Mobile Zero-Scroll Constraints */
   @media (max-width: 680px) {
     .nickname-locked-stage {
@@ -220,8 +300,11 @@
       max-height: calc(100dvh - 56px);
       padding: 0.4rem 0.85rem;
     }
+    .nickname-card-wrap {
+      margin-top: -2.2rem;
+    }
     .nickname-card {
-      padding: 1.35rem 1.2rem;
+      padding: 1.25rem 1.15rem;
       border-radius: 20px;
       max-width: 360px;
     }
@@ -249,6 +332,16 @@
     .nickname-compact-nav {
       margin-bottom: 0.4rem;
     }
+    .nickname-jesus-meme-popup {
+      width: clamp(125px, 34vw, 160px);
+      left: 0;
+      bottom: calc(0px + env(safe-area-inset-bottom, 0px));
+    }
+    .nickname-jesus-close-btn {
+      width: 19px;
+      height: 19px;
+      margin-right: 12px;
+    }
   }
 </style>
 {% endblock %}
@@ -259,7 +352,7 @@
 
 <section class="nickname-locked-stage">
   <div class="nickname-card-wrap">
-    <!-- Compact Back Arrow Link -->
+    <!-- Compact Back Arrow Link (White with Purple Hover) -->
     <div class="nickname-compact-nav">
       <a href="{{ url_for('pages.index') }}" class="compact-back-btn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
@@ -267,7 +360,7 @@
       </a>
     </div>
 
-    <!-- Nickname Input Card (Zero Scroll on Mobile) -->
+    <!-- Nickname Input Card (Shifted Upwards, Zero Scroll on Mobile) -->
     <div class="nickname-card">
       <h1 class="nickname-title-asli" data-i18n="nick_title">Choose Your Nickname</h1>
 
@@ -304,12 +397,12 @@
     </div>
   </div>
 
-  <!-- Floating Meme Popup on Bottom (I SAW THAT! Sticker Cutout, Dismissible) -->
-  <div class="meme-bottom-left-popup" id="nicknameMemePopup" role="complementary" aria-label="Meme reaction">
-    <button type="button" class="meme-sticker-close-btn" id="nicknameMemeCloseBtn" aria-label="Dismiss">
+  <!-- Floating Meme Popup on Bottom Left (Jesus & "I SAW THAT!" Cutout with Transparent Background) -->
+  <div class="nickname-jesus-meme-popup" id="nicknameMemePopup" role="complementary" aria-label="Meme reaction">
+    <button type="button" class="nickname-jesus-close-btn" id="nicknameMemeCloseBtn" aria-label="Dismiss">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
     </button>
-    <img src="{{ url_for('static', filename='images/meme-i-saw-that.webp') }}" alt="I Saw That" class="meme-sticker-img" loading="eager">
+    <img src="{{ url_for('static', filename='images/meme-i-saw-that.webp') }}" alt="I Saw That" class="nickname-jesus-img" loading="eager">
   </div>
 </section>
 {% endblock %}
