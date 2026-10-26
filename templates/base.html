@@ -4,69 +4,89 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ title or "AI vs ASLI — Zenith School of AI" }}</title>
-  <meta name="description" content="AI vs ASLI is a college AI awareness and deepfake detection platform hosted by Zenith School of AI at K.R. Mangalam University. Test your biological instincts against generative AI.">
+  <meta name="description" content="AI vs ASLI is a college AI awareness and deepfake detection challenge hosted by Zenith School of AI at K.R. Mangalam University. Do you trust your eyes?">
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/zenith-logo.png') }}">
+  
+  <!-- Modern Bold & Geometric Typography (Lilita One, Bungee, Plus Jakarta Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Lilita+One&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   {% block extra_css %}{% endblock %}
 </head>
 <body>
 
-  <!-- Official Website Navigation Bar -->
+  <!-- Minimal & Modern Navigation Bar -->
   <header class="site-header">
     <div class="site-nav-container">
-      <!-- Left: Official Zenith Logo & Brand Name -->
+      <!-- Left: Official Zenith Shield & Brand Wordmark -->
       <a href="{{ url_for('pages.index') }}" class="site-brand" aria-label="Zenith School of AI Home">
-        <img src="{{ url_for('static', filename='images/zenith-logo.png') }}" alt="Zenith School of AI Crest Logo" class="site-logo">
+        <img src="{{ url_for('static', filename='images/zenith-shield.png') }}" alt="Zenith Shield Crest" class="site-logo">
         <div class="site-brand-text">
           <span class="site-org-name">ZENITH SCHOOL OF AI</span>
           <span class="site-brand-title">AI vs ASLI</span>
         </div>
       </a>
 
-      <!-- Right: Home Nav Link + Quick Controls + Three-Line Hamburger Icon -->
+      <!-- Right: Single 'Home' Link + Quick Options + Hamburger Button -->
       <div class="header-nav-group">
         <a href="{{ url_for('pages.index') }}" class="nav-item-home" data-i18n="nav_home">Home</a>
 
-        <!-- Desktop Quick Icon Controls (Screens > 680px) -->
+        <!-- Desktop Quick Icon Controls -->
         <div class="nav-desktop-controls">
           <button type="button" class="nav-icon-btn lang-toggle-btn" title="Toggle Language (English / Hinglish)" aria-label="Toggle Language">
-            <span class="btn-icon">🇮🇳</span>
+            <span class="btn-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            </span>
           </button>
 
-          <button type="button" class="nav-icon-btn theme-toggle-btn" title="Toggle Display Theme (Dark / Light)" aria-label="Toggle Theme">
-            <span class="btn-icon">🌙</span>
+          <button type="button" class="nav-icon-btn theme-toggle-btn" title="Toggle Theme (Dark / Light)" aria-label="Toggle Theme">
+            <span class="btn-icon theme-icon-svg">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </span>
           </button>
 
-          <button type="button" class="nav-icon-btn sound-toggle-btn" title="Toggle Audio FX" aria-label="Toggle Sound">
-            <span class="btn-icon">🔊</span>
+          <button type="button" class="nav-icon-btn sound-toggle-btn" title="Toggle Audio FX" aria-label="Toggle Audio FX">
+            <span class="btn-icon sound-icon-svg">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+            </span>
           </button>
         </div>
 
-        <!-- Mobile Quick Vertical Options Button (Screens <= 680px) -->
+        <!-- Mobile Quick Vertical Options Button -->
         <div class="nav-mobile-options-wrap">
-          <button type="button" class="nav-icon-btn mobile-pref-trigger-btn" id="mobilePrefTriggerBtn" title="Preferences (Language, Theme, Sound)" aria-label="Quick Preferences">
-            <span class="btn-icon">⚙️</span>
+          <button type="button" class="nav-icon-btn mobile-pref-trigger-btn" id="mobilePrefTriggerBtn" title="Preferences" aria-label="Quick Preferences">
+            <span class="btn-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </span>
           </button>
 
-          <!-- Vertical Dropdown Options Menu for Mobile -->
+          <!-- Popover Menu for Mobile -->
           <div class="mobile-vertical-popover" id="mobileVerticalPopover">
-            <div class="popover-title">QUICK OPTIONS</div>
+            <div class="popover-title">SETTINGS</div>
             <button type="button" class="vertical-popover-item lang-toggle-btn">
-              <span class="popover-item-icon">🇮🇳</span>
+              <span class="popover-item-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              </span>
               <div class="popover-item-text">
                 <span class="popover-item-label">Language</span>
                 <span class="popover-item-val lang-status-text">English / Hinglish</span>
               </div>
             </button>
             <button type="button" class="vertical-popover-item theme-toggle-btn">
-              <span class="popover-item-icon btn-icon">🌙</span>
+              <span class="popover-item-icon theme-icon-svg">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+              </span>
               <div class="popover-item-text">
                 <span class="popover-item-label">Display Theme</span>
                 <span class="popover-item-val theme-status-text">Light Mode</span>
               </div>
             </button>
             <button type="button" class="vertical-popover-item sound-toggle-btn">
-              <span class="popover-item-icon btn-icon">🔊</span>
+              <span class="popover-item-icon sound-icon-svg">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+              </span>
               <div class="popover-item-text">
                 <span class="popover-item-label">Sound FX</span>
                 <span class="popover-item-val sound-status-text">Enabled</span>
@@ -75,7 +95,7 @@
           </div>
         </div>
 
-        <!-- 3-Line Hamburger Button (Squircle design matching user image 2) -->
+        <!-- 3-Line Accessible Hamburger Menu Button -->
         <button type="button" class="menu-hamburger-btn" id="siteMenuToggle" aria-label="Open Navigation Menu" aria-expanded="false">
           <span class="hamburger-bar"></span>
           <span class="hamburger-bar"></span>
@@ -87,61 +107,73 @@
     <!-- Backdrop for Drawer -->
     <div class="nav-drawer-backdrop" id="drawerBackdrop"></div>
 
-    <!-- Sliding Navigation Menu Drawer (Containing all pages, utilities & challenge CTA) -->
+    <!-- Sliding Navigation Menu Drawer -->
     <aside class="site-nav-drawer" id="siteNavDrawer" aria-hidden="true">
       <div class="drawer-header">
         <div class="drawer-brand">
-          <img src="{{ url_for('static', filename='images/zenith-logo.png') }}" alt="Zenith Emblem" class="drawer-logo">
+          <img src="{{ url_for('static', filename='images/zenith-shield.png') }}" alt="Zenith Shield Emblem" class="drawer-logo">
           <div>
             <span class="drawer-org-name">ZENITH SCHOOL OF AI</span>
-            <span class="drawer-sub">Media Discernment Lab</span>
+            <span class="drawer-sub">K.R. Mangalam University</span>
           </div>
         </div>
-        <button type="button" class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close Navigation Menu">✕</button>
+        <button type="button" class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close Navigation Menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
 
       <!-- Navigation Pages Links -->
       <nav class="drawer-nav-list" aria-label="Website Navigation">
         <a href="{{ url_for('pages.index') }}" class="drawer-nav-item" data-i18n="nav_home">
-          <span class="nav-item-icon">🏠</span>
+          <span class="nav-item-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          </span>
           <span class="nav-item-label">Home</span>
         </a>
-        <a href="{{ url_for('pages.index') }}#howItWorks" class="drawer-nav-item" data-i18n="btn_how_to_play">
-          <span class="nav-item-icon">📖</span>
+        <a href="{{ url_for('pages.guide') }}" class="drawer-nav-item" data-i18n="btn_how_to_play">
+          <span class="nav-item-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+          </span>
           <span class="nav-item-label">How to Play</span>
         </a>
-        <a href="{{ url_for('pages.index') }}#fieldGuide" class="drawer-nav-item">
-          <span class="nav-item-icon">🔍</span>
-          <span class="nav-item-label">Detection Guide</span>
+        <a href="{{ url_for('pages.about') }}" class="drawer-nav-item">
+          <span class="nav-item-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          </span>
+          <span class="nav-item-label">About Zenith</span>
         </a>
         <a href="{{ url_for('pages.leaderboard') }}" class="drawer-nav-item" data-i18n="nav_leaderboard">
-          <span class="nav-item-icon">🏆</span>
+          <span class="nav-item-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1h10v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"></path></svg>
+          </span>
           <span class="nav-item-label">Leaderboard</span>
-        </a>
-        <a href="{{ url_for('pages.index') }}#aboutZenith" class="drawer-nav-item">
-          <span class="nav-item-icon">🎓</span>
-          <span class="nav-item-label">About Zenith</span>
         </a>
       </nav>
 
       <div class="drawer-divider"></div>
 
-      <!-- Settings & Controls Section (Hinglish, Dark Mode, Sound FX) -->
+      <!-- Settings & Controls Section -->
       <div class="drawer-settings-section">
-        <div class="drawer-section-title">PREFERENCES & CONTROLS</div>
+        <div class="drawer-section-title">PREFERENCES</div>
 
         <button type="button" class="drawer-action-btn lang-toggle-btn" title="Switch Language">
-          <span class="btn-icon">🇮🇳</span>
+          <span class="btn-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          </span>
           <span class="btn-text">Language: <strong class="lang-status-text">English / Hinglish</strong></span>
         </button>
 
         <button type="button" class="drawer-action-btn theme-toggle-btn" title="Toggle Theme">
-          <span class="btn-icon">🌙</span>
+          <span class="btn-icon theme-icon-svg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          </span>
           <span class="btn-text">Display: <strong class="theme-status-text">Light Mode</strong></span>
         </button>
 
         <button type="button" class="drawer-action-btn sound-toggle-btn" title="Toggle Sound FX">
-          <span class="btn-icon">🔊</span>
+          <span class="btn-icon sound-icon-svg">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+          </span>
           <span class="btn-text">Audio FX: <strong class="sound-status-text">Enabled</strong></span>
         </button>
       </div>
@@ -149,7 +181,7 @@
       <!-- Primary Challenge Action Button -->
       <div class="drawer-footer-cta">
         <a href="{{ url_for('pages.nickname') }}" class="btn btn-primary btn-drawer-cta" data-i18n="btn_enter_challenge">
-          <span>🚀</span> ENTER THE CHALLENGE
+          ENTER THE CHALLENGE
         </a>
       </div>
     </aside>
@@ -172,14 +204,14 @@
       <!-- Col 1: Brand & Mission -->
       <div class="footer-col brand-col">
         <div class="footer-logo-row">
-          <img src="{{ url_for('static', filename='images/zenith-logo.png') }}" alt="Zenith Emblem" class="site-logo">
+          <img src="{{ url_for('static', filename='images/zenith-shield.png') }}" alt="Zenith Shield Emblem" class="site-logo">
           <div>
             <h3 class="footer-brand-title">ZENITH SCHOOL OF AI</h3>
             <p class="footer-sub">K.R. Mangalam University // Gurugram</p>
           </div>
         </div>
         <p class="footer-mission-text">
-          A university-led initiative to foster media literacy and deepfake discernment in the age of generative synthetic intelligence.
+          A university initiative to foster media discernment and deepfake awareness in the age of generative synthetic intelligence.
         </p>
         <div class="footer-badges-wrap">
           <span class="univ-badge">B.Tech in AI + Mini-MBA</span>
@@ -189,36 +221,39 @@
 
       <!-- Col 2: Quick Links -->
       <div class="footer-col">
-        <h4 class="footer-heading">Challenge</h4>
+        <h4 class="footer-heading">Navigation</h4>
         <ul class="footer-links-list">
-          <li><a href="{{ url_for('pages.index') }}">Challenge Home</a></li>
-          <li><a href="{{ url_for('pages.nickname') }}">Select Codename</a></li>
+          <li><a href="{{ url_for('pages.index') }}">Home</a></li>
+          <li><a href="{{ url_for('pages.guide') }}">How to Play</a></li>
+          <li><a href="{{ url_for('pages.about') }}">About Zenith</a></li>
           <li><a href="{{ url_for('pages.leaderboard') }}">Hall of Fame</a></li>
-          <li><a href="{{ url_for('pages.index') }}#rulesPanel">Scoring Rules</a></li>
+          <li><a href="{{ url_for('pages.nickname') }}">Enter Challenge</a></li>
         </ul>
       </div>
 
       <!-- Col 3: Education & Resources -->
       <div class="footer-col">
-        <h4 class="footer-heading">Education</h4>
+        <h4 class="footer-heading">Challenge Guide</h4>
         <ul class="footer-links-list">
-          <li><a href="{{ url_for('pages.index') }}#fieldGuide">Spotting AI Faces</a></li>
-          <li><a href="{{ url_for('pages.index') }}#fieldGuide">Detecting Voice Clones</a></li>
-          <li><a href="{{ url_for('pages.index') }}#fieldGuide">Video Artifact Analysis</a></li>
-          <li><a href="{{ url_for('pages.index') }}#aboutZenith">Academic Programs</a></li>
+          <li><a href="{{ url_for('pages.guide') }}">Spotting AI Images</a></li>
+          <li><a href="{{ url_for('pages.guide') }}">Detecting Voice Clones</a></li>
+          <li><a href="{{ url_for('pages.guide') }}">Deepfake Video Tells</a></li>
+          <li><a href="{{ url_for('pages.guide') }}">Scoring Architecture</a></li>
         </ul>
       </div>
 
       <!-- Col 4: Official Community -->
       <div class="footer-col">
         <h4 class="footer-heading">Official Channels</h4>
-        <p class="footer-contact-text">Connect with Zenith School of AI first-years and faculty:</p>
+        <p class="footer-contact-text">Connect with Zenith School of AI faculty and student detectives:</p>
         <div class="footer-social-stack">
           <a href="https://www.instagram.com/zenith_school_of_ai?utm_source=ig_web_button_share_sheet&mdxt=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" class="social-pill-link">
-            <span>📷</span> Instagram: <strong>@zenith_school_of_ai</strong>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            Instagram: <strong>@zenith_school_of_ai</strong>
           </a>
           <a href="https://zenithschool.ai/" target="_blank" rel="noopener noreferrer" class="social-pill-link">
-            <span>🌐</span> Website: <strong>zenithschool.ai</strong>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+            Website: <strong>zenithschool.ai</strong>
           </a>
         </div>
       </div>
@@ -227,8 +262,8 @@
     <!-- Bottom Legal & University Credit Bar -->
     <div class="footer-bottom-bar">
       <div class="container footer-bottom-inner">
-        <p>© 2026 Zenith School of AI — K.R. Mangalam University. Built by first-years with AI agents.</p>
-        <p class="footer-tagline-small">"Do you trust your eyes?"</p>
+        <p>© 2026 Zenith School of AI — K.R. Mangalam University.</p>
+        <p class="footer-tagline-small">Do you trust your eyes?</p>
       </div>
     </div>
   </footer>

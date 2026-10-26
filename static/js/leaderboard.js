@@ -98,8 +98,8 @@ document.addEventListener("DOMContentLoaded", () => {
         <!-- 2nd Place -->
         ${second ? `
           <div class="podium-col col-silver">
-            <div class="podium-rank-tag">🥈 2nd</div>
-            <div class="podium-avatar">👤</div>
+            <div class="podium-rank-tag">#2 Second</div>
+            <div class="podium-avatar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
             <div class="podium-nick">${second.nickname}</div>
             <div class="podium-score">${second.score} pts</div>
             <div class="podium-block block-silver"></div>
@@ -109,9 +109,9 @@ document.addEventListener("DOMContentLoaded", () => {
         <!-- 1st Place (Center & Tallest) -->
         ${first ? `
           <div class="podium-col col-gold">
-            <div class="podium-crown">👑</div>
-            <div class="podium-rank-tag">🥇 1st</div>
-            <div class="podium-avatar">⭐</div>
+            <div class="podium-crown"><svg width="32" height="32" viewBox="0 0 24 24" fill="#f59e0b" stroke="#b45309" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>
+            <div class="podium-rank-tag">#1 First</div>
+            <div class="podium-avatar"><svg width="24" height="24" viewBox="0 0 24 24" fill="#f59e0b" stroke="#b45309" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></div>
             <div class="podium-nick">${first.nickname}</div>
             <div class="podium-score">${first.score} pts</div>
             <div class="podium-block block-gold"></div>
@@ -121,8 +121,8 @@ document.addEventListener("DOMContentLoaded", () => {
         <!-- 3rd Place -->
         ${third ? `
           <div class="podium-col col-bronze">
-            <div class="podium-rank-tag">🥉 3rd</div>
-            <div class="podium-avatar">👤</div>
+            <div class="podium-rank-tag">#3 Third</div>
+            <div class="podium-avatar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
             <div class="podium-nick">${third.nickname}</div>
             <div class="podium-score">${third.score} pts</div>
             <div class="podium-block block-bronze"></div>
@@ -148,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       tr.innerHTML = `
         <td class="rank-col">
-          ${item.rank === 1 ? '🥇' : (item.rank === 2 ? '🥈' : (item.rank === 3 ? '🥉' : `#${item.rank}`))}
+          item.rank <= 3 ? `#${item.rank}` : `#${item.rank}`
         </td>
         <td class="player-col">
           <strong>${item.nickname}</strong>

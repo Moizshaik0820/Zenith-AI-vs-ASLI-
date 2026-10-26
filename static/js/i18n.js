@@ -10,9 +10,9 @@ const TRANSLATIONS = {
     "hero_badge": "⚡ Zenith School of AI Campus Experience",
     "hero_tagline": '"Do you trust your eyes?"',
     "hero_hook": "AI can fake a face, a voice, and even reality. Can you spot the difference? Put your perception to the test across synthetic images, neural voice clones, and deepfake videos.",
-    "btn_enter_challenge": "🚀 ENTER THE CHALLENGE",
-    "btn_how_to_play": "📖 How to Play",
-    "rules_title": "📊 Challenge Rules & Scoring Architecture",
+    "btn_enter_challenge": "ENTER THE CHALLENGE",
+    "btn_how_to_play": "How to Play",
+    "rules_title": "Challenge Rules & Scoring Architecture",
     "rule_1_metric": "10",
     "rule_1_desc": "Questions per game across AI images, audio synthesis, and video deepfakes.",
     "rule_2_metric": "+100",
@@ -30,7 +30,7 @@ const TRANSLATIONS = {
     "nick_title": "Choose Your Identity",
     "nick_subtitle": "Every detective needs a codename in the neural matrix.",
     "nick_suggestions": "AI SUGGESTIONS",
-    "nick_refresh": "🔄 Refresh",
+    "nick_refresh": "Refresh",
     "nick_custom_label": "OR ENTER A CUSTOM CODENAME",
     "nick_preview_lead": "This name will represent you in the arena and on the leaderboard:",
     "nick_btn_submit": "Use this name →",
@@ -53,7 +53,7 @@ const TRANSLATIONS = {
     // Game
     "btn_ai_sub": "Synthetic / Deepfake",
     "btn_asli_sub": "Genuine / Authentic",
-    "btn_zoom": "🔍 Zoom & Inspect",
+    "btn_zoom": "Zoom & Inspect",
     "audio_play_prompt": "Press Play to Listen",
     "video_play_prompt": "Tap to play video",
     
@@ -61,15 +61,15 @@ const TRANSLATIONS = {
     "results_game_over": "GAME OVER",
     "results_good_job": "GOOD JOB,",
     "results_score_ready": "Your score is ready to reveal.",
-    "results_btn_reveal": "✨ SCORE + STANDINGS",
+    "results_btn_reveal": "VIEW SCORE & STANDINGS",
     "results_insta_prompt": "Follow Zenith School of AI on Instagram to unlock your verified score report!",
     "results_btn_insta": "Follow @zenith_school_of_ai →",
-    "results_btn_i_followed": "I Followed! Reveal My Score ✨",
-    "results_download_btn": "📥 Download Story Graphic (PNG)",
-    "results_share_friends": "📤 Share with Friends",
-    "results_share_insta": "📸 Share to Instagram Story",
-    "results_leaderboard_btn": "🏆 View Leaderboard",
-    "results_play_again": "🔄 PLAY AGAIN"
+    "results_btn_i_followed": "I Followed! Reveal My Score",
+    "results_download_btn": "Download Story Graphic (PNG)",
+    "results_share_friends": "Share with Friends",
+    "results_share_insta": "Share to Instagram Story",
+    "results_leaderboard_btn": "View Leaderboard",
+    "results_play_again": "PLAY AGAIN"
   },
   
   hi: {
@@ -78,9 +78,9 @@ const TRANSLATIONS = {
     "hero_badge": "⚡ Zenith School of AI Campus Experience",
     "hero_tagline": '"Kya aapko apni aankhon par bharosa hai?"',
     "hero_hook": "AI chehra, aawaz aur yahan tak ki reality bhi fake kar sakta hai. Kya aap asli aur nakli ka farq pehchaan sakte ho? Apni detective instincts ka test lo!",
-    "btn_enter_challenge": "🚀 CHALLENGE MEIN ENTER KARO",
-    "btn_how_to_play": "📖 Kaise Khele",
-    "rules_title": "📊 Challenge Ke Niyam & Score Architecture",
+    "btn_enter_challenge": "CHALLENGE MEIN ENTER KARO",
+    "btn_how_to_play": "Kaise Khele",
+    "rules_title": "Challenge Ke Niyam & Score Architecture",
     "rule_1_metric": "10",
     "rule_1_desc": "Har game mein 10 sawaal - AI photos, audio aur video deepfakes.",
     "rule_2_metric": "+100",
@@ -98,7 +98,7 @@ const TRANSLATIONS = {
     "nick_title": "Apna Codename Chuno",
     "nick_subtitle": "Har reality detective ka ek solid codename hona chahiye.",
     "nick_suggestions": "AI SUGGESTIONS",
-    "nick_refresh": "🔄 Naye Names",
+    "nick_refresh": "Naye Names",
     "nick_custom_label": "YA APNA CUSTOM NAAM LIKHO",
     "nick_preview_lead": "Yeh naam aapke game aur leaderboard par dikhega:",
     "nick_btn_submit": "Yeh Naam Use Karo →",
@@ -121,7 +121,7 @@ const TRANSLATIONS = {
     // Game
     "btn_ai_sub": "Synthetic / Nakli",
     "btn_asli_sub": "Real / Asli",
-    "btn_zoom": "🔍 Bada Karke Dekho",
+    "btn_zoom": "Bada Karke Dekho",
     "audio_play_prompt": "Sunne ke liye Play dabao",
     "video_play_prompt": "Video dekhne ke liye tap karo",
     
@@ -133,11 +133,11 @@ const TRANSLATIONS = {
     "results_insta_prompt": "Apna score aur rank unlock karne ke liye Zenith School of AI ko Instagram par follow karo!",
     "results_btn_insta": "@zenith_school_of_ai Follow Karo →",
     "results_btn_i_followed": "Maine Follow Kar Liya! Score Dikhao ✨",
-    "results_download_btn": "📥 Story Graphic Download Karo (PNG)",
-    "results_share_friends": "📤 Dosto Ke Sath Share Karo",
-    "results_share_insta": "📸 Instagram Story Par Lagao",
-    "results_leaderboard_btn": "🏆 Leaderboard Dekho",
-    "results_play_again": "🔄 PHIR SE KHELO"
+    "results_download_btn": "Story Graphic Download Karo (PNG)",
+    "results_share_friends": "Dosto Ke Sath Share Karo",
+    "results_share_insta": "Instagram Story Par Lagao",
+    "results_leaderboard_btn": "Leaderboard Dekho",
+    "results_play_again": "PHIR SE KHELO"
   }
 };
 

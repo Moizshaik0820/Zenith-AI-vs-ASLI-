@@ -157,7 +157,7 @@ class GameEngine {
       toggleBtn.type = "button";
       toggleBtn.className = "lens-toggle-pill";
       toggleBtn.innerHTML = `
-        <span>🔍</span>
+        <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
         <span class="lens-pill-text">ON</span>
         <span class="lens-pill-switch"></span>
       `;
@@ -397,8 +397,8 @@ class GameEngine {
     const isLastQuestion = (this.currentIndex >= this.totalQuestions - 1) || Boolean(res.is_game_over);
     let statusClass = res.is_correct ? "correct" : (isUnanswered ? "unanswered" : "incorrect");
     let statusText = res.is_correct 
-      ? (isHinglish ? "🎯 Sahi Pehchaana! (Correct)" : "🎯 Spot On! Correct Detection") 
-      : (isUnanswered ? (isHinglish ? "⌛ Time Khatam Ho Gaya!" : "⌛ Time Expired!") : (isHinglish ? "❌ AI Ne Dhokha De Diya!" : "❌ Deceived by the Fake!"));
+      ? (isHinglish ? "Sahi Pehchaana! (Correct)" : "Spot On! Correct Detection") 
+      : (isUnanswered ? (isHinglish ? "Time Khatam Ho Gaya!" : "Time Expired!") : (isHinglish ? "AI Ne Dhokha De Diya!" : "Deceived by the Fake!"));
 
     const nextBtnText = isLastQuestion 
       ? (isHinglish ? "FINAL RESULTS DEKHO →" : "VIEW FINAL RESULTS →")

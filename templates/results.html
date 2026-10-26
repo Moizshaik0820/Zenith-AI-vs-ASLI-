@@ -22,7 +22,7 @@
     <div class="reveal-overlay-prompt" id="revealPromptOverlay">
       <h2 class="reveal-heading" data-i18n="results_score_ready">Your score is ready to reveal.</h2>
       <button type="button" class="btn btn-primary btn-lg btn-pill" id="revealScoreBtn" data-i18n="results_btn_reveal">
-        ✨ SCORE + STANDINGS
+        SCORE & STANDINGS
       </button>
     </div>
 
@@ -108,19 +108,19 @@
     <!-- Actions -->
     <div class="results-actions-grid">
       <button type="button" class="btn btn-primary" id="downloadCardBtn" data-i18n="results_download_btn">
-        📥 Download Story Graphic (PNG)
+        Download Story Graphic (PNG)
       </button>
       <button type="button" class="btn btn-secondary" id="shareFriendsBtn" data-i18n="results_share_friends">
-        📤 Share with Friends
+        Share with Friends
       </button>
       <button type="button" class="btn btn-secondary" id="shareInstaBtn" data-i18n="results_share_insta">
-        📸 Share to Instagram Story
+        Share to Instagram Story
       </button>
       <a href="{{ url_for('pages.leaderboard') }}?session_id={{ session_id }}" class="btn btn-secondary" data-i18n="results_leaderboard_btn">
-        🏆 View Leaderboard
+        View Leaderboard
       </a>
       <button type="button" class="btn btn-coral" id="playAgainBtn" data-i18n="results_play_again">
-        🔄 PLAY AGAIN
+        PLAY AGAIN
       </button>
     </div>
   </div>
@@ -130,7 +130,7 @@
 <!-- MANDATORY INSTAGRAM FOLLOW POPUP MODAL -->
 <div class="modal-overlay" id="followInstagramModal">
   <div class="modal-card" style="text-align:center;">
-    <div style="font-size:3rem; margin-bottom:0.5rem;">📸</div>
+    <div style="margin-bottom:0.5rem;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--zenith-purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></div>
     <h3 style="color:var(--zenith-purple); font-size:1.5rem; font-weight:900; margin-bottom:0.75rem;">
       Follow Zenith School of AI
     </h3>

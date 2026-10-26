@@ -17,6 +17,24 @@ def index():
         campaign_url=Config.CAMPAIGN_URL
     )
 
+@pages_bp.route("/how-to-play")
+@pages_bp.route("/guide")
+def guide():
+    return render_template(
+        "guide.html",
+        title="How to Play & AI Detection Guide | AI vs ASLI",
+        instagram_handle=Config.INSTAGRAM_HANDLE,
+        instagram_url=Config.INSTAGRAM_URL
+    )
+
+@pages_bp.route("/about")
+def about():
+    return render_template(
+        "about.html",
+        title="About Zenith School of AI | K.R. Mangalam University",
+        campaign_url=Config.CAMPAIGN_URL
+    )
+
 @pages_bp.route("/nickname")
 def nickname():
     return render_template("nickname.html", title="Select Player Nickname | AI vs ASLI")
