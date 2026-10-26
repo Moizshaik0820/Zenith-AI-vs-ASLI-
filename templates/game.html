@@ -2,107 +2,460 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
+<style>
+  /* Zero-scroll game arena stage */
+  .game-locked-stage {
+    position: relative;
+    height: calc(100dvh - 72px);
+    max-height: calc(100dvh - 72px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  @media (max-width: 680px) {
+    .game-locked-stage {
+      height: calc(100dvh - 56px);
+      max-height: calc(100dvh - 56px);
+      padding: 0.35rem 0.65rem;
+    }
+  }
+
+  /* Host Big Screen View (Single Screen Unified Layout) */
+  .host-locked-card {
+    background: rgba(23, 19, 48, 0.94);
+    backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(139, 92, 246, 0.35);
+    border-radius: 20px;
+    padding: 1.25rem 1.5rem;
+    max-width: 680px;
+    width: 100%;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.65), 0 0 35px rgba(124, 58, 237, 0.2);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .host-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .host-label {
+    font-size: 0.76rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    display: block;
+  }
+
+  .host-room-title {
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .host-code-red {
+    color: #E11D48;
+    font-family: var(--font-chunky, 'Lilita One', monospace);
+    font-size: 1.7rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+  }
+
+  .host-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+  }
+
+  .host-part-box {
+    text-align: right;
+  }
+
+  .host-part-label {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    display: block;
+  }
+
+  .host-part-count {
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: #ffffff;
+    line-height: 1;
+  }
+
+  .btn-host-start {
+    padding: 0.65rem 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 800;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
+    border: none;
+    color: #ffffff !important;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+    transition: all 0.2s ease;
+  }
+
+  .btn-host-start:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
+  }
+
+  .host-middle-box {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .host-scan-title {
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: #ffffff;
+    margin-bottom: 0.25rem;
+  }
+
+  .host-scan-subtitle {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .host-qr-frame {
+    display: inline-block;
+    padding: 0.65rem;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    margin-bottom: 0.5rem;
+  }
+
+  .host-qr-img {
+    width: 145px;
+    height: 145px;
+    display: block;
+  }
+
+  .host-detectives-wrap {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .host-detectives-label {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+  }
+
+  .host-detectives-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    justify-content: center;
+    max-height: 80px;
+    overflow-y: auto;
+  }
+
+  @media (max-width: 680px) {
+    .host-locked-card {
+      padding: 0.75rem 0.85rem;
+      max-width: 360px;
+      gap: 0.5rem;
+    }
+    .host-code-red {
+      font-size: 1.35rem;
+    }
+    .host-scan-title {
+      font-size: 1.15rem;
+    }
+    .host-scan-subtitle {
+      font-size: 0.82rem;
+      margin-bottom: 0.35rem;
+    }
+    .host-qr-img {
+      width: 115px;
+      height: 115px;
+    }
+    .host-qr-frame {
+      padding: 0.5rem;
+      margin-bottom: 0.35rem;
+    }
+    .btn-host-start {
+      padding: 0.5rem 0.95rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  /* Meme Modal Popup Overlay */
+  .game-meme-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(3, 7, 18, 0.85);
+    backdrop-filter: blur(12px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeIn 0.2s ease-out;
+  }
+
+  .game-meme-modal {
+    background: rgba(23, 19, 48, 0.98);
+    border: 2px solid rgba(139, 92, 246, 0.45);
+    border-radius: 24px;
+    padding: 1.4rem 1.5rem;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 35px rgba(124, 58, 237, 0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .meme-status-badge {
+    font-family: var(--font-chunky, 'Lilita One', sans-serif);
+    font-size: 1.65rem;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.35rem;
+  }
+
+  .meme-status-badge.correct {
+    color: #10b981;
+    text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+  }
+
+  .meme-status-badge.incorrect {
+    color: #ef4444;
+    text-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+  }
+
+  .meme-graphic-frame {
+    width: 140px;
+    height: 140px;
+    margin: 0.25rem 0 0.55rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .meme-reaction-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.65));
+    animation: bounceIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .meme-score-earned {
+    font-family: var(--font-chunky, 'Lilita One', monospace);
+    font-size: 1.35rem;
+    font-weight: 900;
+    margin-bottom: 0.35rem;
+  }
+
+  .meme-score-earned.correct {
+    color: #34d399;
+  }
+
+  .meme-score-earned.incorrect {
+    color: #f87171;
+  }
+
+  .meme-explanation-text {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    line-height: 1.45;
+    margin-bottom: 1rem;
+    max-height: 110px;
+    overflow-y: auto;
+    padding: 0 0.5rem;
+  }
+
+  .btn-next-from-meme {
+    width: 100%;
+    padding: 0.88rem 1.4rem;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
+    border: none;
+    border-radius: var(--radius-pill);
+    color: #ffffff !important;
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.45);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-next-from-meme:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(124, 58, 237, 0.6);
+  }
+
+  @keyframes scaleUp {
+    from { opacity: 0; transform: scale(0.85); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes bounceIn {
+    0% { transform: scale(0.6); }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="game-arena" {% if mode == 'solo' %}id="gameArenaSolo"{% endif %}>
+<!-- Hacker Green Code Rain Background Canvas -->
+<canvas id="matrixCanvas" class="matrix-code-canvas" aria-hidden="true"></canvas>
 
+<section class="game-locked-stage">
   {% if mode == 'solo' %}
-  <!-- SOLO PLAY VIEW (Points Badge Removed as requested!) -->
-  <div class="game-progress-header">
-    <span class="question-counter-badge" id="questionCounter">Question 1 of 10</span>
-    <!-- Note: Points are strictly hidden during questions -->
-  </div>
+  <!-- SOLO PLAY VIEW (Zero-Scroll 6-Question Engine with Swipe Right=ASLI, Swipe Left=AI) -->
+  <div class="game-arena" id="gameArenaSolo">
 
-  <div class="progress-segments-bar" id="progressSegmentsBar" aria-label="10 Question Progress Indicator">
-    {% for i in range(10) %}
-      <div class="progress-segment {% if i == 0 %}current{% endif %}" data-index="{{ i }}"></div>
-    {% endfor %}
-  </div>
+    <div class="game-progress-header">
+      <span class="question-counter-badge" id="questionCounter">Question 1 of 6</span>
+      <!-- Speed scoring info -->
+      <span style="font-size:0.8rem; font-weight:800; color:#34d399;" id="speedPointsBadge">⚡ Speed Points Active</span>
+    </div>
 
-  <div class="question-card">
-    <div class="question-top-bar">
-      <span class="category-tag" id="categoryTag">ANALYSIS</span>
-      <div class="timer-box" id="timerBox">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> <span id="timerDisplay">10.0s</span>
+    <!-- 6 Progress Segments -->
+    <div class="progress-segments-bar" id="progressSegmentsBar" aria-label="6 Question Progress Indicator">
+      {% for i in range(6) %}
+        <div class="progress-segment {% if i == 0 %}current{% endif %}" data-index="{{ i }}"></div>
+      {% endfor %}
+    </div>
+
+    <div class="question-card" id="swipeableCard">
+      <!-- Swipe feedback overlay cues -->
+      <div class="swipe-indicator-overlay swipe-indicator-ai" id="swipeCueAi">👈 AI</div>
+      <div class="swipe-indicator-overlay swipe-indicator-asli" id="swipeCueAsli">ASLI 👉</div>
+
+      <div class="question-top-bar">
+        <span class="category-tag" id="categoryTag">ANALYSIS</span>
+        <div class="timer-box" id="timerBox">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span id="timerDisplay">15.0s</span>
+        </div>
       </div>
-    </div>
 
-    <!-- Media Container -->
-    <div class="media-container" id="mediaViewport" aria-label="Media Analysis Area">
-      <div style="color:var(--text-muted); font-size:0.95rem;">Loading challenge media...</div>
-    </div>
+      <!-- Media Container with Magnifier Support -->
+      <div class="media-container" id="mediaViewport" aria-label="Media Analysis Area">
+        <div style="color:var(--text-muted); font-size:0.95rem;">Loading challenge media...</div>
+      </div>
 
-    <!-- Dual AI vs ASLI Large Buttons -->
-    <div class="answers-row" id="answersRow">
-      <button type="button" class="answer-btn answer-btn-ai" id="btnAnswerAi">
-        AI
-        <span class="btn-subtext" data-i18n="btn_ai_sub">Synthetic / Deepfake</span>
+      <!-- Swipe / Tap Answer Buttons -->
+      <div class="answers-row" id="answersRow">
+        <button type="button" class="answer-btn answer-btn-ai" id="btnAnswerAi" title="Swipe Left or Tap for AI">
+          AI
+          <span class="btn-subtext">← Swipe Left for AI</span>
+        </button>
+
+        <button type="button" class="answer-btn answer-btn-asli" id="btnAnswerAsli" title="Swipe Right or Tap for ASLI">
+          ASLI
+          <span class="btn-subtext">Swipe Right for ASLI →</span>
+        </button>
+      </div>
+
+      <!-- Immediate Feedback Drawer (hidden, replaced by popup meme) -->
+      <div class="feedback-box" id="feedbackDrawer" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- After-Question Meme Popup Modal -->
+  <div class="game-meme-overlay" id="gameMemeOverlay" style="display:none;" role="dialog" aria-modal="true">
+    <div class="game-meme-modal" id="gameMemeModal">
+      <div class="meme-status-badge" id="memeStatusBadge">SAHI JAWAAB! 🎯</div>
+      <div class="meme-graphic-frame">
+        <img id="memeReactionImg" src="{{ url_for('static', filename='images/meme-correct.webp') }}" alt="Reaction Meme" class="meme-reaction-img">
+      </div>
+      <div class="meme-score-earned" id="memeScoreEarned">+88 PTS</div>
+      <p class="meme-explanation-text" id="memeExplanationText"></p>
+      <button type="button" class="btn-next-from-meme" id="btnNextFromMeme">
+        NEXT QUESTION →
       </button>
-
-      <button type="button" class="answer-btn answer-btn-asli" id="btnAnswerAsli">
-        ASLI
-        <span class="btn-subtext" data-i18n="btn_asli_sub">Genuine / Authentic</span>
-      </button>
     </div>
-
-    <!-- Immediate Feedback Drawer (NO POINTS DISPLAYED) -->
-    <div class="feedback-box" id="feedbackDrawer" style="display:none;"></div>
   </div>
 
   {% elif mode == 'host' %}
-  <!-- BIG SCREEN HOST VIEW -->
-  <div style="background:var(--bg-surface); padding:1rem 1.5rem; border-radius:var(--radius-md); margin-bottom:1.5rem; display:flex; justify-content:space-between; align-items:center; border:1px solid var(--border-subtle); box-shadow:var(--shadow-subtle);">
-    <div>
-      <span style="font-size:0.8rem; color:var(--text-dim); text-transform:uppercase; font-weight:800;">Big Screen Auditorium Session</span>
-      <h2 style="font-size:1.6rem; font-weight:900; color:var(--zenith-purple);">ROOM CODE: {{ room_code }}</h2>
-    </div>
-    <div style="display:flex; align-items:center; gap:1.5rem;">
-      <div style="text-align:right;">
-        <span style="font-size:0.8rem; color:var(--text-dim); font-weight:800;">PARTICIPANTS</span>
-        <div id="liveParticipantCount" style="font-size:1.4rem; font-weight:900; color:var(--text-main);">0</div>
+  <!-- BIG SCREEN HOST VIEW (Single Screen Unified Layout, Zero-Scroll, No Footer) -->
+  <div class="host-locked-card">
+    <div class="host-top-row">
+      <div>
+        <span class="host-label">Big Screen Auditorium Session</span>
+        <h2 class="host-room-title">ROOM CODE: <span class="host-code-red">{{ room_code }}</span></h2>
       </div>
-      <button type="button" class="btn btn-primary btn-sm" id="btnHostStartMatch">
-        START MATCH ▶
-      </button>
+      <div class="host-bar-actions">
+        <div class="host-part-box">
+          <span class="host-part-label">PARTICIPANTS</span>
+          <div id="liveParticipantCount" class="host-part-count">0</div>
+        </div>
+        <button type="button" class="btn-host-start" id="btnHostStartMatch">
+          START MATCH ▶
+        </button>
+      </div>
     </div>
-  </div>
 
-  <div id="multiplayerArena">
-    <div style="text-align:center; padding:3rem 1.5rem; background:var(--bg-surface); border-radius:var(--radius-lg); border:1px solid var(--border-subtle); box-shadow:var(--shadow-subtle);">
-      <h3 style="font-size:1.8rem; font-weight:900; margin-bottom:1rem; color:var(--text-main);">Scan to Join the Challenge</h3>
-      <p style="color:var(--text-dim); margin-bottom:2rem; font-size:1.1rem;">
-        Open your phone camera or visit: <strong>{{ request.host }}</strong> and enter code: <strong style="color:var(--zenith-purple); font-size:1.4rem;">{{ room_code }}</strong>
+    <div class="host-middle-box" id="multiplayerArena">
+      <h3 class="host-scan-title">Scan to Join the Challenge</h3>
+      <p class="host-scan-subtitle">
+        Open phone camera or visit: <strong>{{ request.host }}</strong> and enter code: <strong class="host-code-red">{{ room_code }}</strong>
       </p>
 
-      <div style="display:inline-block; padding:1.2rem; background:#fff; border-radius:18px; border:2px solid var(--border-subtle); margin-bottom:2rem; box-shadow:var(--shadow-subtle);">
-        <img src="/api/qr/{{ room_code }}" alt="Scan QR code to join" style="width:240px; height:240px; display:block;">
+      <div class="host-qr-frame">
+        <img src="/api/qr/{{ room_code }}" alt="Scan QR code to join" class="host-qr-img">
       </div>
 
-      <div style="max-width:600px; margin:0 auto;">
-        <h4 style="font-size:0.95rem; color:var(--text-dim); margin-bottom:0.8rem; text-transform:uppercase; font-weight:800;">Connected Students & Detectives:</h4>
-        <div id="lobbyPlayersList" style="display:flex; flex-wrap:wrap; gap:0.6rem; justify-content:center;">
-          <span style="color:var(--text-muted); font-size:0.9rem;">Waiting for participants to connect...</span>
+      <div class="host-detectives-wrap">
+        <h4 class="host-detectives-label">Connected Detectives:</h4>
+        <div id="lobbyPlayersList" class="host-detectives-list">
+          <span style="color:var(--text-muted); font-size:0.85rem;">Waiting for detectives to scan...</span>
         </div>
       </div>
     </div>
   </div>
 
   {% elif mode == 'room_player' %}
-  <!-- PARTICIPANT CONTROLLER VIEW -->
-  <div id="multiplayerArena">
-    <div style="text-align:center; padding:3rem 1rem; background:var(--bg-surface); border-radius:var(--radius-lg); border:1px solid var(--border-subtle); box-shadow:var(--shadow-subtle);">
-      <div style="margin-bottom:1rem;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--zenith-purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></div>
-      <h2 style="font-size:1.8rem; font-weight:900; margin-bottom:0.5rem; color:var(--text-main);">Connected to Room {{ room_code }}</h2>
-      <p style="color:var(--text-dim); margin-bottom:2rem;">Look up at the stage/projector screen. The questions will appear there!</p>
-      <div style="background:var(--bg-card); padding:1rem; border-radius:12px; display:inline-block; font-weight:800; color:var(--zenith-purple); border:1px solid var(--border-subtle);">
-        Status: Waiting for host to launch the match...
-      </div>
+  <!-- PARTICIPANT CONTROLLER VIEW (Single Screen Unified Layout) -->
+  <div class="host-locked-card" style="text-align:center; align-items:center;">
+    <div style="margin-bottom:0.5rem;"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></div>
+    <h2 style="font-size:1.6rem; font-weight:900; margin-bottom:0.35rem; color:#ffffff;">Connected to Room <span class="host-code-red">{{ room_code }}</span></h2>
+    <p style="color:var(--text-dim); margin-bottom:1rem; font-size:0.92rem;">Look up at the stage/projector screen. The questions will appear there!</p>
+    <div style="background:rgba(15,12,35,0.85); padding:0.85rem 1.25rem; border-radius:12px; font-weight:800; color:#34d399; border:1px solid rgba(139,92,246,0.3);">
+      Status: Waiting for host to launch the match...
     </div>
   </div>
   {% endif %}
-
-</div>
+</section>
 {% endblock %}
 
 {% block extra_js %}

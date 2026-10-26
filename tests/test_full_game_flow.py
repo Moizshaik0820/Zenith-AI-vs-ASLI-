@@ -16,8 +16,8 @@ class TestFullGameFlow(unittest.TestCase):
         self.app.config["TESTING"] = True
         self.client = self.app.test_client()
 
-    def test_complete_10_question_game_and_results(self):
-        """Simulates an entire 10-question match and verifies results and leaderboard persistence."""
+    def test_complete_6_question_game_and_results(self):
+        """Simulates an entire 6-question match and verifies results and leaderboard persistence."""
         # 1. Nickname init
         nick_res = self.client.post("/api/player/init", json={"nickname": "E2ETester"})
         self.assertEqual(nick_res.status_code, 200)
@@ -32,12 +32,12 @@ class TestFullGameFlow(unittest.TestCase):
         self.assertEqual(start_res.status_code, 200)
         start_data = json.loads(start_res.data)
         session_id = start_data["session_id"]
-        self.assertEqual(start_data["total_questions"], 10)
+        self.assertEqual(start_data["total_questions"], 6)
 
         curr_q = start_data["question"]
 
-        # 3. Play through all 10 questions
-        for idx in range(10):
+        # 3. Play through all 6 questions
+        for idx in range(6):
             # Answer question
             ans_res = self.client.post(f"/api/game/{session_id}/answer", json={
                 "question_id": curr_q["id"],
@@ -47,13 +47,13 @@ class TestFullGameFlow(unittest.TestCase):
             self.assertEqual(ans_res.status_code, 200)
             ans_data = json.loads(ans_res.data)
 
-            if idx < 9:
+            if idx < 5:
                 self.assertFalse(ans_data["is_game_over"])
                 next_res = self.client.get(f"/api/game/{session_id}/question/{idx + 1}")
                 self.assertEqual(next_res.status_code, 200)
                 curr_q = json.loads(next_res.data)["question"]
             else:
-                self.assertTrue(ans_data["is_game_over"], "Game should be over after question 10!")
+                self.assertTrue(ans_data["is_game_over"], "Game should be over after question 6!")
 
         # 4. Check results page loads successfully
         res_page = self.client.get(f"/results/{session_id}")

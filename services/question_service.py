@@ -59,18 +59,21 @@ class QuestionService:
         return dict(row) if row else None
 
     @staticmethod
-    def select_game_questions(count=10) -> list:
+    def select_game_questions(count=6) -> list:
         """
-        Randomly chooses 10 eligible questions from the available bank:
+        Randomly chooses 6 eligible questions (Image and Video only, no audio) from the bank:
         - Balances AI and ASLI answers as closely as possible.
         - Checks media asset exists on disk.
         - Shuffles order to avoid predictability.
         """
         all_qs = QuestionService.get_all_questions(active_only=True)
         
-        # Verify media file exists
+        # Verify media file exists AND is image or video (NO audio per instruction)
         valid_qs = []
         for q in all_qs:
+            q_type = str(q.get("type", "")).upper()
+            if q_type not in ("IMAGE", "VIDEO"):
+                continue
             full_path = Config.MEDIA_FOLDER / q["media_path"].replace("\\", "/")
             if full_path.exists():
                 valid_qs.append(q)

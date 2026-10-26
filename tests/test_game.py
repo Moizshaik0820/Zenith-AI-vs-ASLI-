@@ -24,28 +24,27 @@ class TestAiVsAsliGame(unittest.TestCase):
         self.client = self.app.test_client()
 
     def test_scoring_formula(self):
-        """Verify deterministic scoring formula for correct, incorrect, and speed bonuses."""
-        # 1. Correct with maximum remaining time (instant answer)
-        # Image total time = 10s, remaining = 10s -> speed bonus = floor(50 * 10 / 10) = 50
+        """Verify deterministic speed-based scoring formula (fixed 100 pts removed)."""
+        # 1. Correct with maximum remaining time (instant answer: 100 pts)
         is_corr, base, bonus, total = ScoringService.evaluate_answer("AI", "AI", time_taken=0.0, total_time=10.0)
         self.assertTrue(is_corr)
-        self.assertEqual(base, 100)
-        self.assertEqual(bonus, 50)
-        self.assertEqual(total, 150)
+        self.assertEqual(base, 0)
+        self.assertEqual(bonus, 100)
+        self.assertEqual(total, 100)
 
-        # 2. Correct with 5 seconds remaining out of 10s -> floor(50 * 5 / 10) = 25
+        # 2. Correct with 5 seconds remaining out of 10s -> floor(100 * 5 / 10) = 50 pts
         is_corr, base, bonus, total = ScoringService.evaluate_answer("ASLI", "ASLI", time_taken=5.0, total_time=10.0)
         self.assertTrue(is_corr)
-        self.assertEqual(base, 100)
-        self.assertEqual(bonus, 25)
-        self.assertEqual(total, 125)
+        self.assertEqual(base, 0)
+        self.assertEqual(bonus, 50)
+        self.assertEqual(total, 50)
 
-        # 3. Correct with 0 seconds remaining (at deadline) -> bonus = 0
+        # 3. Correct with 0 seconds remaining (at deadline) -> min speed floor = 10 pts
         is_corr, base, bonus, total = ScoringService.evaluate_answer("AI", "AI", time_taken=10.0, total_time=10.0)
         self.assertTrue(is_corr)
-        self.assertEqual(base, 100)
-        self.assertEqual(bonus, 0)
-        self.assertEqual(total, 100)
+        self.assertEqual(base, 0)
+        self.assertEqual(bonus, 10)
+        self.assertEqual(total, 10)
 
         # 4. Incorrect answer -> 0 points
         is_corr, base, bonus, total = ScoringService.evaluate_answer("AI", "ASLI", time_taken=2.0, total_time=10.0)
@@ -58,10 +57,10 @@ class TestAiVsAsliGame(unittest.TestCase):
         self.assertEqual(total, 0)
 
     def test_question_selection_and_balancing(self):
-        """Verifies that 10 questions are selected, balanced between AI and ASLI, without duplicates."""
-        selected_ids = QuestionService.select_game_questions(10)
-        self.assertEqual(len(selected_ids), 10)
-        self.assertEqual(len(set(selected_ids)), 10, "Duplicate question IDs found in selection!")
+        """Verifies that 6 questions are selected, balanced between AI and ASLI, without duplicates."""
+        selected_ids = QuestionService.select_game_questions(Config.QUESTIONS_PER_GAME)
+        self.assertEqual(len(selected_ids), 6)
+        self.assertEqual(len(set(selected_ids)), 6, "Duplicate question IDs found in selection!")
 
         # Check balance
         ai_count = 0
@@ -73,8 +72,8 @@ class TestAiVsAsliGame(unittest.TestCase):
             elif q["answer"] == "ASLI":
                 asli_count += 1
 
-        self.assertEqual(ai_count, 5, f"Expected 5 AI questions, got {ai_count}")
-        self.assertEqual(asli_count, 5, f"Expected 5 ASLI questions, got {asli_count}")
+        self.assertEqual(ai_count, 3, f"Expected 3 AI questions, got {ai_count}")
+        self.assertEqual(asli_count, 3, f"Expected 3 ASLI questions, got {asli_count}")
 
     def test_question_sanitization(self):
         """Verifies that questions sent to client never expose ground truth answer or raw paths."""

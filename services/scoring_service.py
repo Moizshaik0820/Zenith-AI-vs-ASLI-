@@ -18,7 +18,8 @@ class ScoringService:
     @staticmethod
     def evaluate_answer(chosen_answer: str, correct_answer: str, time_taken: float, total_time: float):
         """
-        Evaluates an answer and calculates points earned.
+        Evaluates an answer and calculates points earned based purely on response speed.
+        Fixed 100 points removed per instruction. Faster answers earn more points (up to 100).
         Returns: (is_correct, base_points, speed_bonus, total_points)
         """
         if not chosen_answer or chosen_answer.upper() in ("UNANSWERED", "TIMEOUT", "NONE"):
@@ -29,7 +30,12 @@ class ScoringService:
             return False, 0, 0, 0
             
         remaining_time = max(0.0, total_time - float(time_taken))
-        base_points = Config.BASE_POINTS_PER_CORRECT
-        speed_bonus = ScoringService.calculate_speed_bonus(remaining_time, total_time)
-        total_points = base_points + speed_bonus
-        return True, base_points, speed_bonus, total_points
+        # Pure time/speed-based scoring: No fixed 100 points.
+        # Scale points linearly with speed (from 10 up to 100).
+        if total_time > 0:
+            speed_pts = max(10, min(100, math.floor(100 * (remaining_time / total_time))))
+        else:
+            speed_pts = 50
+        base_points = 0
+        total_points = speed_pts
+        return True, base_points, speed_pts, total_points

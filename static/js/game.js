@@ -8,7 +8,7 @@ class GameEngine {
     this.playerId = localStorage.getItem("zenith_player_id");
     this.nickname = localStorage.getItem("zenith_nickname") || "Detective";
     this.currentIndex = 0;
-    this.totalQuestions = 10;
+    this.totalQuestions = 6;
     this.currentQuestion = null;
     this.timerInterval = null;
     this.remainingTime = 10.0;
@@ -45,6 +45,127 @@ class GameEngine {
     if (this.btnAsli) {
       this.btnAsli.addEventListener("click", () => this.handleAnswer("ASLI"));
     }
+
+    this.swipeableCard = document.getElementById("swipeableCard");
+    this.swipeCueAi = document.getElementById("swipeCueAi");
+    this.swipeCueAsli = document.getElementById("swipeCueAsli");
+    this.gameMemeOverlay = document.getElementById("gameMemeOverlay");
+    this.btnNextFromMeme = document.getElementById("btnNextFromMeme");
+    this.memeReactionImg = document.getElementById("memeReactionImg");
+    this.memeStatusBadge = document.getElementById("memeStatusBadge");
+    this.memeScoreEarned = document.getElementById("memeScoreEarned");
+    this.memeExplanationText = document.getElementById("memeExplanationText");
+
+    this.initSwipeGestures();
+  }
+
+  initSwipeGestures() {
+    if (!this.swipeableCard) return;
+
+    let startX = 0;
+    let startY = 0;
+    let currentX = 0;
+    let isDragging = false;
+    let isHorizontalGesture = false;
+
+    const onStart = (clientX, clientY) => {
+      if (this.isAnsweringLocked || this.zoomScale > 1.05) return;
+      startX = clientX;
+      startY = clientY;
+      currentX = clientX;
+      isDragging = true;
+      isHorizontalGesture = false;
+      this.swipeableCard.classList.add("swiping");
+    };
+
+    const onMove = (clientX, clientY) => {
+      if (!isDragging || this.isAnsweringLocked) return;
+      const dx = clientX - startX;
+      const dy = clientY - startY;
+
+      if (!isHorizontalGesture) {
+        if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+          isHorizontalGesture = true;
+        } else if (Math.abs(dy) > 12) {
+          isDragging = false;
+          this.resetCardTransform();
+          return;
+        }
+      }
+
+      if (isHorizontalGesture) {
+        currentX = clientX;
+        const dragDistance = dx;
+        const tiltAngle = Math.max(-14, Math.min(14, dragDistance * 0.05));
+        this.swipeableCard.style.transform = `translateX(${dragDistance * 0.65}px) rotate(${tiltAngle}deg)`;
+
+        if (dragDistance > 30) {
+          this.swipeableCard.classList.add("swipe-right-active");
+          this.swipeableCard.classList.remove("swipe-left-active");
+          if (this.swipeCueAsli) this.swipeCueAsli.classList.add("show");
+          if (this.swipeCueAi) this.swipeCueAi.classList.remove("show");
+        } else if (dragDistance < -30) {
+          this.swipeableCard.classList.add("swipe-left-active");
+          this.swipeableCard.classList.remove("swipe-right-active");
+          if (this.swipeCueAi) this.swipeCueAi.classList.add("show");
+          if (this.swipeCueAsli) this.swipeCueAsli.classList.remove("show");
+        } else {
+          this.swipeableCard.classList.remove("swipe-left-active", "swipe-right-active");
+          if (this.swipeCueAi) this.swipeCueAi.classList.remove("show");
+          if (this.swipeCueAsli) this.swipeCueAsli.classList.remove("show");
+        }
+      }
+    };
+
+    const onEnd = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      this.swipeableCard.classList.remove("swiping");
+      const dx = currentX - startX;
+
+      if (isHorizontalGesture && Math.abs(dx) > 55 && !this.isAnsweringLocked) {
+        if (dx > 55) {
+          this.swipeableCard.style.transform = "translateX(120%) rotate(15deg)";
+          setTimeout(() => {
+            this.handleAnswer("ASLI");
+            this.resetCardTransform();
+          }, 180);
+          return;
+        } else if (dx < -55) {
+          this.swipeableCard.style.transform = "translateX(-120%) rotate(-15deg)";
+          setTimeout(() => {
+            this.handleAnswer("AI");
+            this.resetCardTransform();
+          }, 180);
+          return;
+        }
+      }
+
+      this.resetCardTransform();
+    };
+
+    this.swipeableCard.addEventListener("touchstart", (e) => {
+      if (e.touches.length === 1) {
+        onStart(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    this.swipeableCard.addEventListener("touchmove", (e) => {
+      if (e.touches.length === 1) {
+        onMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    this.swipeableCard.addEventListener("touchend", onEnd);
+    this.swipeableCard.addEventListener("touchcancel", onEnd);
+  }
+
+  resetCardTransform() {
+    if (!this.swipeableCard) return;
+    this.swipeableCard.style.transform = "";
+    this.swipeableCard.classList.remove("swipe-left-active", "swipe-right-active", "swiping");
+    if (this.swipeCueAi) this.swipeCueAi.classList.remove("show");
+    if (this.swipeCueAsli) this.swipeCueAsli.classList.remove("show");
   }
 
   init() {
@@ -55,7 +176,7 @@ class GameEngine {
 
     window.showLoadingScreen(1000, [
       "Calibrating your eyes...",
-      "Preparing 10 reality tests...",
+      "Preparing 6 reality tests...",
       "AI is preparing its best disguises..."
     ], () => {
       this.startSoloSession();
@@ -377,7 +498,6 @@ class GameEngine {
   }
 
   renderFeedback(res, chosenAnswer) {
-    // NOTICE: Live points are NOT shown during the quiz as requested!
     if (res.is_correct) {
       window.soundFx.correct();
       if (chosenAnswer === "AI") this.btnAi.classList.add("selected-correct");
@@ -393,62 +513,69 @@ class GameEngine {
     }
 
     const isHinglish = window.i18n && window.i18n.currentLang === "hi";
-    const isUnanswered = res.is_unanswered;
     const isLastQuestion = (this.currentIndex >= this.totalQuestions - 1) || Boolean(res.is_game_over);
-    let statusClass = res.is_correct ? "correct" : (isUnanswered ? "unanswered" : "incorrect");
-    let statusText = res.is_correct 
-      ? (isHinglish ? "Sahi Pehchaana! (Correct)" : "Spot On! Correct Detection") 
-      : (isUnanswered ? (isHinglish ? "Time Khatam Ho Gaya!" : "Time Expired!") : (isHinglish ? "AI Ne Dhokha De Diya!" : "Deceived by the Fake!"));
 
-    const nextBtnText = isLastQuestion 
-      ? (isHinglish ? "FINAL RESULTS DEKHO →" : "VIEW FINAL RESULTS →")
-      : (isHinglish ? "AGLA SAWAAL →" : "NEXT QUESTION →");
+    // Meme Selection (Right memes vs Wrong memes)
+    const correctMemes = [
+      "/static/images/meme-correct.webp",
+      "/static/images/meme-chaliye-shuru.webp"
+    ];
+    const wrongMemes = [
+      "/static/images/meme-wrong.webp",
+      "/static/images/meme-i-saw-that.webp"
+    ];
 
-    const autoAdvanceText = isLastQuestion 
-      ? (isHinglish ? "Results aa rahe hain 10s mein..." : "Showing results in 10s...")
-      : (isHinglish ? "Agla sawaal 10s mein..." : "Auto-advancing in 10s...");
+    const chosenMeme = res.is_correct
+      ? correctMemes[Math.floor(Math.random() * correctMemes.length)]
+      : wrongMemes[Math.floor(Math.random() * wrongMemes.length)];
 
-    this.feedbackDrawerEl.innerHTML = `
-      <div class="feedback-status-row">
-        <div class="feedback-status-title ${statusClass}">${statusText}</div>
-      </div>
-      <p class="feedback-explanation"><strong>Verification:</strong> ${res.explanation || ""}</p>
-      <div class="feedback-next-row">
-        <span class="auto-timer-note" id="autoAdvanceNote">${autoAdvanceText}</span>
-        <button type="button" class="btn btn-primary btn-sm" id="nextQuestionBtn">
-          ${nextBtnText}
-        </button>
-      </div>
-    `;
-
-    this.feedbackDrawerEl.style.display = "block";
-
-    const btnNext = document.getElementById("nextQuestionBtn");
-    if (btnNext) {
-      btnNext.addEventListener("click", () => {
-        this.advanceToNext(isLastQuestion);
-      });
+    if (this.memeReactionImg) {
+      this.memeReactionImg.src = chosenMeme;
     }
 
-    let countdown = 10;
-    const noteEl = document.getElementById("autoAdvanceNote");
-    if (this.autoAdvanceTimeout) {
-      clearInterval(this.autoAdvanceTimeout);
-      this.autoAdvanceTimeout = null;
+    if (this.memeStatusBadge) {
+      if (res.is_correct) {
+        this.memeStatusBadge.textContent = isHinglish ? "SAHI JAWAAB! 🎯" : "SPOT ON! 🎯";
+        this.memeStatusBadge.className = "meme-status-badge correct";
+      } else {
+        this.memeStatusBadge.textContent = res.is_unanswered
+          ? (isHinglish ? "TIME KHATAM! ⏰" : "TIME EXPIRED! ⏰")
+          : (isHinglish ? "GALAT JAWAAB! 💀" : "DECEIVED BY AI! 💀");
+        this.memeStatusBadge.className = "meme-status-badge incorrect";
+      }
     }
-    const interval = setInterval(() => {
-      countdown--;
-      if (noteEl) {
-        noteEl.textContent = isLastQuestion 
-          ? (isHinglish ? `Results aa rahe hain ${countdown}s mein...` : `Showing results in ${countdown}s...`)
-          : (isHinglish ? `Agla sawaal ${countdown}s mein...` : `Auto-advancing in ${countdown}s...`);
+
+    if (this.memeScoreEarned) {
+      if (res.is_correct) {
+        this.memeScoreEarned.textContent = `+${res.points_awarded || 0} PTS (Speed Bonus)`;
+        this.memeScoreEarned.className = "meme-score-earned correct";
+      } else {
+        this.memeScoreEarned.textContent = "0 PTS";
+        this.memeScoreEarned.className = "meme-score-earned incorrect";
       }
-      if (countdown <= 0) {
-        clearInterval(interval);
+    }
+
+    if (this.memeExplanationText) {
+      this.memeExplanationText.innerHTML = `<strong>Actual: ${res.correct_answer}</strong> — ${res.explanation || ""}`;
+    }
+
+    if (this.btnNextFromMeme) {
+      this.btnNextFromMeme.textContent = isLastQuestion
+        ? (isHinglish ? "FINAL RESULTS DEKHO →" : "VIEW FINAL RESULTS →")
+        : (isHinglish ? "NEXT QUESTION →" : "NEXT QUESTION →");
+
+      this.btnNextFromMeme.onclick = () => {
+        if (this.gameMemeOverlay) this.gameMemeOverlay.style.display = "none";
         this.advanceToNext(isLastQuestion);
-      }
-    }, 1000);
-    this.autoAdvanceTimeout = interval;
+      };
+    }
+
+    // Display Meme Popup Modal
+    if (this.gameMemeOverlay) {
+      setTimeout(() => {
+        this.gameMemeOverlay.style.display = "flex";
+      }, 350);
+    }
   }
 
   advanceToNext(isGameOver) {

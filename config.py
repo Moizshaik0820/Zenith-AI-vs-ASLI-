@@ -30,11 +30,11 @@ class Config:
     CAMPAIGN_URL = os.environ.get("CAMPAIGN_URL", "https://zenithschool.ai/")
     ZENITH_WEBSITE_URL = os.environ.get("ZENITH_WEBSITE_URL", "https://zenithschool.ai/")
     
-    # Game Settings (All timers increased by 5s as requested)
-    QUESTIONS_PER_GAME = 10
-    BASE_POINTS_PER_CORRECT = 100
-    MAX_SPEED_BONUS = 50
-    IMAGE_TIMER_SECONDS = 15           # Increased from 10s -> 15s (+5s)
-    AUDIO_VIDEO_TIMER_SECONDS = 10     # Increased from 5s -> 10s (+5s)
-    FEEDBACK_AUTO_ADVANCE_SECONDS = 10 # Increased from 5s -> 10s (+5s)
-    MAX_POSSIBLE_SCORE = 1500
+    # Game Settings (6 questions, pure speed-based points, no fixed 100 pts)
+    QUESTIONS_PER_GAME = 6
+    BASE_POINTS_PER_CORRECT = 0
+    MAX_SPEED_BONUS = 100
+    IMAGE_TIMER_SECONDS = 15           # Images timer: 15s
+    AUDIO_VIDEO_TIMER_SECONDS = 12     # Videos timer: 12s
+    FEEDBACK_AUTO_ADVANCE_SECONDS = 10
+    MAX_POSSIBLE_SCORE = 600

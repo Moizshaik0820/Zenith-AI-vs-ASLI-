@@ -2,97 +2,262 @@
 
 {% block extra_css %}
 <style>
-  .lobby-section {
-    padding: 3rem 0;
+  .lobby-locked-stage {
+    position: relative;
+    height: calc(100dvh - 72px);
+    max-height: calc(100dvh - 72px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    overflow: hidden;
+    z-index: 1;
   }
+
+  .lobby-card-wrap {
+    width: 100%;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .lobby-compact-nav {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 0.45rem;
+  }
+
+  .compact-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ffffff !important;
+    text-decoration: none;
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.22);
+    transition: all 0.22s ease;
+  }
+
+  .compact-back-btn svg {
+    stroke: #ffffff !important;
+  }
+
+  .compact-back-btn:hover {
+    color: #ffffff !important;
+    background: #7c3aed !important;
+    border-color: #a855f7 !important;
+    box-shadow: 0 4px 16px rgba(124, 58, 237, 0.5);
+    transform: translateX(-2px);
+  }
+
   .lobby-card {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: 2.5rem 2rem;
-    max-width: 680px;
-    margin: 0 auto;
+    background: rgba(23, 19, 48, 0.94);
+    backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(139, 92, 246, 0.35);
+    border-radius: 24px;
+    padding: 1.6rem 1.6rem 1.4rem;
+    width: 100%;
     text-align: center;
-    box-shadow: var(--shadow-subtle);
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.65), 0 0 35px rgba(124, 58, 237, 0.2);
   }
+
+  /* Red Multiplayer Lobby Tagline */
+  .lobby-tagline-red {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #E11D48;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+
+  .lobby-heading {
+    font-size: 1.55rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 0.65rem;
+    line-height: 1.15;
+  }
+
+  /* Red Room Code Badge (Changed from blue to red per user instruction) */
   .lobby-room-badge {
     display: inline-block;
-    background: rgba(0, 240, 255, 0.15);
-    border: 1px solid var(--ai-cyan);
-    color: var(--ai-cyan);
-    font-size: 2.2rem;
+    background: rgba(225, 29, 72, 0.15);
+    border: 2px solid #E11D48;
+    color: #E11D48;
+    font-family: var(--font-chunky, 'Lilita One', monospace);
+    font-size: 2.35rem;
     font-weight: 900;
-    letter-spacing: 0.1em;
-    padding: 0.5rem 1.8rem;
-    border-radius: var(--radius-md);
-    margin: 1rem 0 1.5rem;
-    box-shadow: 0 0 20px var(--ai-glow);
+    letter-spacing: 0.12em;
+    padding: 0.45rem 1.6rem;
+    border-radius: 14px;
+    margin-bottom: 0.85rem;
+    box-shadow: 0 0 25px rgba(225, 29, 72, 0.35);
+    user-select: all;
   }
+
   .lobby-actions-row {
     display: flex;
     justify-content: center;
-    gap: 0.8rem;
+    gap: 0.5rem;
     flex-wrap: wrap;
-    margin-bottom: 2rem;
+    margin-bottom: 0.85rem;
   }
+
+  .btn-lobby-action {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    color: #ffffff;
+    padding: 0.4rem 0.85rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-lobby-action:hover {
+    background: #7c3aed;
+    border-color: #a855f7;
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4);
+    transform: translateY(-1px);
+  }
+
   .players-box {
-    background: var(--bg-card);
-    border-radius: var(--radius-md);
-    padding: 1.5rem;
-    margin-bottom: 2rem;
+    background: rgba(15, 12, 35, 0.85);
+    border: 1px solid rgba(139, 92, 246, 0.25);
+    border-radius: 14px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
     text-align: left;
+    max-height: 110px;
+    overflow-y: auto;
   }
+
   .players-header {
     display: flex;
     justify-content: space-between;
-    font-size: 0.9rem;
-    font-weight: 700;
+    font-size: 0.78rem;
+    font-weight: 800;
     color: var(--text-dim);
-    margin-bottom: 1rem;
+    margin-bottom: 0.45rem;
     text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
+
   .lobby-player-badge {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid var(--border-subtle);
-    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    padding: 0.32rem 0.75rem;
     border-radius: var(--radius-pill);
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.35rem;
+    font-size: 0.82rem;
     font-weight: 700;
-    margin: 0.25rem;
+    color: #f8fafc;
+    margin: 0.15rem;
+  }
+
+  .btn-start-match {
+    width: 100%;
+    padding: 0.88rem 1.4rem;
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
+    border: none;
+    border-radius: var(--radius-pill);
+    color: #ffffff !important;
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.45);
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .btn-start-match:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(124, 58, 237, 0.6);
+  }
+
+  @media (max-width: 680px) {
+    .lobby-locked-stage {
+      height: calc(100dvh - 56px);
+      max-height: calc(100dvh - 56px);
+      padding: 0.35rem 0.75rem;
+    }
+    .lobby-card {
+      padding: 1.15rem 1rem;
+      border-radius: 20px;
+      max-width: 360px;
+    }
+    .lobby-room-badge {
+      font-size: 2rem;
+      padding: 0.35rem 1.25rem;
+      margin-bottom: 0.65rem;
+    }
+    .lobby-heading {
+      font-size: 1.35rem;
+      margin-bottom: 0.45rem;
+    }
+    .btn-start-match {
+      padding: 0.8rem 1.2rem;
+      font-size: 0.98rem;
+    }
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="lobby-section">
-  <div class="container">
-    <div class="lobby-card">
-      <span style="font-size:0.85rem; font-weight:700; color:var(--text-dim); text-transform:uppercase;">MULTIPLAYER LOBBY</span>
-      <h1 style="font-size:1.8rem; font-weight:800; margin-top:0.3rem;">Share with Your Friends</h1>
+<!-- Hacker Green Code Rain Background Canvas -->
+<canvas id="matrixCanvas" class="matrix-code-canvas" aria-hidden="true"></canvas>
 
+<section class="lobby-locked-stage">
+  <div class="lobby-card-wrap">
+    <!-- Compact Back Arrow Link -->
+    <div class="lobby-compact-nav">
+      <a href="{{ url_for('pages.modes') }}" class="compact-back-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span>Arena</span>
+      </a>
+    </div>
+
+    <!-- Lobby Card (Zero Scroll on Mobile, Red Room Code & Red Title) -->
+    <div class="lobby-card">
+      <span class="lobby-tagline-red">MULTIPLAYER LOBBY</span>
+      <h1 class="lobby-heading">Share with Your Friends</h1>
+
+      <!-- Room Code in RED -->
       <div class="lobby-room-badge" id="displayRoomCode">{{ room_code }}</div>
 
       <div class="lobby-actions-row">
-        <button type="button" class="btn btn-secondary btn-sm" id="btnCopyCode">
+        <button type="button" class="btn-lobby-action" id="btnCopyCode">
           Copy Code
         </button>
-        <button type="button" class="btn btn-secondary btn-sm" id="btnShareLink">
+        <button type="button" class="btn-lobby-action" id="btnShareLink">
           Share Join Link
         </button>
-        <button type="button" class="btn btn-secondary btn-sm" id="btnToggleQr">
+        <button type="button" class="btn-lobby-action" id="btnToggleQr">
           Show QR Code
         </button>
       </div>
 
-      <!-- QR Code Container (toggleable) -->
-      <div id="qrDropdownWrap" style="display:none; margin-bottom:2rem;">
-        <img src="/api/qr/{{ room_code }}" alt="Room QR Code" style="width:200px; height:200px; border-radius:12px; border:1px solid var(--border-subtle); background:#fff; padding:8px;">
-        <p style="font-size:0.85rem; color:var(--text-dim); margin-top:0.5rem;">Scan using phone camera to join immediately</p>
+      <!-- QR Code Dropdown (Toggleable) -->
+      <div id="qrDropdownWrap" style="display:none; margin-bottom:0.85rem;">
+        <img src="/api/qr/{{ room_code }}" alt="Room QR Code" style="width:140px; height:140px; border-radius:10px; border:1px solid var(--border-subtle); background:#fff; padding:6px; display:inline-block;">
       </div>
 
-      <!-- Connected Players -->
+      <!-- Connected Squad List -->
       <div class="players-box">
         <div class="players-header">
           <span>Connected Squad</span>
@@ -103,7 +268,7 @@
         </div>
       </div>
 
-      <button type="button" class="btn btn-primary btn-lg" id="btnStartFriendMatch" style="width:100%;">
+      <button type="button" class="btn-start-match" id="btnStartFriendMatch">
         START CHALLENGE MATCH ▶
       </button>
     </div>
