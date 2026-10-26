@@ -3,56 +3,8 @@
    Theme: Purple & White Bright and Simple | Full Website Architecture
    ========================================================================== */
 
-:root {
-  /* Default Theme: Bright Purple & White */
-  --bg-deep: #fbfaff;
-  --bg-surface: #ffffff;
-  --bg-card: #f5f3ff;
-  --bg-card-hover: #ede9fe;
-  --bg-alt: #f3f0fc;
-  --border-subtle: #e9d5ff;
-  --border-focus: #7c3aed;
-  
-  /* Brand Palettes - Bright Royal Purple */
-  --zenith-purple: #7c3aed;
-  --zenith-purple-dark: #581c87;
-  --zenith-purple-light: #8b5cf6;
-  --zenith-violet: #a855f7;
-  --zenith-lavender: #ddd6fe;
-  
-  /* Dual Identity Palettes */
-  --ai-purple: #7c3aed;
-  --ai-cyan: #06b6d4;
-  --ai-glow: rgba(124, 58, 237, 0.25);
-  
-  --asli-coral: #e11d48;
-  --asli-glow: rgba(225, 29, 72, 0.25);
-  
-  /* Text */
-  --text-main: #1e1b4b;
-  --text-dim: #4b5563;
-  --text-muted: #6b7280;
-  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-chunky: 'Lilita One', 'Bungee', cursive, sans-serif;
-  
-  /* Status */
-  --color-success: #16a34a;
-  --color-error: #dc2626;
-  --color-warning: #d97706;
-  
-  /* Radii & Shadows */
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-pill: 9999px;
-  --shadow-subtle: 0 4px 20px rgba(124, 58, 237, 0.08);
-  --shadow-card: 0 10px 30px rgba(124, 58, 237, 0.12);
-}
-
-/* ==========================================================================
-   Dark Mode Override
-   ========================================================================== */
-[data-theme="dark"] {
+:root, [data-theme="dark"], [data-theme="light"] {
+  /* Permanent Universal Dark Theme */
   --bg-deep: #0e0b1f;
   --bg-surface: #171330;
   --bg-card: #1f1a3f;
@@ -61,16 +13,40 @@
   --border-subtle: rgba(139, 92, 246, 0.25);
   --border-focus: #a855f7;
   
+  /* Brand Palettes - Neon Royal Violet */
   --zenith-purple: #a855f7;
   --zenith-purple-dark: #8b5cf6;
   --zenith-purple-light: #c084fc;
+  --zenith-violet: #a855f7;
+  --zenith-lavender: #ddd6fe;
   
+  /* Dual Identity Palettes */
+  --ai-purple: #a855f7;
+  --ai-cyan: #06b6d4;
+  --ai-glow: rgba(168, 85, 247, 0.35);
+  
+  --asli-coral: #e11d48;
+  --asli-glow: rgba(225, 29, 72, 0.35);
+  
+  /* Text */
   --text-main: #f8fafc;
   --text-dim: #cbd5e1;
   --text-muted: #94a3b8;
+  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-chunky: 'Lilita One', 'Bungee', cursive, sans-serif;
   
-  --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.4);
-  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.6);
+  /* Status */
+  --color-success: #10b981;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+  
+  /* Radii & Shadows */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 9999px;
+  --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.65);
 }
 
 /* Reset & Box Sizing */
@@ -97,7 +73,8 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Home page locked viewport (Strict zero-scroll) */
+/* Universal Locked Viewport (Strict zero-scroll on Home, Codename, Modes) */
+body.locked-viewport-body,
 body.home-locked-body {
   height: 100dvh;
   max-height: 100dvh;
@@ -688,8 +665,8 @@ body.home-locked-body .site-main-home {
 }
 
 .standing-shield-3d {
-  width: clamp(60px, 8.5vw, 92px);
-  height: clamp(70px, 10vw, 106px);
+  width: clamp(74px, 10vw, 110px);
+  height: clamp(86px, 11.5vw, 126px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -889,7 +866,7 @@ body.home-locked-body .site-main-home {
   left: clamp(14px, 3.5vw, 32px);
   bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   z-index: 100;
-  width: clamp(140px, 18vw, 210px);
+  width: clamp(175px, 22vw, 255px);
   background: transparent;
   border: none;
   box-shadow: none;
@@ -967,8 +944,8 @@ body.home-locked-body .site-main-home {
   }
 
   .standing-shield-3d {
-    width: 48px;
-    height: 58px;
+    width: 58px;
+    height: 68px;
   }
 
   .chunky-hero-title {
@@ -998,7 +975,7 @@ body.home-locked-body .site-main-home {
   .meme-bottom-left-popup {
     left: 10px;
     bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-    width: clamp(105px, 28vw, 135px);
+    width: clamp(130px, 34vw, 168px);
   }
 
   .meme-sticker-close-btn {

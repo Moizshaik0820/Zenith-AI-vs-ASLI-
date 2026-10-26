@@ -110,39 +110,27 @@ class SoundEffects {
 
 window.soundFx = new SoundEffects();
 
-// Theme Controller (Dark Mode vs Light Mode)
+// Permanent Global Dark Mode Theme Enforcer
 class ThemeManager {
   constructor() {
-    this.theme = localStorage.getItem("zenith_theme") || "light";
+    this.theme = "dark";
   }
 
   init() {
-    this.applyTheme(this.theme);
+    this.applyTheme("dark");
   }
 
   toggleTheme() {
-    this.theme = this.theme === "light" ? "dark" : "light";
-    localStorage.setItem("zenith_theme", this.theme);
-    this.applyTheme(this.theme);
-    return this.theme;
+    // Light theme removed across the entire website per instructions
+    this.applyTheme("dark");
+    return "dark";
   }
 
   applyTheme(theme) {
-    document.documentElement.setAttribute("data-theme", theme);
-    const btns = document.querySelectorAll(".theme-toggle-btn");
-    btns.forEach(btn => {
-      const statusEl = btn.querySelector(".theme-status-text");
-      const iconEl = btn.querySelector(".btn-icon");
-      if (statusEl) {
-        statusEl.textContent = theme === "dark" ? "Dark Mode (Tap to switch)" : "Light Mode (Tap to switch)";
-      }
-      if (iconEl) {
-        iconEl.innerHTML = theme === "dark" ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
-      } else if (!statusEl) {
-        btn.innerHTML = theme === "dark" ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg> Light' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> Dark';
-      }
-      btn.setAttribute("title", theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme");
-    });
+    document.documentElement.setAttribute("data-theme", "dark");
+    try {
+      localStorage.setItem("zenith_theme", "dark");
+    } catch(e) {}
   }
 }
 
@@ -151,6 +139,7 @@ window.themeManager = new ThemeManager();
 document.addEventListener("DOMContentLoaded", () => {
   window.soundFx.updateToggleIcons();
   window.themeManager.init();
+  initGlobalMatrixHackerRain();
 
   // Sound toggle buttons
   document.querySelectorAll(".sound-toggle-btn").forEach(btn => {
@@ -381,3 +370,84 @@ window.showToast = function(msg, isError = false) {
     setTimeout(() => toast.remove(), 300);
   }, 2800);
 };
+
+/**
+ * Universal Hacker Green Matrix Digital Rain Background
+ * Automatically activates on any page having <canvas id="matrixCanvas">
+ */
+function initGlobalMatrixHackerRain() {
+  const canvas = document.getElementById("matrixCanvas");
+  if (!canvas || canvas.dataset.matrixRunning === "1") return;
+  canvas.dataset.matrixRunning = "1";
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  let width = (canvas.width = window.innerWidth);
+  let height = (canvas.height = window.innerHeight);
+
+  const chars = "01010101ABCDEF<>/*&%$#@!AIASLIZENITH01";
+  const charArray = chars.split("");
+
+  const isMobile = window.innerWidth <= 680;
+  const fontSize = isMobile ? 14 : 16;
+  let columns = Math.floor(width / fontSize);
+
+  let drops = [];
+  function resetDrops() {
+    columns = Math.floor(width / fontSize);
+    drops = [];
+    for (let i = 0; i < columns; i++) {
+      drops[i] = Math.floor(Math.random() * -50);
+    }
+  }
+  resetDrops();
+
+  window.addEventListener("resize", () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+    resetDrops();
+  });
+
+  let isTabActive = true;
+  document.addEventListener("visibilitychange", () => {
+    isTabActive = !document.hidden;
+  });
+
+  let lastFrameTime = performance.now();
+  const targetFpsInterval = 1000 / 35;
+
+  function renderMatrix(currentTime) {
+    requestAnimationFrame(renderMatrix);
+    if (!isTabActive) return;
+
+    const elapsed = currentTime - lastFrameTime;
+    if (elapsed < targetFpsInterval) return;
+    lastFrameTime = currentTime - (elapsed % targetFpsInterval);
+
+    ctx.fillStyle = "rgba(3, 7, 18, 0.085)";
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.font = `${fontSize}px monospace`;
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = charArray[Math.floor(Math.random() * charArray.length)];
+      const x = i * fontSize;
+      const y = drops[i] * fontSize;
+
+      if (Math.random() > 0.88) {
+        ctx.fillStyle = "#86efac";
+      } else {
+        ctx.fillStyle = "#10b981";
+      }
+
+      ctx.fillText(text, x, y);
+
+      if (y > height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+
+  requestAnimationFrame(renderMatrix);
+}

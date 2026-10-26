@@ -1,5 +1,5 @@
 /**
- * AI vs ASLI — Nickname Selection Logic
+ * AI vs ASLI — Nickname Selection Logic & Meme Popup Controller
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -24,11 +24,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Input change updates preview
+  // Input change updates preview (if present)
   if (customInput) {
     customInput.addEventListener("input", (e) => {
       const val = e.target.value.trim();
-      previewName.textContent = val || "Your Nickname";
+      if (previewName) previewName.textContent = val || "Your Nickname";
     });
   }
 
@@ -76,13 +76,13 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         } else {
           submitBtn.disabled = false;
-          submitBtn.textContent = "Use this name";
+          submitBtn.textContent = "Use this name →";
           window.showToast(data.error || "Failed to set nickname", true);
         }
       })
       .catch(err => {
         submitBtn.disabled = false;
-        submitBtn.textContent = "Use this name";
+        submitBtn.textContent = "Use this name →";
         window.showToast("Connection error. Please try again.", true);
       });
     });
@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
             pill.addEventListener("click", () => {
               window.soundFx.click();
               customInput.value = nick;
-              previewName.textContent = nick;
+              if (previewName) previewName.textContent = nick;
               // Highlight active pill
               document.querySelectorAll(".nickname-pill-btn").forEach(p => p.classList.remove("active"));
               pill.classList.add("active");
@@ -117,4 +117,35 @@ document.addEventListener("DOMContentLoaded", () => {
         if (cb) cb();
       });
   }
+
+  // Initialize "I SAW THAT!" Meme Popup on Codename Page
+  initNicknameMemePopup();
 });
+
+function initNicknameMemePopup() {
+  const memePopup = document.getElementById("nicknameMemePopup");
+  const closeBtn = document.getElementById("nicknameMemeCloseBtn");
+  if (!memePopup) return;
+
+  try {
+    if (sessionStorage.getItem("zenith_nick_meme_closed") === "1") {
+      memePopup.style.display = "none";
+      return;
+    }
+  } catch (e) {}
+
+  setTimeout(() => {
+    memePopup.classList.add("visible");
+  }, 700);
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      memePopup.classList.remove("visible");
+      memePopup.classList.add("dismissed");
+      try {
+        sessionStorage.setItem("zenith_nick_meme_closed", "1");
+      } catch (err) {}
+    });
+  }
+}

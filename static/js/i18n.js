@@ -27,11 +27,11 @@ const TRANSLATIONS = {
     "rule_6_desc": "No negative marking! Incorrect or unanswered questions simply score zero.",
     
     // Nickname
-    "nick_title": "Choose Your Identity",
+    "nick_title": "Choose Your Nickname",
     "nick_subtitle": "Every detective needs a codename in the neural matrix.",
     "nick_suggestions": "AI SUGGESTIONS",
     "nick_refresh": "Refresh",
-    "nick_custom_label": "OR ENTER A CUSTOM CODENAME",
+    "nick_custom_label": "ENTER A NICKNAME",
     "nick_preview_lead": "This name will represent you in the arena and on the leaderboard:",
     "nick_btn_submit": "Use this name →",
     
@@ -95,11 +95,11 @@ const TRANSLATIONS = {
     "rule_6_desc": "Koi negative marking nahi hai! Galat answer par seedha 0 points.",
     
     // Nickname
-    "nick_title": "Apna Codename Chuno",
+    "nick_title": "Apna Nickname Chuno",
     "nick_subtitle": "Har reality detective ka ek solid codename hona chahiye.",
     "nick_suggestions": "AI SUGGESTIONS",
     "nick_refresh": "Naye Names",
-    "nick_custom_label": "YA APNA CUSTOM NAAM LIKHO",
+    "nick_custom_label": "APNA NICKNAME LIKHO",
     "nick_preview_lead": "Yeh naam aapke game aur leaderboard par dikhega:",
     "nick_btn_submit": "Yeh Naam Use Karo →",
     

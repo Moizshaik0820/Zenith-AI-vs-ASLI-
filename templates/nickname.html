@@ -2,186 +2,314 @@
 
 {% block extra_css %}
 <style>
-  .nickname-section {
-    padding: 2rem 0 4rem;
-  }
-  .breadcrumb-bar {
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
-    font-weight: 700;
-  }
-  .breadcrumb-bar a {
-    color: var(--zenith-purple);
-    text-decoration: none;
-  }
-  .breadcrumb-bar a:hover {
-    text-decoration: underline;
-  }
-  .nickname-card-wrap {
+  .nickname-locked-stage {
+    position: relative;
+    height: calc(100dvh - 72px);
+    max-height: calc(100dvh - 72px);
     display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
+    padding: 1rem 1.25rem;
+    overflow: hidden;
+    z-index: 1;
   }
-  .nickname-card {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: 2.8rem 2.2rem;
-    max-width: 540px;
+
+  .nickname-card-wrap {
     width: 100%;
-    box-shadow: var(--shadow-card);
-    text-align: center;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
   }
-  .nickname-title {
-    font-size: 2rem;
-    font-weight: 900;
-    margin-bottom: 0.5rem;
-    color: var(--text-main);
+
+  .nickname-compact-nav {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 0.65rem;
   }
-  .nickname-subtitle {
-    font-size: 1rem;
+
+  .compact-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    font-weight: 700;
     color: var(--text-dim);
-    margin-bottom: 2rem;
+    text-decoration: none;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
   }
+
+  .compact-back-btn:hover {
+    color: #ffffff;
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.4);
+    transform: translateX(-2px);
+  }
+
+  .nickname-card {
+    background: rgba(23, 19, 48, 0.94);
+    backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(139, 92, 246, 0.35);
+    border-radius: 24px;
+    padding: 2rem 2rem 1.8rem;
+    width: 100%;
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.65), 0 0 35px rgba(124, 58, 237, 0.2);
+    text-align: center;
+    position: relative;
+    animation: heroTextEntrance 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* Red ASLI Gradient Title */
+  .nickname-title-asli {
+    font-family: var(--font-chunky, 'Lilita One', 'Bungee', sans-serif);
+    font-size: clamp(2rem, 6vw, 2.75rem);
+    line-height: 1.08;
+    margin-bottom: 1.4rem;
+    color: #E11D48;
+    background: linear-gradient(135deg, #FB7185 0%, #E11D48 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 18px rgba(225, 29, 72, 0.38));
+    letter-spacing: 0.02em;
+  }
+
   .suggestions-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.85rem;
-    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 800;
+    letter-spacing: 0.06em;
     color: var(--text-dim);
   }
-  .refresh-btn {
-    background: transparent;
-    border: none;
-    color: var(--zenith-purple);
+
+  /* Interactive Hover Refresh Button */
+  .refresh-hover-btn {
+    background: rgba(139, 92, 246, 0.14);
+    border: 1px solid rgba(139, 92, 246, 0.35);
+    color: #c084fc;
+    padding: 0.32rem 0.85rem;
+    border-radius: var(--radius-pill);
     cursor: pointer;
-    font-size: 0.95rem;
+    font-size: 0.82rem;
     font-weight: 800;
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-    transition: transform 0.2s;
+    gap: 0.35rem;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .refresh-btn.spinning {
+
+  .refresh-hover-btn:hover {
+    background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
+    border-color: #A855F7;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.45);
+    transform: translateY(-1px) scale(1.03);
+  }
+
+  .refresh-hover-btn.spinning svg {
     transform: rotate(360deg);
+    transition: transform 0.4s ease;
   }
+
   .nickname-pills-row {
     display: flex;
     gap: 0.6rem;
     flex-wrap: wrap;
     justify-content: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
   }
+
+  /* Interactive Hover Pill Buttons */
   .nickname-pill-btn {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    color: var(--text-main);
-    padding: 0.6rem 1.2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(139, 92, 246, 0.35);
+    color: #f8fafc;
+    padding: 0.55rem 1.15rem;
     border-radius: var(--radius-pill);
     font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(8px);
   }
-  .nickname-pill-btn:hover, .nickname-pill-btn.active {
-    background: var(--zenith-purple);
-    border-color: var(--zenith-purple);
-    color: #fff;
-    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.35);
-    transform: translateY(-2px);
+
+  .nickname-pill-btn:hover {
+    background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
+    border-color: #A855F7;
+    color: #ffffff;
+    box-shadow: 0 6px 18px rgba(124, 58, 237, 0.45);
+    transform: translateY(-2px) scale(1.04);
   }
+
+  .nickname-pill-btn.active {
+    background: linear-gradient(135deg, #E11D48 0%, #FB7185 100%);
+    border-color: #FB7185;
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(225, 29, 72, 0.5);
+    transform: translateY(-1px) scale(1.03);
+  }
+
   .input-label {
     text-align: left;
     display: block;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 800;
+    letter-spacing: 0.06em;
     color: var(--text-dim);
     margin-bottom: 0.5rem;
   }
+
   .custom-name-input {
     width: 100%;
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
+    background: rgba(15, 12, 35, 0.8);
+    border: 1.5px solid rgba(139, 92, 246, 0.4);
     border-radius: var(--radius-md);
-    padding: 0.9rem 1.25rem;
-    color: var(--text-main);
+    padding: 0.95rem 1.25rem;
+    color: #ffffff;
     font-size: 1.05rem;
     font-weight: 700;
-    margin-bottom: 1.5rem;
-    transition: border-color 0.2s;
+    margin-bottom: 1.4rem;
+    transition: all 0.22s ease;
   }
+
   .custom-name-input:focus {
     outline: none;
-    border-color: var(--zenith-purple);
-    box-shadow: 0 0 15px var(--ai-glow);
+    border-color: #A855F7;
+    background: rgba(15, 12, 35, 0.95);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
   }
-  .identity-preview-box {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    padding: 1rem;
-    margin-bottom: 1.8rem;
-    font-size: 0.9rem;
-    color: var(--text-dim);
-  }
-  .identity-preview-box strong {
-    color: var(--zenith-purple);
-    font-weight: 900;
+
+  .btn-nickname-submit {
+    width: 100%;
+    padding: 1rem 1.5rem;
     font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
+    border: none;
+    border-radius: var(--radius-pill);
+    color: #ffffff !important;
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.45);
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .btn-nickname-submit:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(124, 58, 237, 0.6);
+  }
+
+  .btn-nickname-submit:active {
+    transform: translateY(1px);
+  }
+
+  /* Mobile Zero-Scroll Constraints */
+  @media (max-width: 680px) {
+    .nickname-locked-stage {
+      height: calc(100dvh - 56px);
+      max-height: calc(100dvh - 56px);
+      padding: 0.4rem 0.85rem;
+    }
+    .nickname-card {
+      padding: 1.35rem 1.2rem;
+      border-radius: 20px;
+      max-width: 360px;
+    }
+    .nickname-title-asli {
+      font-size: 1.85rem;
+      margin-bottom: 0.9rem;
+    }
+    .nickname-pills-row {
+      gap: 0.45rem;
+      margin-bottom: 1rem;
+    }
+    .nickname-pill-btn {
+      padding: 0.45rem 0.95rem;
+      font-size: 0.88rem;
+    }
+    .custom-name-input {
+      padding: 0.8rem 1rem;
+      font-size: 0.98rem;
+      margin-bottom: 1.1rem;
+    }
+    .btn-nickname-submit {
+      padding: 0.88rem 1.2rem;
+      font-size: 1rem;
+    }
+    .nickname-compact-nav {
+      margin-bottom: 0.4rem;
+    }
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="nickname-section">
-  <div class="container">
-    <!-- Breadcrumb -->
-    <div class="breadcrumb-bar">
-      <a href="{{ url_for('pages.index') }}">← Home</a> / <span style="color:var(--text-dim);">Player Codename</span>
+<!-- Hacker Green Code Rain Background Canvas -->
+<canvas id="matrixCanvas" class="matrix-code-canvas" aria-hidden="true"></canvas>
+
+<section class="nickname-locked-stage">
+  <div class="nickname-card-wrap">
+    <!-- Compact Back Arrow Link -->
+    <div class="nickname-compact-nav">
+      <a href="{{ url_for('pages.index') }}" class="compact-back-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span>Home</span>
+      </a>
     </div>
 
-    <div class="nickname-card-wrap">
-      <div class="nickname-card">
-        <h1 class="nickname-title" data-i18n="nick_title">Choose Your Identity</h1>
-        <p class="nickname-subtitle" data-i18n="nick_subtitle">Every detective needs a codename in the neural matrix.</p>
+    <!-- Nickname Input Card (Zero Scroll on Mobile) -->
+    <div class="nickname-card">
+      <h1 class="nickname-title-asli" data-i18n="nick_title">Choose Your Nickname</h1>
 
-        <!-- Suggested Nicknames -->
-        <div class="suggestions-header">
-          <span data-i18n="nick_suggestions">AI SUGGESTIONS</span>
-          <button type="button" class="refresh-btn" id="refreshNicknamesBtn" title="Generate 3 new suggestions" data-i18n="nick_refresh">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg> Refresh
-          </button>
-        </div>
-
-        <div class="nickname-pills-row" id="nicknameSuggestions">
-          <div style="color:var(--text-muted); font-size:0.85rem;">Generating codenames...</div>
-        </div>
-
-        <!-- Custom Form -->
-        <form id="nicknameForm">
-          <label for="customNicknameInput" class="input-label" data-i18n="nick_custom_label">OR ENTER A CUSTOM CODENAME</label>
-          <input 
-            type="text" 
-            id="customNicknameInput" 
-            class="custom-name-input" 
-            placeholder="e.g. CyberSleuth"
-            maxlength="25"
-            autocomplete="off"
-            required
-          >
-
-          <div class="identity-preview-box">
-            <span data-i18n="nick_preview_lead">This name will represent you in the arena and on the leaderboard:</span><br>
-            <strong id="previewNicknameText">Your Nickname</strong>
-          </div>
-
-          <button type="submit" class="btn btn-primary btn-lg" id="confirmNicknameBtn" style="width: 100%;" data-i18n="nick_btn_submit">
-            Use this name →
-          </button>
-        </form>
+      <!-- Suggested Nicknames -->
+      <div class="suggestions-header">
+        <span data-i18n="nick_suggestions">AI SUGGESTIONS</span>
+        <button type="button" class="refresh-hover-btn" id="refreshNicknamesBtn" title="Generate 3 new suggestions" data-i18n="nick_refresh">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          <span>Refresh</span>
+        </button>
       </div>
+
+      <div class="nickname-pills-row" id="nicknameSuggestions">
+        <div style="color:var(--text-muted); font-size:0.85rem;">Generating codenames...</div>
+      </div>
+
+      <!-- Custom Form -->
+      <form id="nicknameForm">
+        <label for="customNicknameInput" class="input-label" data-i18n="nick_custom_label">ENTER A NICKNAME</label>
+        <input 
+          type="text" 
+          id="customNicknameInput" 
+          class="custom-name-input" 
+          placeholder="e.g. CyberSleuth"
+          maxlength="25"
+          autocomplete="off"
+          required
+        >
+
+        <button type="submit" class="btn btn-nickname-submit" id="confirmNicknameBtn" data-i18n="nick_btn_submit">
+          Use this name →
+        </button>
+      </form>
     </div>
+  </div>
+
+  <!-- Floating Meme Popup on Bottom (I SAW THAT! Sticker Cutout, Dismissible) -->
+  <div class="meme-bottom-left-popup" id="nicknameMemePopup" role="complementary" aria-label="Meme reaction">
+    <button type="button" class="meme-sticker-close-btn" id="nicknameMemeCloseBtn" aria-label="Dismiss">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <img src="{{ url_for('static', filename='images/meme-i-saw-that.webp') }}" alt="I Saw That" class="meme-sticker-img" loading="eager">
   </div>
 </section>
 {% endblock %}

@@ -16,7 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
  */
 function initMatrixHackerRain() {
   const canvas = document.getElementById("matrixCanvas");
-  if (!canvas) return;
+  if (!canvas || canvas.dataset.matrixRunning === "1") return;
+  canvas.dataset.matrixRunning = "1";
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 

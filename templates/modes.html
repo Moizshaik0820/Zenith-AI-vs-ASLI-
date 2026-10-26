@@ -2,215 +2,379 @@
 
 {% block extra_css %}
 <style>
-  .modes-section {
-    padding: 2rem 0 4rem;
+  .modes-locked-stage {
+    position: relative;
+    height: calc(100dvh - 72px);
+    max-height: calc(100dvh - 72px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    overflow: hidden;
+    z-index: 1;
   }
-  .breadcrumb-bar {
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
-    font-weight: 700;
+
+  .modes-wrap {
+    width: 100%;
+    max-width: 1080px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
   }
-  .breadcrumb-bar a {
-    color: var(--zenith-purple);
-    text-decoration: none;
-  }
-  .breadcrumb-bar a:hover {
-    text-decoration: underline;
-  }
-  .modes-header {
-    text-align: center;
-    margin-bottom: 2.5rem;
-  }
-  .modes-title {
-    font-size: 2.4rem;
-    font-weight: 900;
+
+  .modes-compact-nav {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
     margin-bottom: 0.5rem;
-    color: var(--text-main);
   }
-  .modes-subtitle {
-    font-size: 1.05rem;
+
+  .compact-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    font-weight: 700;
     color: var(--text-dim);
+    text-decoration: none;
+    padding: 0.3rem 0.75rem;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
   }
+
+  .compact-back-btn:hover {
+    color: #ffffff;
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.4);
+    transform: translateX(-2px);
+  }
+
+  /* Red ASLI Gradient Title */
+  .modes-title-asli {
+    font-family: var(--font-chunky, 'Lilita One', 'Bungee', sans-serif);
+    font-size: clamp(1.85rem, 5vw, 2.75rem);
+    line-height: 1.05;
+    margin-bottom: 1.25rem;
+    color: #E11D48;
+    background: linear-gradient(135deg, #FB7185 0%, #E11D48 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 18px rgba(225, 29, 72, 0.38));
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
+
   .modes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
-    gap: 2rem;
-    max-width: 1080px;
-    margin: 0 auto;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    width: 100%;
   }
+
   .mode-card {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
-    padding: 2.4rem 2rem;
+    background: rgba(23, 19, 48, 0.94);
+    backdrop-filter: blur(14px);
+    border: 1.5px solid rgba(139, 92, 246, 0.3);
+    border-radius: 20px;
+    padding: 1.6rem 1.4rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: var(--shadow-subtle);
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.55), 0 0 25px rgba(124, 58, 237, 0.12);
   }
+
   .mode-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--zenith-purple);
-    box-shadow: var(--shadow-card);
+    transform: translateY(-4px);
+    border-color: #a855f7;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(168, 85, 247, 0.3);
   }
+
   .mode-card-header {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 0.85rem;
   }
+
+  /* White outline icon box */
   .mode-icon-circle {
-    width: 64px;
-    height: 64px;
-    border-radius: var(--radius-md);
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
-    margin-bottom: 1.4rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1.5px solid rgba(255, 255, 255, 0.28);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   }
+
+  .mode-icon-circle svg {
+    stroke: #ffffff !important;
+  }
+
   .mode-name {
-    font-size: 1.45rem;
+    font-size: 1.35rem;
     font-weight: 900;
-    margin-bottom: 0.75rem;
-    color: var(--text-main);
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.15;
   }
+
   .mode-desc {
     color: var(--text-dim);
-    font-size: 0.98rem;
-    line-height: 1.6;
-    margin-bottom: 1.8rem;
-    flex-grow: 1;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    margin-bottom: 1.25rem;
   }
+
   .mode-features-list {
     list-style: none;
-    font-size: 0.88rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
+
   .mode-features-list li::before {
     content: "▹";
     color: var(--zenith-purple);
-    margin-right: 0.5rem;
+    margin-right: 0.4rem;
     font-weight: bold;
   }
 
-  /* Responsive Mobile View: Hide Heavy Paragraphs/Lists, Show Clean Compact Action Buttons in Vertical Stack */
+  .mode-card .btn-mode-act {
+    width: 100%;
+    padding: 0.85rem 1.2rem;
+    font-size: 1.02rem;
+    font-weight: 800;
+    border-radius: var(--radius-pill);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .join-room-box {
+    margin-top: 0.65rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .join-room-title {
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .room-input-group {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  .room-code-input {
+    flex: 1;
+    background: rgba(15, 12, 35, 0.85);
+    border: 1.5px solid rgba(139, 92, 246, 0.35);
+    border-radius: 10px;
+    padding: 0.5rem 0.75rem;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .room-code-input:focus {
+    outline: none;
+    border-color: #a855f7;
+  }
+
+  .room-join-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.88rem;
+    font-weight: 800;
+    border-radius: 10px;
+    background: var(--bg-surface);
+    color: #ffffff;
+    border: 1px solid var(--border-subtle);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .room-join-btn:hover {
+    background: var(--zenith-purple);
+    border-color: var(--zenith-purple);
+  }
+
+  /* Mobile Zero-Scroll Optimization: Everything fits on screen without scrolling */
   @media (max-width: 768px) {
-    .modes-section {
-      padding: 1rem 0 2.5rem;
+    .modes-locked-stage {
+      height: calc(100dvh - 56px);
+      max-height: calc(100dvh - 56px);
+      padding: 0.35rem 0.75rem 0.45rem;
+      justify-content: space-between;
     }
-    .modes-header {
-      margin-bottom: 1.25rem;
+
+    .modes-wrap {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      max-width: 440px;
     }
-    .modes-title {
-      font-size: 1.6rem;
-      margin-bottom: 0.25rem;
+
+    .modes-compact-nav {
+      margin-bottom: 0.15rem;
     }
-    .modes-subtitle {
-      font-size: 0.88rem;
+
+    .modes-title-asli {
+      font-size: 1.55rem;
+      margin-bottom: 0.35rem;
+      line-height: 1.05;
     }
+
     .modes-grid {
       grid-template-columns: 1fr;
-      gap: 0.85rem;
-    }
-    .mode-card {
-      padding: 1.1rem 1.1rem;
-      border-radius: 16px;
-    }
-    .mode-card-header {
+      gap: 0.5rem;
+      flex: 1;
       display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 0.75rem;
+      flex-direction: column;
+      justify-content: space-between;
     }
+
+    .mode-card {
+      padding: 0.65rem 0.85rem;
+      border-radius: 16px;
+      margin-bottom: 0;
+    }
+
+    .mode-card-header {
+      gap: 0.65rem;
+      margin-bottom: 0.45rem;
+    }
+
     .mode-icon-circle {
-      width: 42px;
-      height: 42px;
-      font-size: 1.35rem;
-      margin-bottom: 0;
-      flex-shrink: 0;
-      border-radius: 10px;
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
     }
+
+    .mode-icon-circle svg {
+      width: 20px;
+      height: 20px;
+    }
+
     .mode-name {
-      font-size: 1.2rem;
-      margin-bottom: 0;
+      font-size: 1.1rem;
     }
-    /* Strictly hide long descriptions and bullet point features on mobile as requested */
+
     .mode-desc,
     .mode-features-list {
       display: none !important;
     }
-    .mode-card .btn-lg {
-      padding: 0.85rem 1rem;
-      font-size: 1rem;
-      width: 100%;
+
+    .mode-card .btn-mode-act {
+      padding: 0.6rem 0.9rem;
+      font-size: 0.92rem;
     }
+
     .join-room-box {
-      margin-top: 0.75rem;
-      padding-top: 0.75rem;
+      margin-top: 0.35rem;
+      padding-top: 0.35rem;
+    }
+
+    .join-room-title {
+      font-size: 0.68rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .room-code-input {
+      padding: 0.38rem 0.65rem;
+      font-size: 0.85rem;
+    }
+
+    .room-join-btn {
+      padding: 0.38rem 0.85rem;
+      font-size: 0.82rem;
     }
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="modes-section">
-  <div class="container">
-    <!-- Website Breadcrumb -->
-    <div class="breadcrumb-bar">
-      <a href="{{ url_for('pages.index') }}">← Home</a> / <a href="{{ url_for('pages.nickname') }}">Codename</a> / <span style="color:var(--text-dim);">Select Arena</span>
+<!-- Hacker Green Code Rain Background Canvas -->
+<canvas id="matrixCanvas" class="matrix-code-canvas" aria-hidden="true"></canvas>
+
+<section class="modes-locked-stage">
+  <div class="modes-wrap">
+    <!-- Compact Back Arrow Link -->
+    <div class="modes-compact-nav">
+      <a href="{{ url_for('pages.nickname') }}" class="compact-back-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span>Codename</span>
+      </a>
     </div>
 
-    <div class="modes-header">
-      <h1 class="modes-title" data-i18n="modes_title">Select Challenge Arena</h1>
-      <p class="modes-subtitle" data-i18n="modes_subtitle">Compete solo, host an auditorium event, or challenge your squad.</p>
-    </div>
+    <!-- Title (Red ASLI Gradient, Subtitle removed per request) -->
+    <h1 class="modes-title-asli" data-i18n="modes_title">Select Challenge Arena</h1>
 
+    <!-- 3 Challenge Arena Cards -->
     <div class="modes-grid">
       <!-- Card A: Big Screen Host -->
       <div class="mode-card">
         <div>
           <div class="mode-card-header">
-            <div class="mode-icon-circle"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--zenith-purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg></div>
+            <div class="mode-icon-circle">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+            </div>
             <h2 class="mode-name" data-i18n="mode_big_title">Play on Big Screen</h2>
           </div>
           <p class="mode-desc" data-i18n="mode_big_desc">
-            Designed for college auditoriums, classrooms, and stage projectors. Host the questions on the big screen while students answer on their phones via QR code.
+            Designed for college auditoriums and stage projectors. Host on the big screen while students answer on phones.
           </p>
           <ul class="mode-features-list">
             <li>Stage projector synchronized view</li>
             <li>QR code join for instant mobile entry</li>
-            <li>Live response counters without early spoilers</li>
-            <li>Auditorium podium leaderboard</li>
           </ul>
         </div>
-        <button type="button" class="btn btn-secondary btn-lg" id="btnLaunchHost" data-i18n="mode_big_btn">
+        <button type="button" class="btn btn-secondary btn-mode-act" id="btnLaunchHost" data-i18n="mode_big_btn">
           Launch Big Screen Session
         </button>
       </div>
 
       <!-- Card B: Play Alone (Solo) -->
-      <div class="mode-card" style="border-color: var(--zenith-purple); box-shadow: 0 4px 25px rgba(124, 58, 237, 0.15);">
+      <div class="mode-card" style="border-color: rgba(168, 85, 247, 0.6); box-shadow: 0 4px 25px rgba(124, 58, 237, 0.2);">
         <div>
           <div class="mode-card-header">
-            <div class="mode-icon-circle"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--zenith-purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
+            <div class="mode-icon-circle">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
             <h2 class="mode-name" data-i18n="mode_solo_title">Play Alone</h2>
           </div>
           <p class="mode-desc" data-i18n="mode_solo_desc">
-            Test your own instincts against 10 randomized AI vs ASLI items. Fast responses earn up to 50 speed bonus points per question. Save your record to the global leaderboard.
+            Test your instincts against 10 randomized AI vs ASLI items. Fast responses earn up to 50 speed bonus points.
           </p>
           <ul class="mode-features-list">
-            <li>10 balanced challenges across Image, Audio, Video</li>
-            <li>Interactive zoom & waveform analysis</li>
+            <li>10 challenges across Image, Audio, Video</li>
             <li>Speed bonus scoring system (up to 1,500 pts)</li>
-            <li>Downloadable 9:16 Instagram Story report</li>
           </ul>
         </div>
-        <a href="{{ url_for('pages.solo_game') }}" class="btn btn-primary btn-lg" data-i18n="mode_solo_btn">
+        <a href="{{ url_for('pages.solo_game') }}" class="btn btn-primary btn-mode-act" data-i18n="mode_solo_btn">
           Start Solo Challenge →
         </a>
       </div>
@@ -219,30 +383,31 @@
       <div class="mode-card">
         <div>
           <div class="mode-card-header">
-            <div class="mode-icon-circle"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--zenith-purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+            <div class="mode-icon-circle">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </div>
             <h2 class="mode-name" data-i18n="mode_friends_title">Play With Friends</h2>
           </div>
           <p class="mode-desc" data-i18n="mode_friends_desc">
-            Create a custom room with a unique code, invite your friends via QR or shareable link, and compete head-to-head in real time.
+            Create a custom room with a unique code, invite friends via QR or link, and compete head-to-head in real time.
           </p>
           <ul class="mode-features-list">
             <li>Real-time Socket.IO room synchronization</li>
-            <li>Host-controlled match start & advance</li>
             <li>Live room leaderboard & winner podium</li>
           </ul>
         </div>
 
         <div>
-          <button type="button" class="btn btn-coral btn-lg" style="width: 100%;" id="btnCreateFriendRoom" data-i18n="mode_friends_btn">
+          <button type="button" class="btn btn-coral btn-mode-act" id="btnCreateFriendRoom" data-i18n="mode_friends_btn">
             Create a Room
           </button>
 
-          <!-- Fully Responsive Join Code Box -->
+          <!-- Responsive Join Code Box -->
           <div class="join-room-box">
-            <span style="font-size:0.8rem; font-weight:800; color:var(--text-dim);" data-i18n="mode_have_code">HAVE A ROOM CODE?</span>
+            <span class="join-room-title" data-i18n="mode_have_code">HAVE A ROOM CODE?</span>
             <div class="room-input-group">
               <input type="text" id="manualRoomCodeInput" class="room-code-input" placeholder="CODE" maxlength="8">
-              <button type="button" class="btn btn-secondary room-join-btn" id="btnJoinManualRoom" data-i18n="mode_join_btn">
+              <button type="button" class="room-join-btn" id="btnJoinManualRoom" data-i18n="mode_join_btn">
                 Join
               </button>
             </div>
