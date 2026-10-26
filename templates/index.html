@@ -1,21 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Hacker Green Code Rain Background Canvas -->
+<canvas id="matrixCanvas" class="matrix-code-canvas" aria-hidden="true"></canvas>
+
 <section class="home-hero-stage">
-  <!-- 1. Floating Interactive Rotating Zenith Shield Background -->
-  <div class="hero-shield-backdrop" aria-hidden="true">
-    <div class="interactive-shield-container" id="interactiveShield" title="Drag or swipe to spin the Zenith shield">
+  <!-- Standing Upright 3D Rotating Zenith Shield on Top Right Corner -->
+  <div class="shield-top-right-anchor" id="shieldTopRightAnchor">
+    <div class="standing-shield-3d" id="standingShield" title="Swipe or drag to spin the Zenith shield">
       <img 
         src="{{ url_for('static', filename='images/zenith-shield.png') }}" 
         alt="Zenith Shield Emblem" 
-        class="shield-graphic" 
-        id="shieldGraphic"
+        class="standing-shield-graphic" 
+        id="standingShieldGraphic"
         draggable="false"
       >
     </div>
   </div>
 
-  <!-- 2. Hero Content Foreground -->
+  <!-- Hero Content Foreground (Perfect Vertical & Horizontal Balance) -->
   <div class="container hero-focus-container">
     <div class="hero-title-wrap">
       <h1 class="chunky-hero-title">
@@ -26,7 +29,7 @@
       <h2 class="chunky-hero-tagline" data-i18n="hero_tagline">Do you trust your eyes?</h2>
     </div>
 
-    <!-- 3. Primary & Secondary Action Buttons (Strictly no emojis) -->
+    <!-- Primary & Secondary Action Buttons (Strictly no emojis) -->
     <div class="hero-action-cluster">
       <a href="{{ url_for('pages.nickname') }}" class="btn btn-primary btn-hero-primary" data-i18n="btn_enter_challenge">
         ENTER THE CHALLENGE
@@ -37,14 +40,12 @@
     </div>
   </div>
 
-  <!-- 4. Floating Meme Popup (Dismissible for session) -->
-  <div class="meme-floating-popup" id="homeMemePopup" role="complementary" aria-label="Welcome announcement">
-    <button type="button" class="meme-close-btn" id="memeCloseBtn" aria-label="Dismiss message">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+  <!-- Floating Meme Popup on Bottom Left (Transparent Cutout, No Box Background, Dismissible) -->
+  <div class="meme-bottom-left-popup" id="homeMemePopup" role="complementary" aria-label="Welcome announcement">
+    <button type="button" class="meme-sticker-close-btn" id="memeCloseBtn" aria-label="Dismiss">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
     </button>
-    <div class="meme-image-frame">
-      <img src="{{ url_for('static', filename='images/meme-chaliye-shuru.webp') }}" alt="Chaliye Shuru Karte Hai" class="meme-media-img" loading="lazy">
-    </div>
+    <img src="{{ url_for('static', filename='images/meme-chaliye-shuru.webp') }}" alt="Chaliye Shuru Karte Hai" class="meme-sticker-img" loading="eager">
   </div>
 </section>
 {% endblock %}

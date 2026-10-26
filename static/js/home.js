@@ -1,63 +1,139 @@
 /**
  * AI vs ASLI — Home Page Interactive Controller
- * 1. Interactive 360° Rotating Zenith Shield with Drag Physics & Momentum
- * 2. Floating Meme Entrance & Dismissal
+ * 1. Hacker Green Matrix Digital Rain Background
+ * 2. Standing Upright 3D Rotating Shield on Top-Right Corner
+ * 3. Bottom-Left Transparent Meme Popup Entrance & Session Dismissal
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-  initRotatingShield();
+  initMatrixHackerRain();
+  initStandingShield();
   initMemePopup();
 });
 
 /**
- * 1. Interactive Rotating Zenith Shield
+ * 1. Hacker Green Matrix Digital Rain Background
  */
-function initRotatingShield() {
-  const container = document.getElementById("interactiveShield");
-  const graphic = document.getElementById("shieldGraphic");
+function initMatrixHackerRain() {
+  const canvas = document.getElementById("matrixCanvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  let width = (canvas.width = window.innerWidth);
+  let height = (canvas.height = window.innerHeight);
+
+  // Digital Rain Characters (Matrix + Binary + Hex + Keywords)
+  const chars = "01010101ABCDEF<>/*&%$#@!AIASLIZENITH01";
+  const charArray = chars.split("");
+
+  // Column spacing (smaller on mobile for high density)
+  const isMobile = window.innerWidth <= 680;
+  const fontSize = isMobile ? 14 : 16;
+  let columns = Math.floor(width / fontSize);
+
+  // Array storing current y-position of each drop
+  let drops = [];
+  function resetDrops() {
+    columns = Math.floor(width / fontSize);
+    drops = [];
+    for (let i = 0; i < columns; i++) {
+      // Stagger initial drop positions across the screen
+      drops[i] = Math.floor(Math.random() * -50);
+    }
+  }
+  resetDrops();
+
+  // Resize handler
+  window.addEventListener("resize", () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+    resetDrops();
+  });
+
+  let isTabActive = true;
+  document.addEventListener("visibilitychange", () => {
+    isTabActive = !document.hidden;
+  });
+
+  let lastFrameTime = performance.now();
+  const targetFpsInterval = 1000 / 35; // 35 FPS optimal for mobile battery & smooth trails
+
+  function renderMatrix(currentTime) {
+    requestAnimationFrame(renderMatrix);
+
+    if (!isTabActive) return;
+
+    const elapsed = currentTime - lastFrameTime;
+    if (elapsed < targetFpsInterval) return;
+    lastFrameTime = currentTime - (elapsed % targetFpsInterval);
+
+    // Subtle dark fade trail to create phosphor glow effect
+    ctx.fillStyle = "rgba(3, 7, 18, 0.085)";
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.font = `${fontSize}px monospace`;
+
+    for (let i = 0; i < drops.length; i++) {
+      const text = charArray[Math.floor(Math.random() * charArray.length)];
+      const x = i * fontSize;
+      const y = drops[i] * fontSize;
+
+      // Randomly make the leading head of the stream bright white/cyan
+      if (Math.random() > 0.88) {
+        ctx.fillStyle = "#86efac"; // Bright green head
+      } else {
+        ctx.fillStyle = "#10b981"; // Electric hacker green
+      }
+
+      ctx.fillText(text, x, y);
+
+      // Reset drop to top with slight randomization once it reaches bottom
+      if (y > height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+
+      drops[i]++;
+    }
+  }
+
+  requestAnimationFrame(renderMatrix);
+}
+
+/**
+ * 2. Standing Upright 3D Rotating Zenith Shield on Top-Right Corner
+ */
+function initStandingShield() {
+  const container = document.getElementById("standingShield");
+  const graphic = document.getElementById("standingShieldGraphic");
   if (!container || !graphic) return;
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // Rotation parameters
-  const BASE_SPEED = prefersReducedMotion ? 0 : 0.22; // Degrees per frame
-  const MAX_SPEED = 18; // Maximum degrees per frame
-  const DECELERATION = 0.965; // Damping factor
+  const BASE_SPEED = prefersReducedMotion ? 0 : 0.85; // Continuous degrees per frame
+  const MAX_SPEED = 24; // Maximum degrees per frame
+  const DAMPING = 0.958; // Deceleration rate towards base speed
 
   let currentAngle = 0;
   let currentSpeed = BASE_SPEED;
   let isDragging = false;
-  let lastPointerAngle = 0;
-  let lastTimestamp = 0;
+  let startX = 0;
+  let lastX = 0;
+  let lastTime = 0;
   let dragVelocity = 0;
-  let animationFrameId = null;
 
-  // Get center point of the shield container
-  function getCenter() {
-    const rect = container.getBoundingClientRect();
-    return {
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2
-    };
-  }
-
-  // Calculate angle from center to client coordinates
-  function calculateAngle(clientX, clientY, center) {
-    return Math.atan2(clientY - center.y, clientX - center.x) * (180 / Math.PI);
-  }
-
-  // Pointer Down (Mouse, Touch, Pen)
+  // Pointer Down (Mouse, Touch, Stylus)
   container.addEventListener("pointerdown", (e) => {
-    // Only respond to primary button
     if (e.button && e.button !== 0) return;
-    
+
     isDragging = true;
     container.setPointerCapture(e.pointerId);
     container.classList.add("grabbing");
 
-    const center = getCenter();
-    lastPointerAngle = calculateAngle(e.clientX, e.clientY, center);
-    lastTimestamp = performance.now();
+    startX = e.clientX;
+    lastX = e.clientX;
+    lastTime = performance.now();
     dragVelocity = 0;
   });
 
@@ -65,75 +141,66 @@ function initRotatingShield() {
   container.addEventListener("pointermove", (e) => {
     if (!isDragging) return;
 
-    const center = getCenter();
-    const newAngle = calculateAngle(e.clientX, e.clientY, center);
+    const currentX = e.clientX;
+    const deltaX = currentX - lastX;
     const now = performance.now();
-    const dt = Math.max(1, now - lastTimestamp);
+    const dt = Math.max(1, now - lastTime);
 
-    // Shortest angular distance between -180 and 180
-    let delta = newAngle - lastPointerAngle;
-    if (delta > 180) delta -= 360;
-    if (delta < -180) delta += 360;
+    // Direct 3D Y-axis rotation response to horizontal drag
+    currentAngle += deltaX * 1.1;
+    graphic.style.transform = `rotateY(${currentAngle}deg)`;
 
-    currentAngle = (currentAngle + delta) % 360;
-    graphic.style.transform = `rotate(${currentAngle}deg)`;
+    // Calculate instantaneous velocity in deg/frame (~16.6ms)
+    dragVelocity = (deltaX / dt) * 16.6;
 
-    // Calculate velocity (deg/frame ~ 16.6ms)
-    dragVelocity = (delta / dt) * 16.6;
-
-    lastPointerAngle = newAngle;
-    lastTimestamp = now;
+    lastX = currentX;
+    lastTime = now;
   });
 
   // Pointer Up / Cancel
-  function endDrag(e) {
+  function onPointerEnd(e) {
     if (!isDragging) return;
     isDragging = false;
     container.classList.remove("grabbing");
+
     try {
       if (container.hasPointerCapture(e.pointerId)) {
         container.releasePointerCapture(e.pointerId);
       }
     } catch (err) {}
 
-    // Apply clamped velocity to continuous speed
-    const boost = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, dragVelocity));
-    if (Math.abs(boost) > 0.5) {
+    // Apply clamped velocity to continuous 3D rotation speed
+    const boost = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, dragVelocity * 1.25));
+    if (Math.abs(boost) > 0.4) {
       currentSpeed = boost;
     }
   }
 
-  container.addEventListener("pointerup", endDrag);
-  container.addEventListener("pointercancel", endDrag);
+  container.addEventListener("pointerup", onPointerEnd);
+  container.addEventListener("pointercancel", onPointerEnd);
 
   // Animation Loop (requestAnimationFrame)
-  function animate() {
+  function animateShield() {
     if (!isDragging) {
-      // Gradually decelerate towards BASE_SPEED
-      if (Math.abs(currentSpeed - BASE_SPEED) > 0.01) {
-        currentSpeed = BASE_SPEED + (currentSpeed - BASE_SPEED) * DECELERATION;
+      // Smoothly decelerate back to BASE_SPEED
+      if (Math.abs(currentSpeed - BASE_SPEED) > 0.02) {
+        currentSpeed = BASE_SPEED + (currentSpeed - BASE_SPEED) * DAMPING;
       } else {
         currentSpeed = BASE_SPEED;
       }
 
       currentAngle = (currentAngle + currentSpeed) % 360;
-      graphic.style.transform = `rotate(${currentAngle}deg)`;
+      graphic.style.transform = `rotateY(${currentAngle}deg)`;
     }
 
-    animationFrameId = requestAnimationFrame(animate);
+    requestAnimationFrame(animateShield);
   }
 
-  // Start continuous rotation
-  animate();
-
-  // Cleanup if page changes
-  window.addEventListener("beforeunload", () => {
-    if (animationFrameId) cancelAnimationFrame(animationFrameId);
-  });
+  animateShield();
 }
 
 /**
- * 2. Floating Meme Popup
+ * 3. Bottom-Left Transparent Meme Popup Entrance & Session Dismissal
  */
 function initMemePopup() {
   const memePopup = document.getElementById("homeMemePopup");
@@ -142,29 +209,31 @@ function initMemePopup() {
 
   // Check if user dismissed it during this session
   try {
-    if (sessionStorage.getItem("zenith_meme_dismissed") === "1") {
+    if (sessionStorage.getItem("zenith_meme_closed") === "1") {
       memePopup.style.display = "none";
       return;
     }
   } catch (e) {}
 
-  // Reveal with gentle entrance animation after hero is visible
+  // Reveal with gentle slide-up animation after homepage elements are ready
   setTimeout(() => {
     memePopup.classList.add("visible");
-  }, 750);
+  }, 650);
 
-  // Close handler
+  // Dismiss button handler
   if (closeBtn) {
     closeBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       memePopup.classList.remove("visible");
       memePopup.classList.add("dismissed");
+
       try {
-        sessionStorage.setItem("zenith_meme_dismissed", "1");
+        sessionStorage.setItem("zenith_meme_closed", "1");
       } catch (err) {}
+
       setTimeout(() => {
         memePopup.style.display = "none";
-      }, 400);
+      }, 450);
     });
   }
 }

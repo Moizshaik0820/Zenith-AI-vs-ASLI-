@@ -97,6 +97,33 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Home page locked viewport (Strict zero-scroll) */
+body.home-locked-body {
+  height: 100dvh;
+  max-height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden !important;
+  position: fixed;
+  width: 100%;
+}
+
+.site-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+body.home-locked-body .site-main-home {
+  flex: 1;
+  height: calc(100dvh - 72px);
+  max-height: calc(100dvh - 72px);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 /* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -160,8 +187,29 @@ body {
 .site-brand-text {
   display: flex;
   flex-direction: column;
-  line-height: 1.15;
+  line-height: 1.08;
   white-space: nowrap;
+}
+
+/* Brand Wordmark Styled matching Image 3 (Zenith bold on top, School of AI directly below) */
+.site-brand-main {
+  font-family: var(--font-chunky, 'Plus Jakarta Sans', sans-serif);
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.02;
+  color: var(--text-main);
+  display: block;
+}
+
+.site-brand-sub {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--zenith-purple, #8b5cf6);
+  text-transform: uppercase;
+  line-height: 1.1;
+  display: block;
 }
 
 .site-org-name {
@@ -600,64 +648,81 @@ body {
 }
 
 /* ==========================================================================
-   Simplified, High-Impact Home Hero Stage with Animated Rotating Shield
+   Matrix Hacker Green Code Canvas & High-Impact Home Hero Stage
    ========================================================================== */
+.matrix-code-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  background-color: #030712;
+}
+
 .home-hero-stage {
   position: relative;
-  min-height: calc(100vh - 78px);
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  padding: 2.5rem 1rem 3.5rem;
-  background: radial-gradient(circle at 50% 45%, rgba(124, 58, 237, 0.09) 0%, transparent 65%);
+  padding: 1rem 1.25rem;
+  background: transparent;
+  z-index: 1;
 }
 
-/* Background Animated & Interactive Rotating Shield */
-.hero-shield-backdrop {
+/* Standing Upright 3D Rotating Shield in Top-Right Corner */
+.shield-top-right-anchor {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-  pointer-events: none;
+  top: 1.25rem;
+  right: 1.5rem;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: center;
-  will-change: transform;
+  perspective: 900px;
 }
 
-.interactive-shield-container {
-  width: clamp(230px, 46vw, 420px);
-  height: clamp(230px, 46vw, 420px);
-  border-radius: 50%;
-  pointer-events: auto;
+.standing-shield-3d {
+  width: clamp(60px, 8.5vw, 92px);
+  height: clamp(70px, 10vw, 106px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: grab;
   touch-action: none;
   user-select: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.17;
-  filter: drop-shadow(0 0 35px rgba(124, 58, 237, 0.45));
-  transition: opacity 0.3s ease, filter 0.3s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+  filter: drop-shadow(0 6px 20px rgba(139, 92, 246, 0.45));
+  transition: filter 0.25s ease;
 }
 
-.interactive-shield-container:hover {
-  opacity: 0.28;
-  filter: drop-shadow(0 0 50px rgba(124, 58, 237, 0.7));
+.standing-shield-3d:hover {
+  filter: drop-shadow(0 8px 28px rgba(168, 85, 247, 0.75));
 }
 
-.interactive-shield-container.grabbing {
+.standing-shield-3d.grabbing {
   cursor: grabbing;
-  opacity: 0.38;
+  filter: drop-shadow(0 10px 32px rgba(168, 85, 247, 0.9));
 }
 
-.shield-graphic {
+.standing-shield-graphic {
   width: 100%;
   height: 100%;
   object-fit: contain;
   pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  display: block;
+  background: transparent;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  transform-style: preserve-3d;
   will-change: transform;
 }
 
@@ -671,10 +736,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 
 .hero-title-wrap {
-  margin-bottom: 2rem;
+  margin-bottom: 1.75rem;
   animation: heroTextEntrance 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -692,10 +758,10 @@ body {
 /* Chunky Bold Main Title (Lilita One / Bungee inspired by reference) */
 .chunky-hero-title {
   font-family: var(--font-chunky, 'Lilita One', 'Bungee', sans-serif);
-  font-size: clamp(3.6rem, 12vw, 8rem);
+  font-size: clamp(3.6rem, 12vw, 7.5rem);
   line-height: 1.02;
   letter-spacing: 0.02em;
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -735,7 +801,7 @@ body {
 /* Chunky Engaging Tagline (No quotes) */
 .chunky-hero-tagline {
   font-family: var(--font-chunky, 'Lilita One', 'Plus Jakarta Sans', sans-serif);
-  font-size: clamp(1.4rem, 4.2vw, 2.35rem);
+  font-size: clamp(1.35rem, 4.2vw, 2.25rem);
   font-weight: 700;
   color: var(--text-main);
   letter-spacing: 0.025em;
@@ -817,108 +883,129 @@ body {
   transform: translateY(1px);
 }
 
-/* Floating Meme Popup */
-.meme-floating-popup {
+/* Floating Meme Popup on Bottom Left (Transparent Cutout, No Box Background, Dismissible) */
+.meme-bottom-left-popup {
   position: fixed;
-  right: 28px;
-  bottom: 28px;
+  left: clamp(14px, 3.5vw, 32px);
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   z-index: 100;
-  width: clamp(180px, 16vw, 230px);
-  border-radius: 16px;
-  background: rgba(15, 12, 35, 0.88);
-  backdrop-filter: blur(12px);
-  border: 2px solid rgba(124, 58, 237, 0.4);
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45), 0 0 25px rgba(124, 58, 237, 0.25);
+  width: clamp(140px, 18vw, 210px);
+  background: transparent;
+  border: none;
+  box-shadow: none;
   overflow: visible;
   opacity: 0;
-  transform: translateY(30px) scale(0.92);
-  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(100px) scale(0.85);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-.meme-floating-popup.visible {
+.meme-bottom-left-popup.visible {
   opacity: 1;
   transform: translateY(0) scale(1);
   pointer-events: auto;
 }
 
-.meme-floating-popup.dismissed {
+.meme-bottom-left-popup.dismissed {
   opacity: 0;
-  transform: translateY(20px) scale(0.9);
+  transform: translateY(80px) scale(0.8);
+  pointer-events: none;
 }
 
-.meme-close-btn {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  width: 28px;
-  height: 28px;
+.meme-sticker-close-btn {
+  align-self: flex-end;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: #E11D48;
+  background: rgba(225, 29, 72, 0.92);
   color: #ffffff;
-  border: 2px solid #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   transition: transform 0.15s ease, background 0.15s ease;
+  margin-bottom: 2px;
   z-index: 10;
 }
 
-.meme-close-btn:hover {
-  transform: scale(1.1);
+.meme-sticker-close-btn:hover {
+  transform: scale(1.15);
   background: #be123c;
 }
 
-.meme-image-frame {
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.meme-media-img {
+.meme-sticker-img {
   width: 100%;
   height: auto;
-  border-radius: 12px;
   display: block;
   object-fit: contain;
+  background: transparent;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.55));
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 @media (max-width: 680px) {
-  .home-hero-stage {
-    min-height: calc(100vh - 68px);
-    padding: 1.5rem 1rem 2.5rem;
+  body.home-locked-body .site-main-home {
+    height: calc(100dvh - 56px);
+    max-height: calc(100dvh - 56px);
   }
+
+  body.home-locked-body .home-hero-stage {
+    padding: 0.5rem 1rem;
+    justify-content: center;
+  }
+
+  .shield-top-right-anchor {
+    top: 0.6rem;
+    right: 0.75rem;
+  }
+
+  .standing-shield-3d {
+    width: 48px;
+    height: 58px;
+  }
+
   .chunky-hero-title {
-    font-size: clamp(3rem, 15vw, 4.8rem);
-    margin-bottom: 0.6rem;
+    font-size: clamp(2.8rem, 13.5vw, 4.2rem);
+    margin-bottom: 0.4rem;
   }
+
   .chunky-hero-tagline {
-    font-size: clamp(1.2rem, 5vw, 1.6rem);
-    margin-bottom: 1.8rem;
+    font-size: clamp(1.05rem, 4.2vw, 1.35rem);
+    margin-bottom: 1.25rem;
   }
+
   .hero-action-cluster {
-    gap: 0.85rem;
+    gap: 0.75rem;
     flex-direction: column;
     width: 100%;
-    max-width: 320px;
+    max-width: 290px;
   }
+
   .btn-hero-primary,
   .btn-hero-secondary {
     width: 100%;
-    padding: 0.95rem 1.6rem;
-    font-size: 1.05rem;
+    padding: 0.82rem 1.4rem;
+    font-size: 0.98rem;
   }
-  .meme-floating-popup {
-    right: 14px;
-    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-    width: clamp(120px, 34vw, 155px);
-  }
-}
 
-@media (max-width: 680px) {
+  .meme-bottom-left-popup {
+    left: 10px;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    width: clamp(105px, 28vw, 135px);
+  }
+
+  .meme-sticker-close-btn {
+    width: 20px;
+    height: 20px;
+  }
+
   .site-header {
     padding: 0.5rem 0;
   }
@@ -940,7 +1027,14 @@ body {
     min-width: 0;
     white-space: nowrap;
   }
-  /* Enforce ZENITH SCHOOL OF AI on ONE SINGLE LINE */
+  .site-brand-main {
+    font-size: 1.05rem;
+    line-height: 1.05;
+  }
+  .site-brand-sub {
+    font-size: 0.68rem;
+    line-height: 1.1;
+  }
   .site-org-name {
     font-size: 0.72rem;
     letter-spacing: 0.04em;
