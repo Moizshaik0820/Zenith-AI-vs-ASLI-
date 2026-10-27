@@ -10,7 +10,7 @@
   <!-- Modern Bold & Geometric Typography (Lilita One, Bungee, Plus Jakarta Sans) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Lilita+One&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Lilita+One&family=Outfit:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@700;800;900&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   {% block extra_css %}{% endblock %}
@@ -20,12 +20,11 @@
   <!-- Minimal & Modern Navigation Bar -->
   <header class="site-header">
     <div class="site-nav-container">
-      <!-- Left: Official Zenith Shield & Brand Wordmark (Image 3 Style: Zenith School of AI - NO AI vs ASLI) -->
-      <a href="{{ url_for('pages.index') }}" class="site-brand" aria-label="Zenith School of AI">
-        <img src="{{ url_for('static', filename='images/zenith-shield.png') }}" alt="Zenith Shield Crest" class="site-logo">
+      <!-- Left: Zenith Brand Wordmark (Logo removed per request, stylish font) -->
+      <a href="{{ url_for('pages.index') }}" class="site-brand site-brand-no-logo" aria-label="Zenith School of AI">
         <div class="site-brand-text">
           <span class="site-brand-main">Zenith</span>
-          <span class="site-brand-sub">School of AI</span>
+          <span class="site-brand-sub">SCHOOL OF AI</span>
         </div>
       </a>
 

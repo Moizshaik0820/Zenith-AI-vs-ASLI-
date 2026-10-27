@@ -330,12 +330,22 @@
     60% { transform: scale(1.1); }
     100% { transform: scale(1); }
   }
+
+  /* Quiz Section Distraction-Free Blurred Matrix Code Background Animation */
+  .matrix-code-canvas,
+  .quiz-blurred-canvas {
+    filter: blur(10px) !important;
+    -webkit-filter: blur(10px) !important;
+    opacity: 0.28 !important;
+    transform: scale(1.08) !important;
+    pointer-events: none !important;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 <!-- Hacker Green Code Rain Background Canvas -->
-<canvas id="matrixCanvas" class="matrix-code-canvas" aria-hidden="true"></canvas>
+<canvas id="matrixCanvas" class="matrix-code-canvas quiz-blurred-canvas" aria-hidden="true"></canvas>
 
 <section class="game-locked-stage">
   {% if mode == 'solo' %}

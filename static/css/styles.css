@@ -127,12 +127,12 @@ body.home-locked-body .site-main-home {
    Full Desktop Website Header
    ========================================================================== */
 .site-header {
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border-subtle);
+  background: #ffffff !important;
+  border-bottom: 1.5px solid rgba(0, 0, 0, 0.12) !important;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 2px 12px rgba(124, 58, 237, 0.06);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.08) !important;
 }
 
 .site-nav-container {
@@ -170,23 +170,25 @@ body.home-locked-body .site-main-home {
 
 /* Brand Wordmark Styled matching Image 3 (Zenith bold on top, School of AI directly below) */
 .site-brand-main {
-  font-family: var(--font-chunky, 'Plus Jakarta Sans', sans-serif);
-  font-size: 1.3rem;
+  font-family: 'Space Grotesk', 'Outfit', sans-serif !important;
+  font-size: 1.35rem;
   font-weight: 800;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
   line-height: 1.02;
-  color: var(--text-main);
+  color: #000000 !important;
   display: block;
 }
 
 .site-brand-sub {
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--zenith-purple, #8b5cf6);
+  font-family: 'Space Grotesk', 'Outfit', sans-serif !important;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: #000000 !important;
   text-transform: uppercase;
   line-height: 1.1;
   display: block;
+  margin-top: 1px;
 }
 
 .site-org-name {
@@ -227,7 +229,7 @@ body.home-locked-body .site-main-home {
 }
 
 .nav-item-home {
-  color: var(--text-main);
+  color: #000000 !important;
   text-decoration: none;
   font-weight: 800;
   font-size: 1.05rem;
@@ -237,24 +239,24 @@ body.home-locked-body .site-main-home {
 }
 
 .nav-item-home:hover {
-  color: var(--zenith-purple);
-  background: var(--bg-card);
+  color: #000000 !important;
+  background: rgba(0, 0, 0, 0.08) !important;
 }
 
 /* Compact Nav Icon-Only Quick Controls (No text, intuitive icons) */
 .nav-icon-btn {
   width: 42px;
   height: 42px;
-  background: var(--bg-card);
-  border: 1.5px solid var(--border-subtle);
+  background: #ffffff !important;
+  border: 1.5px solid #000000 !important;
   border-radius: 13px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  color: var(--text-main);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  color: #000000 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   padding: 0;
   flex-shrink: 0;
 }
@@ -267,23 +269,28 @@ body.home-locked-body .site-main-home {
   justify-content: center;
 }
 
+.nav-icon-btn svg {
+  stroke: #000000 !important;
+}
+
 .nav-icon-btn:hover {
-  border-color: var(--zenith-purple);
-  background: var(--bg-card-hover);
+  border-color: #000000 !important;
+  background: rgba(0, 0, 0, 0.08) !important;
+  color: #000000 !important;
   transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.25);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
 }
 
 .nav-icon-btn:active {
   transform: scale(0.95);
 }
 
-/* 3-Line Hamburger Button (Squircle design matching image 2) */
+/* 3-Line Hamburger Button in Black */
 .menu-hamburger-btn {
   width: 48px;
   height: 48px;
-  background: var(--bg-card);
-  border: 2px solid var(--border-subtle);
+  background: #ffffff !important;
+  border: 2px solid #000000 !important;
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -292,22 +299,22 @@ body.home-locked-body .site-main-home {
   gap: 5.5px;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   padding: 0;
 }
 
 .menu-hamburger-btn:hover {
-  border-color: var(--zenith-purple);
-  background: var(--bg-card-hover);
+  border-color: #000000 !important;
+  background: rgba(0, 0, 0, 0.08) !important;
   transform: translateY(-2px);
-  box-shadow: var(--shadow-glow);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
 }
 
 .hamburger-bar {
   display: block;
   width: 22px;
   height: 3.2px;
-  background: var(--text-main);
+  background: #000000 !important;
   border-radius: 4px;
   transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
   transform-origin: center;
@@ -834,6 +841,8 @@ body.home-locked-body .site-main-home {
 }
 
 .btn-hero-secondary {
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em;
   padding: 1.15rem 2.5rem;
   font-size: 1.15rem;
   font-weight: 700;
@@ -1005,12 +1014,14 @@ body.home-locked-body .site-main-home {
     white-space: nowrap;
   }
   .site-brand-main {
-    font-size: 1.05rem;
-    line-height: 1.05;
+    font-size: 1.15rem !important;
+    line-height: 1.02;
+    color: #000000 !important;
   }
   .site-brand-sub {
-    font-size: 0.68rem;
+    font-size: 0.62rem !important;
     line-height: 1.1;
+    color: #000000 !important;
   }
   .site-org-name {
     font-size: 0.72rem;
@@ -1028,8 +1039,9 @@ body.home-locked-body .site-main-home {
     flex-shrink: 0;
   }
   .nav-item-home {
-    font-size: 0.92rem;
-    padding: 0.35rem 0.6rem;
+    font-size: 0.95rem;
+    padding: 0.35rem 0.65rem;
+    color: #000000 !important;
   }
   /* Hide congested horizontal controls on mobile */
   .nav-desktop-controls {
@@ -1045,15 +1057,24 @@ body.home-locked-body .site-main-home {
     height: 38px;
     border-radius: 12px;
     font-size: 1.05rem;
+    background: #ffffff !important;
+    border: 1.5px solid #000000 !important;
+    color: #000000 !important;
+  }
+  .mobile-pref-trigger-btn svg {
+    stroke: #000000 !important;
   }
   .menu-hamburger-btn {
     width: 40px;
     height: 40px;
     border-radius: 12px;
+    background: #ffffff !important;
+    border: 2px solid #000000 !important;
   }
   .hamburger-bar {
     width: 18px;
     height: 2.8px;
+    background: #000000 !important;
   }
   /* Mobile Vertical Options Popover Menu */
   .mobile-vertical-popover {
@@ -1061,10 +1082,10 @@ body.home-locked-body .site-main-home {
     top: calc(100% + 8px);
     right: -30px;
     width: 250px;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-subtle);
+    background: #ffffff !important;
+    border: 1.5px solid #000000 !important;
     border-radius: 16px;
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.25) !important;
     padding: 0.85rem;
     display: none;
     flex-direction: column;
@@ -1078,11 +1099,11 @@ body.home-locked-body .site-main-home {
   .popover-title {
     font-size: 0.72rem;
     font-weight: 800;
-    color: var(--text-dim);
+    color: #4b5563 !important;
     letter-spacing: 0.06em;
     padding: 0.2rem 0.4rem;
     margin-bottom: 0.25rem;
-    border-bottom: 1px solid var(--border-subtle);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
   }
   .vertical-popover-item {
     display: flex;
@@ -1091,12 +1112,24 @@ body.home-locked-body .site-main-home {
     width: 100%;
     padding: 0.65rem 0.75rem;
     border-radius: 10px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    color: var(--text-main);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    color: #000000 !important;
     cursor: pointer;
     text-align: left;
     transition: all 0.15s ease;
+  }
+  .vertical-popover-item svg {
+    stroke: #000000 !important;
+  }
+  .vertical-popover-item:hover {
+    background: rgba(0, 0, 0, 0.06) !important;
+  }
+  .popover-item-label {
+    color: #000000 !important;
+  }
+  .popover-item-val {
+    color: #4b5563 !important;
   }
   .vertical-popover-item:active {
     background: var(--bg-surface-elevated);

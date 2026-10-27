@@ -714,3 +714,14 @@
     font-size: 0.82rem;
   }
 }
+
+
+/* Quiz Section Distraction-Free Blurred Matrix Code Background Animation */
+.matrix-code-canvas,
+.quiz-blurred-canvas {
+  filter: blur(10px) !important;
+  -webkit-filter: blur(10px) !important;
+  opacity: 0.28 !important;
+  transform: scale(1.08) !important;
+  pointer-events: none !important;
+}
