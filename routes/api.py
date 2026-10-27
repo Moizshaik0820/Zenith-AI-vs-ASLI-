@@ -9,6 +9,7 @@ from services.question_service import QuestionService
 from services.scoring_service import ScoringService
 from services.leaderboard_service import LeaderboardService
 from services.media_service import MediaService
+from services.meme_service import MemeService
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 
@@ -242,6 +243,7 @@ def submit_answer(session_id):
     
     # Aggregate stats
     stats = QuestionService.get_question_stats(question_id)
+    meme_url = MemeService.get_random_meme(is_correct=is_correct)
     
     return jsonify({
         "status": "success",
@@ -255,8 +257,13 @@ def submit_answer(session_id):
         "current_score": new_score,
         "next_index": new_index,
         "is_game_over": is_game_over,
+        "meme_url": meme_url,
         "stats": stats
     })
+
+@api_bp.route("/memes/all", methods=["GET"])
+def get_all_memes():
+    return jsonify(MemeService.get_all_memes())
 
 @api_bp.route("/media/masked/<question_id>", methods=["GET"])
 def get_masked_media(question_id):

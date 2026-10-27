@@ -10,16 +10,18 @@ class Config:
     # Database
     DATABASE_PATH = os.environ.get("DATABASE_PATH", str(BASE_DIR / "instance" / "app.db"))
     
-    # Media & Data
+    # Media, Static & Data
     MEDIA_FOLDER = BASE_DIR / "media"
+    STATIC_FOLDER = BASE_DIR / "static"
     DATA_FOLDER = BASE_DIR / "data"
     QUESTIONS_JSON = os.environ.get("QUESTIONS_JSON", str(BASE_DIR / "data" / "questions.json"))
+    EXTERNAL_RESOURCES_DIR = Path(os.environ.get("RESOURCES_DIR", "S:/resources"))
     
     # Allowed media formats & limits
     ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif"}
     ALLOWED_AUDIO_EXTENSIONS = {"mp3", "wav", "ogg", "m4a", "aac"}
-    ALLOWED_VIDEO_EXTENSIONS = {"mp4", "webm", "ogg"}
-    MAX_CONTENT_LENGTH = 32 * 1024 * 1024  # 32 MB max upload
+    ALLOWED_VIDEO_EXTENSIONS = {"mp4", "webm", "ogg", "mov"}
+    MAX_CONTENT_LENGTH = 64 * 1024 * 1024  # 64 MB max upload
     
     # Official Branding & Social (Updated to Official Zenith Handle & URL)
     INSTAGRAM_HANDLE = "@zenith_school_of_ai"
@@ -30,8 +32,10 @@ class Config:
     CAMPAIGN_URL = os.environ.get("CAMPAIGN_URL", "https://zenithschool.ai/")
     ZENITH_WEBSITE_URL = os.environ.get("ZENITH_WEBSITE_URL", "https://zenithschool.ai/")
     
-    # Game Settings (6 questions, pure speed-based points, no fixed 100 pts)
+    # Game Settings (6 questions: 4 images + 2 videos, pure speed-based points)
     QUESTIONS_PER_GAME = 6
+    GAME_NUM_IMAGES = 4
+    GAME_NUM_VIDEOS = 2
     BASE_POINTS_PER_CORRECT = 0
     MAX_SPEED_BONUS = 100
     IMAGE_TIMER_SECONDS = 15           # Images timer: 15s

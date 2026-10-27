@@ -1,9 +1,14 @@
 import json
 import random
 import os
+import re
+import logging
 from pathlib import Path
 from config import Config
 from models import get_db
+from services.resource_sync_service import ResourceSyncService
+
+logger = logging.getLogger(__name__)
 
 class QuestionService:
     @staticmethod
@@ -38,6 +43,95 @@ class QuestionService:
         conn.close()
 
     @staticmethod
+    def auto_discover_questions():
+        """
+        Dynamically auto-discovers all media in media/images and media/videos:
+        - Auto-syncs from S:\resources (or Config.EXTERNAL_RESOURCES_DIR) if mounted.
+        - Subfolder 'ai' -> Answer: AI
+        - Subfolder 'real' or 'asli' -> Answer: ASLI
+        - Automatically registers any new media into the SQLite database.
+        - Preserves custom metadata for existing questions.
+        """
+        try:
+            ResourceSyncService.sync_all()
+        except Exception as e:
+            logger.warning(f"ResourceSyncService.sync_all warning: {e}")
+
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT media_path, id FROM questions")
+        existing_paths = {row["media_path"].replace("\\", "/").lower(): row["id"] for row in cursor.fetchall()}
+
+        new_entries = []
+        for type_folder, q_type in [("images", "IMAGE"), ("videos", "VIDEO")]:
+            type_dir = Config.MEDIA_FOLDER / type_folder
+            if not type_dir.exists():
+                continue
+
+            for answer_folder in ["ai", "real", "asli"]:
+                ans_dir = type_dir / answer_folder
+                if not ans_dir.exists():
+                    continue
+
+                ans = "AI" if answer_folder == "ai" else "ASLI"
+                for file_path in ans_dir.iterdir():
+                    if not file_path.is_file():
+                        continue
+
+                    # Check allowed extensions
+                    ext = file_path.suffix.lower().lstrip(".")
+                    if q_type == "IMAGE" and ext not in Config.ALLOWED_IMAGE_EXTENSIONS:
+                        continue
+                    if q_type == "VIDEO" and ext not in Config.ALLOWED_VIDEO_EXTENSIONS:
+                        continue
+
+                    rel_path = f"{type_folder}/{answer_folder}/{file_path.name}".replace("\\", "/")
+                    if rel_path.lower() in existing_paths:
+                        continue
+
+                    # Generate clean, unique ID
+                    clean_name = re.sub(r"[^a-zA-Z0-9]+", "_", file_path.stem).strip("_").upper()
+                    prefix = "IMG" if q_type == "IMAGE" else "VID"
+                    q_id = f"{prefix}-{ans}-{clean_name}"
+                    
+                    # Ensure ID uniqueness in batch
+                    base_id = q_id
+                    suffix_counter = 1
+                    while any(e[0] == q_id for e in new_entries) or q_id in existing_paths.values():
+                        q_id = f"{base_id}_{suffix_counter}"
+                        suffix_counter += 1
+
+                    category = "Visual Turing Test" if q_type == "IMAGE" else "Video Deepfake Benchmark"
+                    if ans == "AI":
+                        explanation = "AI-Generated Media: Synthetic artifacting, algorithmic hallucination, or unnatural boundary smoothing detected."
+                    else:
+                        explanation = "Authentic Reality: Natural optical depth, consistent physics, and authentic camera sensor characteristics."
+
+                    new_entries.append((
+                        q_id,
+                        q_type,
+                        rel_path,
+                        ans,
+                        explanation,
+                        category,
+                        "medium",
+                        "Zenith AI vs ASLI Media Corpus",
+                        1
+                    ))
+
+        if new_entries:
+            with conn:
+                conn.executemany(
+                    """INSERT OR IGNORE INTO questions
+                    (id, type, media_path, answer, explanation, category, difficulty, attribution, active)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    new_entries
+                )
+            logger.info(f"Auto-discovered and registered {len(new_entries)} new media questions.")
+
+        conn.close()
+
+    @staticmethod
     def get_all_questions(active_only=True):
         conn = get_db()
         cursor = conn.cursor()
@@ -59,16 +153,24 @@ class QuestionService:
         return dict(row) if row else None
 
     @staticmethod
-    def select_game_questions(count=6) -> list:
+    def select_game_questions(count=6, num_images=4, num_videos=2) -> list:
         """
-        Randomly chooses 6 eligible questions (Image and Video only, no audio) from the bank:
-        - Balances AI and ASLI answers as closely as possible.
-        - Checks media asset exists on disk.
+        Randomly chooses 6 questions: exactly 4 images and 2 videos (balanced between AI and ASLI):
+        - 4 Images: 2 AI + 2 ASLI
+        - 2 Videos: 1 AI + 1 ASLI
+        - Total: 6 questions (3 AI, 3 ASLI)
         - Shuffles order to avoid predictability.
+        - Verified that media file exists on disk.
         """
+        # Auto-discover any new files on disk first
+        try:
+            QuestionService.auto_discover_questions()
+        except Exception as e:
+            logger.warning(f"auto_discover_questions warning: {e}")
+
         all_qs = QuestionService.get_all_questions(active_only=True)
         
-        # Verify media file exists AND is image or video (NO audio per instruction)
+        # Verify media file exists on disk and is IMAGE or VIDEO
         valid_qs = []
         for q in all_qs:
             q_type = str(q.get("type", "")).upper()
@@ -79,40 +181,70 @@ class QuestionService:
                 valid_qs.append(q)
                 
         if len(valid_qs) < count:
-            # Fallback if fewer than count questions available
             selected = valid_qs
             random.shuffle(selected)
             return [q["id"] for q in selected]
 
-        ai_pool = [q for q in valid_qs if q["answer"].upper() == "AI"]
-        asli_pool = [q for q in valid_qs if q["answer"].upper() == "ASLI"]
-        
-        half = count // 2
-        ai_count = min(len(ai_pool), half)
-        asli_count = min(len(asli_pool), count - ai_count)
-        
-        # In case one pool is short, fill remainder from the other
-        if ai_count + asli_count < count:
-            ai_count = min(len(ai_pool), count - asli_count)
-            asli_count = min(len(asli_pool), count - ai_count)
-            
-        selected_ai = random.sample(ai_pool, ai_count)
-        selected_asli = random.sample(asli_pool, asli_count)
-        
-        combined = selected_ai + selected_asli
-        
-        # If still short (e.g. fewer total available), fill from remaining valid
-        remaining = [q for q in valid_qs if q not in combined]
-        while len(combined) < count and remaining:
-            choice = random.choice(remaining)
-            combined.append(choice)
-            remaining.remove(choice)
-            
+        # Categorize valid questions by media type and answer
+        image_ai = [q for q in valid_qs if q["type"] == "IMAGE" and q["answer"] == "AI"]
+        image_asli = [q for q in valid_qs if q["type"] == "IMAGE" and q["answer"] == "ASLI"]
+        video_ai = [q for q in valid_qs if q["type"] == "VIDEO" and q["answer"] == "AI"]
+        video_asli = [q for q in valid_qs if q["type"] == "VIDEO" and q["answer"] == "ASLI"]
+
+        # 1. Select 4 Images (target: 2 AI, 2 ASLI)
+        half_img = num_images // 2
+        ai_img_count = min(len(image_ai), half_img)
+        asli_img_count = min(len(image_asli), num_images - ai_img_count)
+        if ai_img_count + asli_img_count < num_images:
+            ai_img_count = min(len(image_ai), num_images - asli_img_count)
+
+        selected_images = []
+        if image_ai and ai_img_count > 0:
+            selected_images.extend(random.sample(image_ai, ai_img_count))
+        if image_asli and asli_img_count > 0:
+            selected_images.extend(random.sample(image_asli, asli_img_count))
+
+        # Fallback if image pools were smaller than num_images
+        all_images = [q for q in valid_qs if q["type"] == "IMAGE" and q not in selected_images]
+        while len(selected_images) < num_images and all_images:
+            pick = random.choice(all_images)
+            selected_images.append(pick)
+            all_images.remove(pick)
+
+        # 2. Select 2 Videos (target: 1 AI, 1 ASLI)
+        half_vid = num_videos // 2
+        ai_vid_count = min(len(video_ai), half_vid)
+        asli_vid_count = min(len(video_asli), num_videos - ai_vid_count)
+        if ai_vid_count + asli_vid_count < num_videos:
+            ai_vid_count = min(len(video_ai), num_videos - asli_vid_count)
+
+        selected_videos = []
+        if video_ai and ai_vid_count > 0:
+            selected_videos.extend(random.sample(video_ai, ai_vid_count))
+        if video_asli and asli_vid_count > 0:
+            selected_videos.extend(random.sample(video_asli, asli_vid_count))
+
+        # Fallback if video pools were smaller than num_videos
+        all_videos = [q for q in valid_qs if q["type"] == "VIDEO" and q not in selected_videos]
+        while len(selected_videos) < num_videos and all_videos:
+            pick = random.choice(all_videos)
+            selected_videos.append(pick)
+            all_videos.remove(pick)
+
+        # 3. Combine and ensure total count
+        combined = selected_images + selected_videos
+        remaining_all = [q for q in valid_qs if q not in combined]
+        while len(combined) < count and remaining_all:
+            pick = random.choice(remaining_all)
+            combined.append(pick)
+            remaining_all.remove(pick)
+
+        # Shuffle so video questions appear at unpredictable positions
         random.shuffle(combined)
         return [q["id"] for q in combined]
 
     @staticmethod
-    def sanitize_question_for_client(question: dict, index: int, total: int = 10) -> dict:
+    def sanitize_question_for_client(question: dict, index: int, total: int = 6) -> dict:
         """
         Never reveals the answer, explanation, or file path in client metadata.
         """
@@ -133,9 +265,6 @@ class QuestionService:
 
     @staticmethod
     def get_question_stats(question_id: str) -> dict:
-        """
-        Calculates real, aggregate percentage correct vs incorrect from database records.
-        """
         conn = get_db()
         cursor = conn.cursor()
         cursor.execute(
@@ -153,7 +282,6 @@ class QuestionService:
         correct = row["correct"] if row and row["correct"] else 0
         
         if total == 0:
-            # Baseline benchmark if no answers recorded yet
             return {
                 "total_answers": 0,
                 "correct_pct": 50,

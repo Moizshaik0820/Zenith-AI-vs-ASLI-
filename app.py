@@ -70,6 +70,7 @@ def create_app():
     init_db()
     seed_demo_leaderboard()
     QuestionService.sync_questions_from_json()
+    QuestionService.auto_discover_questions()
     
     # Register blueprints (Admin removed as requested)
     app.register_blueprint(pages_bp)

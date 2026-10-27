@@ -407,12 +407,11 @@ class GameEngine {
       this.mediaViewportEl.appendChild(wrap);
 
     } else if (q.type === "VIDEO") {
-      this.isAudioVideoPlaybackActive = true;
-      this.btnAi.disabled = true;
-      this.btnAsli.disabled = true;
-      this.totalAnswerTime = q.total_time || 10.0;
+      // Default muted video as explicitly requested (no audio emitted)
+      this.isAudioVideoPlaybackActive = false;
+      this.totalAnswerTime = q.total_time || 12.0;
       this.remainingTime = this.totalAnswerTime;
-      this.timerDisplayEl.textContent = (window.i18n && window.i18n.currentLang === "hi") ? "Pehle video dekho..." : "Watch first...";
+      this.updateTimerDisplay(this.remainingTime);
 
       const wrap = document.createElement("div");
       wrap.className = "video-player-wrap";
@@ -420,31 +419,35 @@ class GameEngine {
       const video = document.createElement("video");
       video.src = q.media_url;
       video.className = "question-media-video";
+      video.muted = true;
+      video.defaultMuted = true;
+      video.volume = 0;
       video.playsInline = true;
+      video.autoplay = true;
+      video.loop = true;
+      video.setAttribute("muted", "");
+      video.setAttribute("playsinline", "");
+      video.setAttribute("autoplay", "");
+      video.setAttribute("loop", "");
 
-      const overlay = document.createElement("div");
-      overlay.className = "video-play-overlay";
-      const vidText = (window.i18n && window.i18n.currentLang === "hi") ? "Video dekhne ke liye tap karo" : "Tap to play video";
-      overlay.innerHTML = `<div class="video-play-btn">▶</div><p style="color:#fff; font-weight:700;">${vidText}</p>`;
-
-      overlay.addEventListener("click", () => {
-        overlay.style.display = "none";
-        video.play().catch(() => {
-          overlay.style.display = "flex";
-          overlay.innerHTML = `<p style="color:#fff;">Tap again to play</p>`;
-        });
-      });
-
-      video.addEventListener("ended", () => {
-        this.isAudioVideoPlaybackActive = false;
-        this.btnAi.disabled = false;
-        this.btnAsli.disabled = false;
-        this.startCountdown();
+      // Ensure video is permanently muted and cannot play audio
+      video.addEventListener("volumechange", () => {
+        if (!video.muted || video.volume > 0) {
+          video.muted = true;
+          video.volume = 0;
+        }
       });
 
       wrap.appendChild(video);
-      wrap.appendChild(overlay);
       this.mediaViewportEl.appendChild(wrap);
+
+      // Start muted autoplay immediately
+      video.play().catch(err => {
+        console.warn("Muted video autoplay blocked, will start on user swipe/interaction:", err);
+      });
+
+      // Start countdown immediately so player can inspect video and swipe
+      this.startCountdown();
     }
   }
 
@@ -536,19 +539,31 @@ class GameEngine {
     const isHinglish = window.i18n && window.i18n.currentLang === "hi";
     const isLastQuestion = (this.currentIndex >= this.totalQuestions - 1) || Boolean(res.is_game_over);
 
-    // Meme Selection (Right memes vs Wrong memes)
-    const correctMemes = [
-      "/static/images/meme-correct.webp",
-      "/static/images/meme-chaliye-shuru.webp"
-    ];
-    const wrongMemes = [
-      "/static/images/meme-wrong.webp",
-      "/static/images/meme-i-saw-that.webp"
-    ];
-
-    const chosenMeme = res.is_correct
-      ? correctMemes[Math.floor(Math.random() * correctMemes.length)]
-      : wrongMemes[Math.floor(Math.random() * wrongMemes.length)];
+    // Meme Selection (Right memes vs Wrong memes from server auto-discovery)
+    let chosenMeme = res.meme_url;
+    if (!chosenMeme) {
+      const correctMemes = [
+        "/static/memes/correct/1.jpeg",
+        "/static/memes/correct/2.jpeg",
+        "/static/memes/correct/3.jpeg",
+        "/static/memes/correct/4.jpeg",
+        "/static/memes/correct/5.jpeg",
+        "/static/images/meme-correct.webp",
+        "/static/images/meme-chaliye-shuru.webp"
+      ];
+      const wrongMemes = [
+        "/static/memes/wrong/2.jpg",
+        "/static/memes/wrong/3.jpg",
+        "/static/memes/wrong/5.jpg",
+        "/static/memes/wrong/6.jpg",
+        "/static/memes/wrong/10.jpg",
+        "/static/images/meme-wrong.webp",
+        "/static/images/meme-i-saw-that.webp"
+      ];
+      chosenMeme = res.is_correct
+        ? correctMemes[Math.floor(Math.random() * correctMemes.length)]
+        : wrongMemes[Math.floor(Math.random() * wrongMemes.length)];
+    }
 
     if (this.memeReactionImg) {
       this.memeReactionImg.src = chosenMeme;
