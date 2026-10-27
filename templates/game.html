@@ -438,7 +438,7 @@
     <div class="host-middle-box" id="multiplayerArena">
       <h3 class="host-scan-title">Scan to Join the Challenge</h3>
       <p class="host-scan-subtitle">
-        Open phone camera or visit: <strong>{{ request.host }}</strong> and enter code: <strong class="host-code-red">{{ room_code }}</strong>
+        Scan QR or visit: <strong>{{ request.host }}/join/{{ room_code }}</strong> | Code: <strong class="host-code-red">{{ room_code }}</strong>
       </p>
 
       <div class="host-qr-frame">
@@ -456,12 +456,14 @@
 
   {% elif mode == 'room_player' %}
   <!-- PARTICIPANT CONTROLLER VIEW (Single Screen Unified Layout) -->
-  <div class="host-locked-card" style="text-align:center; align-items:center;">
-    <div style="margin-bottom:0.5rem;"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></div>
-    <h2 style="font-size:1.6rem; font-weight:900; margin-bottom:0.35rem; color:#ffffff;">Connected to Room <span class="host-code-red">{{ room_code }}</span></h2>
-    <p style="color:var(--text-dim); margin-bottom:1rem; font-size:0.92rem;">Look up at the stage/projector screen. The questions will appear there!</p>
-    <div style="background:rgba(15,12,35,0.85); padding:0.85rem 1.25rem; border-radius:12px; font-weight:800; color:#34d399; border:1px solid rgba(139,92,246,0.3);">
-      Status: Waiting for host to launch the match...
+  <div class="host-locked-card player-controller-card" style="text-align:center; align-items:center;">
+    <div class="host-middle-box" id="multiplayerArena" style="width:100%;">
+      <div style="margin-bottom:0.5rem;"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></div>
+      <h2 style="font-size:1.6rem; font-weight:900; margin-bottom:0.35rem; color:#ffffff;">Connected to Room <span class="host-code-red">{{ room_code }}</span></h2>
+      <p style="color:var(--text-dim); margin-bottom:1rem; font-size:0.92rem;">Connecting to live session...</p>
+      <div style="background:rgba(15,12,35,0.85); padding:0.85rem 1.25rem; border-radius:12px; font-weight:800; color:#34d399; border:1px solid rgba(139,92,246,0.3);">
+        Status: Initializing controller...
+      </div>
     </div>
   </div>
   {% endif %}
@@ -484,9 +486,13 @@
     const startBtn = document.getElementById("btnHostStartMatch");
     if (startBtn) {
       startBtn.addEventListener("click", () => {
-        window.soundFx.click();
-        mp.socket.emit("start_room_game", { room_code: roomCode });
-        startBtn.style.display = "none";
+        if (window.soundFx && typeof window.soundFx.click === "function") {
+          window.soundFx.click();
+        }
+        if (mp && mp.socket) {
+          mp.socket.emit("start_room_game", { room_code: roomCode });
+          startBtn.style.display = "none";
+        }
       });
     }
   });

@@ -725,3 +725,58 @@
   transform: scale(1.08) !important;
   pointer-events: none !important;
 }
+
+
+/* Multiplayer Participant Mobile Controller Styles */
+.player-controller-card {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.room-player-btn,
+#roomBtnAi,
+#roomBtnAsli {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease, background 0.15s ease !important;
+}
+
+.room-player-btn:active,
+#roomBtnAi:active,
+#roomBtnAsli:active {
+  transform: scale(0.96) !important;
+}
+
+#roomBtnAi:hover {
+  border-color: #a855f7 !important;
+  box-shadow: 0 4px 22px rgba(168, 85, 247, 0.5) !important;
+}
+
+#roomBtnAsli:hover {
+  border-color: #e11d48 !important;
+  box-shadow: 0 4px 22px rgba(225, 29, 72, 0.5) !important;
+}
+
+.lobby-player-badge {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  padding: 0.32rem 0.75rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #ffffff;
+  animation: badgePop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes badgePop {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

@@ -76,18 +76,29 @@ def register_multiplayer_events(socketio):
             emit("join_error", {"message": f"Room '{room_code}' has already ended."})
             return
             
-        # Add to participants
+        # Preserve is_host if this player is the room's host
+        is_host = 1 if player_id == room["host_player_id"] else 0
         with conn:
             conn.execute(
                 """INSERT OR REPLACE INTO room_participants
                 (room_code, player_id, nickname, is_host)
-                VALUES (?, ?, ?, 0)""",
-                (room_code, player_id, nickname)
+                VALUES (?, ?, ?, ?)""",
+                (room_code, player_id, nickname, is_host)
             )
             
         # Fetch current player list
         cursor.execute("SELECT player_id, nickname, is_host FROM room_participants WHERE room_code = ?", (room_code,))
         participants = [dict(r) for r in cursor.fetchall()]
+
+        # Check if match is already in progress and retrieve current question
+        current_question = None
+        questions_list = json.loads(room["questions_sequence"]) if room["questions_sequence"] else []
+        if room["status"] == "playing" and questions_list:
+            curr_idx = room["current_question_index"]
+            if curr_idx < len(questions_list):
+                raw_q = QuestionService.get_question_by_id(questions_list[curr_idx])
+                current_question = QuestionService.sanitize_question_for_client(raw_q, curr_idx, len(questions_list))
+                
         conn.close()
         
         join_room(room_code)
@@ -97,7 +108,9 @@ def register_multiplayer_events(socketio):
             "mode": room["mode"],
             "status": room["status"],
             "participants": participants,
-            "current_index": room["current_question_index"]
+            "current_index": room["current_question_index"],
+            "total_questions": len(questions_list),
+            "current_question": current_question
         })
         
         # Broadcast to room that player joined

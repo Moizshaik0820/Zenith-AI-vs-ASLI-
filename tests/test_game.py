@@ -152,5 +152,32 @@ class TestAiVsAsliGame(unittest.TestCase):
             self.assertNotIn("1", code)
             self.assertNotIn("I", code)
 
+    def test_room_qr_endpoint(self):
+        """Verifies QR code endpoint generates valid PNG with robust host resolution."""
+        # 1. Standard request
+        res = self.client.get("/api/qr/TEST99")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.mimetype, "image/png")
+        self.assertGreater(len(res.data), 100)
+
+        # 2. Render proxy headers with comma-separated proto
+        res2 = self.client.get(
+            "/api/qr/TEST99",
+            headers={
+                "X-Forwarded-Proto": "https, http",
+                "X-Forwarded-Host": "vs-asli.onrender.com"
+            }
+        )
+        self.assertEqual(res2.status_code, 200)
+        self.assertEqual(res2.mimetype, "image/png")
+
+    def test_join_room_page_contains_arena(self):
+        """Verifies /join/<room_code> page contains #multiplayerArena for participant controller."""
+        res = self.client.get("/join/TEST99")
+        self.assertEqual(res.status_code, 200)
+        html = res.data.decode("utf-8")
+        self.assertIn('id="multiplayerArena"', html)
+        self.assertIn("TEST99", html)
+
 if __name__ == "__main__":
     unittest.main()
