@@ -77,7 +77,7 @@ class TestAiVsAsliGame(unittest.TestCase):
 
     def test_question_sanitization(self):
         """Verifies that questions sent to client never expose ground truth answer or raw paths."""
-        raw_q = QuestionService.get_question_by_id("IMG-AI-001")
+        raw_q = QuestionService.get_question_by_id("IMG-AI-AI_1")
         self.assertIsNotNone(raw_q)
 
         sanitized = QuestionService.sanitize_question_for_client(raw_q, index=0, total=10)

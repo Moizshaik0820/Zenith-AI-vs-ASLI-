@@ -48,7 +48,7 @@ class TestAllRoutes(unittest.TestCase):
         self.assertEqual(res.content_type, "image/png")
 
         # Masked media
-        res = self.client.get("/api/media/masked/IMG-AI-001")
+        res = self.client.get("/api/media/masked/IMG-AI-AI_1")
         self.assertEqual(res.status_code, 200)
 
 if __name__ == "__main__":

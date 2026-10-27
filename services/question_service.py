@@ -129,6 +129,18 @@ class QuestionService:
                 )
             logger.info(f"Auto-discovered and registered {len(new_entries)} new media questions.")
 
+        # Clean up any obsolete questions whose media file does not exist on disk
+        cursor.execute("SELECT id, media_path FROM questions")
+        obsolete_ids = []
+        for row in cursor.fetchall():
+            m_path = Config.MEDIA_FOLDER / row["media_path"].replace("\\", "/")
+            if not m_path.exists():
+                obsolete_ids.append((row["id"],))
+        if obsolete_ids:
+            with conn:
+                cursor.executemany("DELETE FROM questions WHERE id = ?", obsolete_ids)
+            logger.info(f"Purged {len(obsolete_ids)} obsolete questions whose files no longer exist.")
+
         conn.close()
 
     @staticmethod
