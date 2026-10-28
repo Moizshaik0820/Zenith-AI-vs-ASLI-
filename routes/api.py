@@ -300,6 +300,27 @@ def get_room_leaderboard(room_code):
         "leaderboard": leaderboard
     })
 
+@api_bp.route("/room/check/<room_code>", methods=["GET"])
+def check_room(room_code):
+    """Verifies room existence, mode, and status before joining."""
+    clean_code = room_code.strip().upper()
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT code, mode, status, host_nickname FROM rooms WHERE code = ?", (clean_code,))
+    room = cursor.fetchone()
+    conn.close()
+    
+    if not room:
+        return jsonify({"exists": False, "error": f"Room '{clean_code}' was not found. Please verify the code."}), 404
+        
+    return jsonify({
+        "exists": True,
+        "room_code": room["code"],
+        "mode": room["mode"],
+        "status": room["status"],
+        "host_nickname": room["host_nickname"]
+    })
+
 @api_bp.route("/qr/<room_code>", methods=["GET"])
 def get_room_qr(room_code):
     """Generates dynamic QR code PNG image pointing to the player join page."""

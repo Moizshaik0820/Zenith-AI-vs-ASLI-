@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const urlParams = new URLSearchParams(window.location.search);
           const targetRoom = urlParams.get("room") || urlParams.get("room_code");
           if (targetRoom) {
-            window.location.href = `/join/${targetRoom.toUpperCase()}`;
+            window.location.href = `/lobby/${targetRoom.toUpperCase()}`;
           } else {
             window.location.href = "/modes";
           }

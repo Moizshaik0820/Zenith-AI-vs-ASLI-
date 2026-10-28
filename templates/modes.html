@@ -435,10 +435,26 @@
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
+    // Show error toast if redirected with error
+    const urlParams = new URLSearchParams(window.location.search);
+    const err = urlParams.get("error");
+    if (err && typeof window.showToast === "function") {
+      window.showToast(err, true);
+    }
+
     const btnLaunchHost = document.getElementById("btnLaunchHost");
     const btnCreateRoom = document.getElementById("btnCreateFriendRoom");
     const btnJoinManual = document.getElementById("btnJoinManualRoom");
     const manualInput = document.getElementById("manualRoomCodeInput");
+
+    function getOrCreatePlayerId() {
+      let pId = localStorage.getItem("zenith_player_id");
+      if (!pId) {
+        pId = "p_" + Math.random().toString(36).substring(2, 10);
+        try { localStorage.setItem("zenith_player_id", pId); } catch(e){}
+      }
+      return pId;
+    }
 
     const socket = io({ transports: ["websocket", "polling"] });
 
@@ -446,7 +462,7 @@
       btnLaunchHost.addEventListener("click", () => {
         window.soundFx.click();
         socket.emit("create_room", {
-          player_id: localStorage.getItem("zenith_player_id"),
+          player_id: getOrCreatePlayerId(),
           nickname: localStorage.getItem("zenith_nickname") || "Host",
           mode: "big_screen"
         });
@@ -457,7 +473,7 @@
       btnCreateRoom.addEventListener("click", () => {
         window.soundFx.click();
         socket.emit("create_room", {
-          player_id: localStorage.getItem("zenith_player_id"),
+          player_id: getOrCreatePlayerId(),
           nickname: localStorage.getItem("zenith_nickname") || "RoomHost",
           mode: "friends"
         });
@@ -465,6 +481,9 @@
     }
 
     socket.on("room_created", (data) => {
+      if (data.player_id) {
+        try { localStorage.setItem("zenith_player_id", data.player_id); } catch(e){}
+      }
       if (data.mode === "big_screen") {
         window.location.href = `/game/host/${data.room_code}`;
       } else {
@@ -472,14 +491,66 @@
       }
     });
 
-    if (btnJoinManual && manualInput) {
+    function doJoinRoom() {
+      if (!manualInput) return;
+      const code = manualInput.value.trim().toUpperCase().replace(/\s+/g, '');
+      if (!code) {
+        if (typeof window.showToast === "function") window.showToast("Please enter a room code", true);
+        manualInput.focus();
+        return;
+      }
+
+      if (btnJoinManual) {
+        btnJoinManual.disabled = true;
+        btnJoinManual.textContent = "...";
+      }
+
+      fetch(`/api/room/check/${code}`)
+        .then(res => res.json())
+        .then(data => {
+          if (btnJoinManual) {
+            btnJoinManual.disabled = false;
+            btnJoinManual.textContent = "Join";
+          }
+          if (!data.exists) {
+            if (typeof window.showToast === "function") window.showToast(data.error || "Room not found", true);
+            manualInput.focus();
+            return;
+          }
+          if (data.status === "finished") {
+            if (typeof window.showToast === "function") window.showToast(`Room '${code}' match has already ended`, true);
+            return;
+          }
+          if (data.mode === "big_screen") {
+            window.location.href = `/join/${code}`;
+          } else {
+            window.location.href = `/lobby/${code}`;
+          }
+        })
+        .catch(() => {
+          if (btnJoinManual) {
+            btnJoinManual.disabled = false;
+            btnJoinManual.textContent = "Join";
+          }
+          // Fallback direct navigation
+          window.location.href = `/lobby/${code}`;
+        });
+    }
+
+    if (btnJoinManual) {
       btnJoinManual.addEventListener("click", () => {
-        const code = manualInput.value.trim().toUpperCase();
-        if (!code) {
-          window.showToast("Enter a room code", true);
-          return;
+        window.soundFx.click();
+        doJoinRoom();
+      });
+    }
+
+    if (manualInput) {
+      manualInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          window.soundFx.click();
+          doJoinRoom();
         }
-        window.location.href = `/join/${code}`;
       });
     }
   });

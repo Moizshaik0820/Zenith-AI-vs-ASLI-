@@ -1,6 +1,6 @@
 /**
  * AI vs ASLI — Multiplayer & Big Screen Controller (Socket.IO)
- * Fixed & Enhanced for seamless QR join, live participant sync & mobile media viewing.
+ * Seamless room creation, friend code joining, synchronized questions & room leaderboard.
  */
 
 class MultiplayerManager {
@@ -9,13 +9,16 @@ class MultiplayerManager {
     this.roomCode = roomCode ? roomCode.toUpperCase() : null;
     this.playerId = localStorage.getItem("zenith_player_id");
     this.nickname = localStorage.getItem("zenith_nickname") || "";
+    this.isHost = false;
     this.socket = null;
     this.currentQuestion = null;
     this.hasAnsweredCurrent = false;
     this.lastChosenAnswer = null;
     this.startTime = null;
     this.timerInterval = null;
+    this.nextCountdownInterval = null;
     this.totalAnswerTime = 10.0;
+    this.initialLobbyHtml = null;
   }
 
   getArena() {
@@ -23,20 +26,8 @@ class MultiplayerManager {
   }
 
   init() {
-    if (this.mode === "room_player") {
-      // Direct QR-code or link joiner flow:
-      // If user has not set a name yet, prompt them immediately without losing the room code!
-      if (!this.playerId || !this.nickname || this.nickname === "Player") {
-        this.renderQuickNameEntry();
-        return;
-      }
-      this.renderWaitingRoom();
-      this.connectAndJoin();
-      return;
-    }
-
     if (this.mode === "host") {
-      // Big screen projector host never needs to be kicked to nickname screen
+      // Big screen projector host in auditorium mode
       if (!this.playerId) {
         this.playerId = "host_" + Math.random().toString(36).substring(2, 9);
         try {
@@ -46,6 +37,31 @@ class MultiplayerManager {
       if (!this.nickname) {
         this.nickname = "Host";
       }
+      this.connectAndJoin();
+      return;
+    }
+
+    if (this.mode === "lobby") {
+      const arena = this.getArena();
+      if (arena) {
+        this.initialLobbyHtml = arena.innerHTML;
+      }
+
+      // If user has not set a name yet, prompt them right in the lobby!
+      if (!this.playerId || !this.nickname || this.nickname === "Player") {
+        this.renderQuickNameEntry();
+        return;
+      }
+      this.connectAndJoin();
+      return;
+    }
+
+    if (this.mode === "room_player") {
+      if (!this.playerId || !this.nickname || this.nickname === "Player") {
+        this.renderQuickNameEntry();
+        return;
+      }
+      this.renderWaitingRoom();
       this.connectAndJoin();
       return;
     }
@@ -61,7 +77,6 @@ class MultiplayerManager {
 
   connectAndJoin() {
     if (!this.socket) {
-      // Connect to Socket.IO
       this.socket = io({ transports: ["websocket", "polling"] });
 
       this.socket.on("connect", () => {
@@ -92,22 +107,22 @@ class MultiplayerManager {
     if (!arena) return;
 
     arena.innerHTML = `
-      <div style="max-width:440px; margin:0 auto; text-align:center; padding:1.5rem 1rem; width:100%; box-sizing:border-box;">
-        <div style="display:inline-flex; align-items:center; gap:0.5rem; background:rgba(225,29,72,0.14); color:#fb7185; font-weight:800; font-size:0.85rem; padding:0.4rem 1rem; border-radius:9999px; border:1px solid rgba(225,29,72,0.4); margin-bottom:1rem;">
+      <div style="max-width:440px; margin:0 auto; text-align:center; padding:1.2rem 1rem; width:100%; box-sizing:border-box;">
+        <div style="display:inline-flex; align-items:center; gap:0.5rem; background:rgba(225,29,72,0.14); color:#fb7185; font-weight:800; font-size:0.85rem; padding:0.4rem 1rem; border-radius:9999px; border:1px solid rgba(225,29,72,0.4); margin-bottom:0.85rem;">
           🎯 JOINING ROOM: <strong style="letter-spacing:0.05em; color:#ffffff;">${this.roomCode}</strong>
         </div>
 
-        <h2 style="font-size:1.6rem; font-weight:900; margin-bottom:0.35rem; color:#ffffff;">
-          Enter Your Name
+        <h2 style="font-size:1.55rem; font-weight:900; margin-bottom:0.35rem; color:#ffffff;">
+          Enter Your Codename
         </h2>
-        <p style="color:var(--text-dim); font-size:0.88rem; margin-bottom:1.25rem; line-height:1.45;">
-          Enter your detective codename to jump right into the live challenge!
+        <p style="color:var(--text-dim); font-size:0.88rem; margin-bottom:1.1rem; line-height:1.45;">
+          Pick a detective alias to join your friends in the live arena!
         </p>
 
-        <form id="quickJoinForm" style="display:flex; flex-direction:column; gap:1rem; text-align:left;">
+        <form id="quickJoinForm" style="display:flex; flex-direction:column; gap:0.85rem; text-align:left;">
           <div>
-            <label style="display:block; font-size:0.78rem; font-weight:800; color:var(--text-dim); margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.05em;">
-              Your Name / Codename
+            <label style="display:block; font-size:0.75rem; font-weight:800; color:var(--text-dim); margin-bottom:0.35rem; text-transform:uppercase; letter-spacing:0.05em;">
+              Your Codename
             </label>
             <input 
               type="text" 
@@ -117,7 +132,7 @@ class MultiplayerManager {
               required 
               autofocus 
               value="${(this.nickname && this.nickname !== 'Player') ? this.nickname : ''}" 
-              style="width:100%; font-size:1.05rem; font-weight:700; text-align:left; padding:0.8rem 1rem; border-radius:12px; border:1.5px solid rgba(255,255,255,0.2); background:rgba(3,7,18,0.7); color:#ffffff; box-sizing:border-box; outline:none;"
+              style="width:100%; font-size:1.05rem; font-weight:700; text-align:left; padding:0.75rem 1rem; border-radius:12px; border:1.5px solid rgba(255,255,255,0.25); background:rgba(3,7,18,0.7); color:#ffffff; box-sizing:border-box; outline:none;"
             >
           </div>
 
@@ -131,8 +146,8 @@ class MultiplayerManager {
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary" id="btnConfirmQuickJoin" style="margin-top:0.4rem; width:100%; font-size:1.1rem; padding:0.85rem; border-radius:12px; font-weight:900; background:#e11d48; border:none; color:#ffffff; box-shadow:0 4px 18px rgba(225,29,72,0.45); cursor:pointer;">
-            JOIN ROOM 🚀
+          <button type="submit" class="btn btn-primary" id="btnConfirmQuickJoin" style="margin-top:0.35rem; width:100%; font-size:1.05rem; padding:0.85rem; border-radius:12px; font-weight:900; background:#e11d48; border:none; color:#ffffff; box-shadow:0 4px 18px rgba(225,29,72,0.45); cursor:pointer;">
+            JOIN SQUAD 🚀
           </button>
         </form>
       </div>
@@ -158,7 +173,7 @@ class MultiplayerManager {
         return;
       }
       submitBtn.disabled = true;
-      submitBtn.textContent = "Joining Room...";
+      submitBtn.textContent = "Connecting...";
 
       fetch("/api/player/init", {
         method: "POST",
@@ -180,18 +195,29 @@ class MultiplayerManager {
           if (window.soundFx && typeof window.soundFx.click === "function") {
             window.soundFx.click();
           }
-          this.renderWaitingRoom();
+
+          if (this.mode === "lobby") {
+            // Restore lobby markup
+            if (this.initialLobbyHtml) {
+              arena.innerHTML = this.initialLobbyHtml;
+              if (typeof window.setupLobbyButtons === "function") {
+                window.setupLobbyButtons();
+              }
+            }
+          } else {
+            this.renderWaitingRoom();
+          }
           this.connectAndJoin();
         } else {
           submitBtn.disabled = false;
-          submitBtn.textContent = "JOIN ROOM 🚀";
+          submitBtn.textContent = "JOIN SQUAD 🚀";
           if (typeof window.showToast === "function") window.showToast(data.error || "Failed to set name", true);
         }
       })
       .catch(err => {
         console.error("Join error:", err);
         submitBtn.disabled = false;
-        submitBtn.textContent = "JOIN ROOM 🚀";
+        submitBtn.textContent = "JOIN SQUAD 🚀";
         if (typeof window.showToast === "function") window.showToast("Connection issue. Please retry.", true);
       });
     });
@@ -205,17 +231,17 @@ class MultiplayerManager {
       <div style="text-align:center; padding:1.8rem 1rem; width:100%; box-sizing:border-box;">
         <div style="font-size:3rem; margin-bottom:0.5rem; animation: pulseCurrent 1.5s infinite;">⚡</div>
         <h2 style="font-size:1.6rem; font-weight:900; margin-bottom:0.4rem; color:#ffffff;">
-          Connected to Room <span class="host-code-red">${this.roomCode}</span>
+          Connected to Room <span class="host-code-red" style="color:#e11d48;">${this.roomCode}</span>
         </h2>
         <div style="display:inline-flex; align-items:center; gap:0.4rem; background:rgba(124,58,237,0.15); border:1.5px solid #a855f7; color:#ffffff; padding:0.35rem 0.9rem; border-radius:9999px; font-weight:800; font-size:0.9rem; margin-bottom:1.2rem;">
           <span style="color:#a855f7;">Player:</span> <strong id="displayName">${this.nickname}</strong>
           <button type="button" id="btnChangePlayerName" style="background:none; border:none; color:var(--text-dim); text-decoration:underline; cursor:pointer; font-size:0.78rem; margin-left:0.35rem; font-weight:700;">(Change)</button>
         </div>
         <p style="color:var(--text-dim); margin-bottom:1.4rem; font-size:0.95rem; line-height:1.5;">
-          Look up at the stage/projector screen!<br>The challenge will launch as soon as the host starts.
+          Waiting for host to launch the challenge match...
         </p>
         <div style="background:rgba(34,197,94,0.12); padding:0.85rem 1.25rem; border-radius:12px; display:inline-block; font-weight:800; color:#34d399; border:1px solid rgba(34,197,94,0.35);">
-          Status: Ready & Waiting for Host ▶
+          Status: Ready & In Room ▶
         </div>
       </div>
     `;
@@ -240,7 +266,25 @@ class MultiplayerManager {
   bindSocketEvents() {
     this.socket.on("joined_successfully", (data) => {
       console.log("Room joined:", data);
+      this.isHost = data.is_host;
+      if (data.player_id && !this.playerId) {
+        this.playerId = data.player_id;
+        try { localStorage.setItem("zenith_player_id", data.player_id); } catch(e){}
+      }
       this.updateParticipantList(data.participants);
+
+      // In lobby: toggle Start Match button for host vs Waiting status for friends
+      const btnStart = document.getElementById("btnStartFriendMatch");
+      const waitingStatus = document.getElementById("friendWaitingStatus");
+      if (btnStart && waitingStatus) {
+        if (this.isHost) {
+          btnStart.style.display = "block";
+          waitingStatus.style.display = "none";
+        } else {
+          btnStart.style.display = "none";
+          waitingStatus.style.display = "block";
+        }
+      }
 
       // If match is already in progress when user joins, render the active question immediately!
       if (data.status === "playing" && data.current_question) {
@@ -252,8 +296,8 @@ class MultiplayerManager {
 
     this.socket.on("player_joined", (data) => {
       this.updateParticipantList(data.participants);
-      if (typeof window.showToast === "function") {
-        window.showToast(`${data.nickname} entered the arena!`);
+      if (typeof window.showToast === "function" && data.player_id !== this.playerId) {
+        window.showToast(`${data.nickname} joined the squad!`);
       }
     });
 
@@ -265,6 +309,7 @@ class MultiplayerManager {
     });
 
     this.socket.on("room_game_started", (data) => {
+      this.clearIntervals();
       this.currentQuestion = data.question;
       this.hasAnsweredCurrent = false;
       this.lastChosenAnswer = null;
@@ -272,9 +317,15 @@ class MultiplayerManager {
     });
 
     this.socket.on("live_answer_count", (data) => {
-      const counterEl = document.getElementById("hostLiveAnswerCount");
-      if (counterEl) {
-        counterEl.textContent = `${data.answered_count} answered`;
+      const hostCounter = document.getElementById("hostLiveAnswerCount");
+      if (hostCounter) {
+        hostCounter.textContent = `${data.answered_count} answered`;
+      }
+      const mobileStatus = document.getElementById("mobileAnswerStatus");
+      if (mobileStatus && this.hasAnsweredCurrent) {
+        const total = data.total_participants || '';
+        const totalStr = total ? `/${total}` : '';
+        mobileStatus.innerHTML = `🔒 Verdict Locked: <strong>${this.lastChosenAnswer}</strong> (${data.answered_count}${totalStr} answered)`;
       }
     });
 
@@ -282,7 +333,7 @@ class MultiplayerManager {
       this.hasAnsweredCurrent = true;
       const statusEl = document.getElementById("mobileAnswerStatus");
       if (statusEl) {
-        statusEl.innerHTML = `✅ Verdict Recorded: <strong style="color:#ffffff;">${data.chosen_answer}</strong><br><small style="color:var(--text-dim);">Waiting for timer to expire...</small>`;
+        statusEl.innerHTML = `✅ Verdict Locked: <strong style="color:#ffffff;">${data.chosen_answer}</strong><br><small style="color:var(--text-dim);">Waiting for timer to expire...</small>`;
       }
     });
 
@@ -291,6 +342,7 @@ class MultiplayerManager {
     });
 
     this.socket.on("advance_question", (data) => {
+      this.clearIntervals();
       this.currentQuestion = data.question;
       this.hasAnsweredCurrent = false;
       this.lastChosenAnswer = null;
@@ -298,6 +350,7 @@ class MultiplayerManager {
     });
 
     this.socket.on("room_game_over", (data) => {
+      this.clearIntervals();
       this.renderRoomGameOver(data.leaderboard);
     });
   }
@@ -313,7 +366,13 @@ class MultiplayerManager {
       participants.forEach(p => {
         const item = document.createElement("div");
         item.className = "lobby-player-badge";
-        item.innerHTML = `<span>⚡</span> <span>${p.nickname}</span> ${p.is_host ? '<small style="color:#fb7185;">(Host)</small>' : ''}`;
+        const isSelf = (p.player_id === this.playerId);
+        item.innerHTML = `
+          <span>⚡</span>
+          <span>${p.nickname}</span>
+          ${p.is_host ? '<small style="color:#fb7185; font-weight:800; margin-left:3px;">(Host)</small>' : ''}
+          ${isSelf ? '<small style="color:#34d399; font-weight:800; margin-left:3px;">(You)</small>' : ''}
+        `;
         listEl.appendChild(item);
       });
     }
@@ -327,7 +386,7 @@ class MultiplayerManager {
     this.clearIntervals();
 
     if (this.mode === "host") {
-      // Big screen view: shows media, question number, and live answer count.
+      // Big screen auditorium view (projector screen)
       arena.innerHTML = `
         <div class="question-top-bar">
           <span class="category-tag">${q.category || 'DEEPFAKE ANALYSIS'}</span>
@@ -355,45 +414,45 @@ class MultiplayerManager {
         </div>
       `;
 
-      // Host countdown timer
       this.totalAnswerTime = q.total_time;
       this.startHostCountdown(q.id);
 
-    } else if (this.mode === "room_player") {
-      // Mobile participant view: includes question media preview and large tactical AI & ASLI buttons!
+    } else {
+      // Participant view for ALL players (both Host and Friends in friends mode!)
       arena.innerHTML = `
-        <div class="question-top-bar" style="margin-bottom:0.4rem;">
-          <span class="category-tag">Question ${currentIdx + 1} / ${total}</span>
-          <div class="timer-box" id="playerTimerBox">
+        <div class="question-top-bar" style="margin-bottom:0.4rem; display:flex; justify-content:space-between; align-items:center;">
+          <span class="category-tag" style="font-size:0.75rem; padding:0.25rem 0.65rem;">${q.category || 'CHALLENGE'}</span>
+          <div class="question-counter-badge" style="font-size:0.95rem; font-weight:800; color:#ffffff;">Question ${currentIdx + 1} of ${total}</div>
+          <div class="timer-box" id="playerTimerBox" style="font-size:0.95rem; font-weight:900;">
             <span id="playerTimerDisplay">${q.total_time}.0s</span>
           </div>
         </div>
         
-        <div class="mobile-media-preview-box" style="margin: 0.5rem 0 0.75rem; border-radius: 14px; overflow: hidden; background: #000; border: 1.5px solid rgba(255,255,255,0.18); max-height: 220px; display: flex; align-items: center; justify-content: center;">
+        <div class="mobile-media-preview-box" style="margin: 0.4rem 0 0.65rem; border-radius: 14px; overflow: hidden; background: #000; border: 1.5px solid rgba(255,255,255,0.18); max-height: 220px; display: flex; align-items: center; justify-content: center; position: relative;">
           ${q.type === 'IMAGE' 
             ? `<img src="${q.media_url}" style="max-height: 220px; max-width: 100%; object-fit: contain; display: block;" alt="Question Preview">` 
             : (q.type === 'AUDIO' 
-                ? `<div style="padding:1.5rem; text-align:center; width:100%;"><span style="font-size:2.5rem;">🎧</span><p style="color:var(--text-dim); margin-top:0.5rem; font-size:0.85rem;">Audio playing on Big Screen</p></div>`
+                ? `<div style="padding:1.2rem; text-align:center; width:100%;"><span style="font-size:2.5rem;">🎧</span><p style="color:var(--text-dim); margin:0.35rem 0 0.5rem; font-size:0.85rem;">Listen carefully:</p><audio src="${q.media_url}" controls autoplay style="width:90%;"></audio></div>`
                 : `<video src="${q.media_url}" style="max-height: 220px; max-width: 100%; object-fit: contain; display: block;" autoplay muted playsinline loop></video>`
               )
           }
         </div>
 
-        <div style="text-align:center; margin-bottom:0.4rem;">
-          <h3 style="font-size:1.1rem; font-weight:800; margin:0 0 0.15rem; color:#ffffff;">Cast Your Verdict</h3>
-          <p style="color:var(--text-dim); font-size:0.8rem; margin:0;">Inspect above or look at big screen, then tap below:</p>
+        <div style="text-align:center; margin-bottom:0.35rem;">
+          <h3 style="font-size:1.1rem; font-weight:900; margin:0 0 0.15rem; color:#ffffff;">Do you trust your eyes?</h3>
+          <p style="color:var(--text-dim); font-size:0.8rem; margin:0;">Inspect above and lock your verdict:</p>
         </div>
 
-        <div class="answers-row" style="margin-top:0.4rem;">
-          <button type="button" class="answer-btn answer-btn-ai room-player-btn" id="roomBtnAi">
+        <div class="answers-row" style="margin-top:0.4rem; display:flex; gap:0.6rem;">
+          <button type="button" class="answer-btn answer-btn-ai room-player-btn" id="roomBtnAi" style="flex:1;">
             AI <span class="btn-subtext">Synthetic / Fake</span>
           </button>
-          <button type="button" class="answer-btn answer-btn-asli room-player-btn" id="roomBtnAsli">
+          <button type="button" class="answer-btn answer-btn-asli room-player-btn" id="roomBtnAsli" style="flex:1;">
             ASLI <span class="btn-subtext">Real / Genuine</span>
           </button>
         </div>
         
-        <div id="mobileAnswerStatus" style="text-align:center; margin-top:0.75rem; font-size:0.92rem; font-weight:700; color:var(--ai-cyan); min-height: 22px;"></div>
+        <div id="mobileAnswerStatus" style="text-align:center; margin-top:0.65rem; font-size:0.88rem; font-weight:800; color:#a855f7; min-height: 22px;"></div>
       `;
 
       const btnAi = document.getElementById("roomBtnAi");
@@ -443,7 +502,7 @@ class MultiplayerManager {
 
     const statusEl = document.getElementById("mobileAnswerStatus");
     if (statusEl) {
-      statusEl.innerHTML = `🔒 Verdict Locked: <strong>${answer}</strong>`;
+      statusEl.innerHTML = `🔒 Verdict Locked: <strong>${answer}</strong> (+Speed Points)<br><small style="color:var(--text-dim);">Waiting for other players...</small>`;
     }
 
     this.socket.emit("submit_room_answer", {
@@ -451,7 +510,7 @@ class MultiplayerManager {
       player_id: this.playerId,
       question_id: this.currentQuestion.id,
       chosen_answer: answer,
-      time_taken: Math.min(this.totalAnswerTime, Math.max(0, timeTaken))
+      time_taken: Math.min(this.totalAnswerTime, Math.max(0.1, timeTaken))
     });
 
     if (window.soundFx && typeof window.soundFx.click === "function") {
@@ -471,7 +530,6 @@ class MultiplayerManager {
 
       if (remaining <= 0) {
         clearInterval(this.timerInterval);
-        // Time expired: host requests reveal from server
         this.socket.emit("end_question_phase", {
           room_code: this.roomCode,
           question_id: questionId
@@ -486,7 +544,12 @@ class MultiplayerManager {
       const elapsed = (Date.now() - this.startTime) / 1000;
       remaining = Math.max(0, this.totalAnswerTime - elapsed);
       const display = document.getElementById("playerTimerDisplay");
-      if (display) display.textContent = `${remaining.toFixed(1)}s`;
+      if (display) {
+        display.textContent = `${remaining.toFixed(1)}s`;
+        if (remaining <= 5.0) {
+          display.style.color = "#ef4444";
+        }
+      }
 
       if (remaining <= 0) {
         clearInterval(this.timerInterval);
@@ -494,6 +557,13 @@ class MultiplayerManager {
         const btnAsli = document.getElementById("roomBtnAsli");
         if (btnAi) btnAi.disabled = true;
         if (btnAsli) btnAsli.disabled = true;
+
+        if (this.isHost) {
+          this.socket.emit("end_question_phase", {
+            room_code: this.roomCode,
+            question_id: this.currentQuestion.id
+          });
+        }
       }
     }, 100);
   }
@@ -504,7 +574,7 @@ class MultiplayerManager {
     if (!arena) return;
 
     if (this.mode === "host") {
-      // Big screen reveals correct answer, explanation, response stats, and live leaderboard!
+      // Big screen projector feedback
       arena.innerHTML = `
         <div style="background:rgba(15,23,42,0.85); padding:1.5rem; border-radius:18px; border:1px solid rgba(255,255,255,0.15); width:100%; box-sizing:border-box;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.2rem; flex-wrap:wrap; gap:0.5rem;">
@@ -550,30 +620,93 @@ class MultiplayerManager {
         });
       }
 
-    } else if (this.mode === "room_player") {
+    } else {
+      // Participant feedback view for ALL players (both Host and Friends in friends mode!)
       const chosen = this.lastChosenAnswer;
       const isCorrect = chosen && (chosen === data.correct_answer);
+
+      if (isCorrect) {
+        if (window.soundFx && typeof window.soundFx.correct === "function") window.soundFx.correct();
+      } else {
+        if (window.soundFx && typeof window.soundFx.incorrect === "function") window.soundFx.incorrect();
+      }
+
       arena.innerHTML = `
         <div style="text-align:center; padding:1.2rem 0.5rem; width:100%; box-sizing:border-box;">
-          <div style="font-size:2.5rem; margin-bottom:0.3rem;">${isCorrect ? '🎯' : '⚡'}</div>
+          <div style="font-size:2.4rem; margin-bottom:0.25rem;">${isCorrect ? '🎯' : '⚡'}</div>
           
           <div style="display:inline-block; padding:0.35rem 0.9rem; border-radius:999px; font-weight:900; font-size:0.85rem; margin-bottom:0.65rem; background:${isCorrect ? 'rgba(34,197,94,0.2)' : 'rgba(225,29,72,0.2)'}; color:${isCorrect ? '#4ade80' : '#fb7185'}; border:1px solid ${isCorrect ? '#22c55e' : '#e11d48'};">
             ${isCorrect ? 'YOU WERE CORRECT!' : (chosen ? 'YOU WERE FOOLED!' : 'TIME EXPIRED')}
           </div>
 
-          <h2 style="font-size:1.6rem; font-weight:900; color:${data.correct_answer === 'AI' ? '#a855f7' : '#e11d48'}; margin-bottom:0.5rem;">
+          <h2 style="font-size:1.75rem; font-weight:900; color:${data.correct_answer === 'AI' ? '#a855f7' : '#e11d48'}; margin:0 0 0.5rem;">
             Answer: ${data.correct_answer === 'AI' ? '🤖 GENERATED BY AI' : '📸 ASLI (REAL)'}
           </h2>
 
-          <p style="color:rgba(255,255,255,0.85); font-size:0.88rem; line-height:1.5; margin-bottom:1rem; background:rgba(0,0,0,0.35); padding:0.75rem; border-radius:10px; border:1px solid rgba(255,255,255,0.1);">
-            ${data.explanation}
+          <p style="color:rgba(255,255,255,0.9); font-size:0.88rem; line-height:1.5; margin-bottom:0.85rem; background:rgba(0,0,0,0.35); padding:0.75rem 0.85rem; border-radius:10px; border:1px solid rgba(255,255,255,0.1); text-align:left;">
+            <strong style="color:#ffffff;">Why:</strong> ${data.explanation}
           </p>
 
-          <div style="color:var(--text-dim); font-size:0.82rem; font-weight:700;">
-            Waiting for host to launch next question...
+          <div style="background:rgba(0,0,0,0.3); padding:0.65rem 0.95rem; border-radius:10px; margin-bottom:0.85rem; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-weight:700; color:var(--text-dim); font-size:0.85rem;">Room Accuracy:</span>
+            <strong style="color:#34d399; font-size:1.05rem;">${data.room_stats ? data.room_stats.display : ''}</strong>
           </div>
+
+          <h4 style="font-size:0.88rem; margin:0 0 0.45rem; color:#ffffff; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; text-align:left;">Live Room Standings</h4>
+          <div style="max-height:130px; overflow-y:auto; margin-bottom:1rem; border-radius:10px; background:rgba(0,0,0,0.25); padding:0.4rem;">
+            ${(data.leaderboard || []).map((p, idx) => `
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:0.45rem 0.75rem; background:${p.player_id === this.playerId ? 'rgba(124,58,237,0.25)' : 'rgba(255,255,255,0.05)'}; border:1px solid ${p.player_id === this.playerId ? '#a855f7' : 'rgba(255,255,255,0.08)'}; border-radius:8px; margin-bottom:0.25rem;">
+                <span style="font-weight:800; font-size:0.88rem; color:#ffffff;">
+                  ${idx === 0 ? '👑 #1' : `#${idx + 1}`} ${p.nickname} ${p.player_id === this.playerId ? '<small style="color:#34d399">(You)</small>' : ''}
+                </span>
+                <span style="font-weight:900; color:${idx === 0 ? '#fbbf24' : '#a855f7'}; font-size:0.95rem;">${p.score} pts</span>
+              </div>
+            `).join('')}
+          </div>
+
+          ${this.isHost ? `
+            <button type="button" class="btn btn-primary" id="btnNextRoomQuestion" style="width:100%; padding:0.8rem; font-size:1.05rem; font-weight:900; background:#e11d48; border:none; border-radius:var(--radius-pill); cursor:pointer; color:#ffffff; box-shadow:0 4px 18px rgba(225,29,72,0.45);">
+              NEXT QUESTION → (<span id="autoNextCountdown">5</span>s)
+            </button>
+          ` : `
+            <div style="color:var(--text-dim); font-size:0.85rem; font-weight:700;">
+              Next question starting in <strong id="autoNextCountdown" style="color:#ffffff;">5</strong>s...
+            </div>
+          `}
         </div>
       `;
+
+      // 5-second countdown to next question
+      let countdown = 5;
+      const countEl = document.getElementById("autoNextCountdown");
+      const nextBtn = document.getElementById("btnNextRoomQuestion");
+
+      const advanceNext = () => {
+        if (this.nextCountdownInterval) {
+          clearInterval(this.nextCountdownInterval);
+          this.nextCountdownInterval = null;
+        }
+        if (this.isHost) {
+          this.socket.emit("next_room_question", { room_code: this.roomCode });
+        }
+      };
+
+      if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+          if (window.soundFx && typeof window.soundFx.click === "function") window.soundFx.click();
+          advanceNext();
+        });
+      }
+
+      this.nextCountdownInterval = setInterval(() => {
+        countdown--;
+        if (countEl) countEl.textContent = countdown;
+        if (countdown <= 0) {
+          clearInterval(this.nextCountdownInterval);
+          this.nextCountdownInterval = null;
+          advanceNext();
+        }
+      }, 1000);
     }
   }
 
@@ -589,22 +722,25 @@ class MultiplayerManager {
     arena.innerHTML = `
       <div style="text-align:center; padding:1.5rem 0.5rem; width:100%; box-sizing:border-box;">
         <h1 style="font-family:var(--font-chunky, 'Lilita One', sans-serif); font-size:2.2rem; color:#e11d48; margin:0 0 0.35rem; letter-spacing:0.04em;">
-          CHALLENGE COMPLETE
+          CHALLENGE COMPLETE 🏆
         </h1>
         <p style="font-size:0.95rem; color:var(--text-dim); margin-bottom:1.2rem;">
-          Room <span class="host-code-red">${this.roomCode}</span> Final Standings
+          Room <span class="host-code-red" style="color:#e11d48; font-weight:900;">${this.roomCode}</span> Final Standings
         </p>
-        <div style="width:100%; max-width:440px; margin:0 auto 1.5rem; max-height:260px; overflow-y:auto;">
+        <div style="width:100%; max-width:440px; margin:0 auto 1.5rem; max-height:280px; overflow-y:auto;">
           ${(leaderboard || []).map((p, idx) => `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:0.65rem 1rem; background:${idx === 0 ? 'rgba(251, 191, 36, 0.15)' : 'rgba(255,255,255,0.05)'}; border:1.5px solid ${idx === 0 ? '#fbbf24' : 'rgba(255,255,255,0.12)'}; border-radius:10px; margin-bottom:0.4rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:0.65rem 1rem; background:${idx === 0 ? 'rgba(251, 191, 36, 0.15)' : (p.player_id === this.playerId ? 'rgba(124,58,237,0.25)' : 'rgba(255,255,255,0.05)')}; border:1.5px solid ${idx === 0 ? '#fbbf24' : (p.player_id === this.playerId ? '#a855f7' : 'rgba(255,255,255,0.12)')}; border-radius:12px; margin-bottom:0.45rem;">
               <span style="font-weight:800; font-size:0.95rem; color:#ffffff;">
-                ${idx === 0 ? '👑 #1' : `#${idx + 1}`} ${p.nickname} ${p.player_id === this.playerId ? '<small style="color:#34d399">(You)</small>' : ''}
+                ${idx === 0 ? '👑 #1' : `#${idx + 1}`} ${p.nickname} ${p.player_id === this.playerId ? '<small style="color:#34d399; font-weight:800;">(You)</small>' : ''}
               </span>
-              <span style="font-size:1.05rem; font-weight:900; color:${idx === 0 ? '#fbbf24' : '#a855f7'};">${p.score} pts</span>
+              <div style="text-align:right;">
+                <span style="font-size:1.05rem; font-weight:900; color:${idx === 0 ? '#fbbf24' : '#a855f7'};">${p.score} pts</span>
+                <div style="font-size:0.75rem; color:var(--text-dim);">${p.correct_count || 0}/6 correct</div>
+              </div>
             </div>
           `).join('')}
         </div>
-        <a href="/modes" class="btn btn-primary" style="padding:0.75rem 1.6rem; border-radius:999px; font-weight:800; text-decoration:none; display:inline-block; background:#e11d48; border:none; color:#ffffff; box-shadow:0 4px 18px rgba(225,29,72,0.45);">
+        <a href="/modes" class="btn btn-primary" style="padding:0.85rem 1.8rem; border-radius:var(--radius-pill); font-weight:900; text-decoration:none; display:inline-block; background:#e11d48; border:none; color:#ffffff; box-shadow:0 4px 18px rgba(225,29,72,0.45); font-size:1rem;">
           Play Another Match 🚀
         </a>
       </div>
@@ -615,6 +751,10 @@ class MultiplayerManager {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
+    }
+    if (this.nextCountdownInterval) {
+      clearInterval(this.nextCountdownInterval);
+      this.nextCountdownInterval = null;
     }
   }
 }

@@ -12,16 +12,53 @@ from services.leaderboard_service import LeaderboardService
 
 # Memory store for active room answer tracking during answering phase
 active_room_answers = {} # room_code -> { question_id -> { player_id -> answer_dict } }
+revealed_questions = set() # (room_code, question_id) to prevent duplicate reveals
 
 def generate_room_code(length=6):
     chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789" # Exclude confusing chars 0/O, 1/I
     return "".join(random.choice(chars) for _ in range(length))
 
 def register_multiplayer_events(socketio):
+    def reveal_question(room_code, question_id):
+        key = (room_code, question_id)
+        if key in revealed_questions:
+            return
+        revealed_questions.add(key)
+        
+        real_q = QuestionService.get_question_by_id(question_id)
+        if not real_q:
+            return
+            
+        answers_dict = active_room_answers.get(room_code, {}).get(question_id, {})
+        total_in_room = len(answers_dict)
+        correct_in_room = sum(1 for a in answers_dict.values() if a.get("is_correct"))
+        
+        room_correct_pct = int(round((correct_in_room / total_in_room) * 100)) if total_in_room > 0 else 50
+        room_incorrect_pct = 100 - room_correct_pct
+        
+        # Get live room leaderboard
+        room_leaderboard = LeaderboardService.get_room_leaderboard(room_code)
+        
+        socketio.emit("reveal_feedback", {
+            "question_id": question_id,
+            "correct_answer": real_q["answer"],
+            "explanation": real_q["explanation"],
+            "room_stats": {
+                "total_answered": total_in_room,
+                "correct_pct": room_correct_pct,
+                "incorrect_pct": room_incorrect_pct,
+                "display": f"{room_correct_pct}% CORRECT | {room_incorrect_pct}% INCORRECT"
+            },
+            "leaderboard": room_leaderboard
+        }, to=room_code)
+
     @socketio.on("create_room")
     def handle_create_room(data):
-        player_id = data.get("player_id")
-        nickname = data.get("nickname", "Host").strip()[:25]
+        player_id = (data.get("player_id") or "").strip()
+        if not player_id:
+            player_id = f"p_{generate_room_code(8).lower()}"
+            
+        nickname = (data.get("nickname") or "Host").strip()[:25]
         mode = data.get("mode", "friends") # "friends" or "big_screen"
         
         room_code = generate_room_code()
@@ -50,16 +87,20 @@ def register_multiplayer_events(socketio):
         emit("room_created", {
             "status": "success",
             "room_code": room_code,
+            "player_id": player_id,
             "mode": mode,
             "host_nickname": nickname,
-            "join_url": f"/join/{room_code}"
+            "join_url": f"/lobby/{room_code}" if mode == "friends" else f"/join/{room_code}"
         })
 
     @socketio.on("join_room")
     def handle_join_room(data):
         room_code = data.get("room_code", "").strip().upper()
-        player_id = data.get("player_id")
-        nickname = data.get("nickname", "Anonymous").strip()[:25]
+        player_id = (data.get("player_id") or "").strip()
+        if not player_id:
+            player_id = f"p_{generate_room_code(8).lower()}"
+            
+        nickname = (data.get("nickname") or "Anonymous").strip()[:25]
         
         conn = get_db()
         cursor = conn.cursor()
@@ -76,8 +117,8 @@ def register_multiplayer_events(socketio):
             emit("join_error", {"message": f"Room '{room_code}' has already ended."})
             return
             
-        # Preserve is_host if this player is the room's host
-        is_host = 1 if player_id == room["host_player_id"] else 0
+        # Check if player is the designated host
+        is_host = 1 if (player_id and player_id == room["host_player_id"]) else 0
         with conn:
             conn.execute(
                 """INSERT OR REPLACE INTO room_participants
@@ -105,6 +146,9 @@ def register_multiplayer_events(socketio):
         
         emit("joined_successfully", {
             "room_code": room_code,
+            "player_id": player_id,
+            "nickname": nickname,
+            "is_host": bool(is_host),
             "mode": room["mode"],
             "status": room["status"],
             "participants": participants,
@@ -202,9 +246,15 @@ def register_multiplayer_events(socketio):
                 WHERE room_code = ? AND player_id = ?""",
                 (points_awarded, speed_bonus, 1 if is_correct else 0, room_code, player_id)
             )
+        
+        # Count total answered so far for this question
+        total_answers = len(active_room_answers[room_code][question_id])
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) as count FROM room_participants WHERE room_code = ?", (room_code,))
+        total_participants = cursor.fetchone()["count"]
         conn.close()
         
-        # Send confirmation to the specific player only (do not reveal answers publicly yet!)
+        # Send confirmation to the specific player
         emit("answer_acknowledged", {
             "question_id": question_id,
             "chosen_answer": chosen_answer,
@@ -212,46 +262,23 @@ def register_multiplayer_events(socketio):
             "speed_bonus": speed_bonus
         })
         
-        # Broadcast count of submitted answers to the room (for live counter on big screen)
-        total_answers = len(active_room_answers[room_code][question_id])
+        # Broadcast count of submitted answers to the room
         emit("live_answer_count", {
             "question_id": question_id,
-            "answered_count": total_answers
+            "answered_count": total_answers,
+            "total_participants": total_participants
         }, to=room_code)
+        
+        # If all participants in the room have answered, reveal feedback immediately!
+        if total_answers >= total_participants and total_participants > 0:
+            reveal_question(room_code, question_id)
 
     @socketio.on("end_question_phase")
     def handle_end_question_phase(data):
         """Host or timer calls this when answer timer runs out. Reveals correct answer & stats!"""
         room_code = data.get("room_code", "").strip().upper()
         question_id = data.get("question_id")
-        
-        real_q = QuestionService.get_question_by_id(question_id)
-        if not real_q:
-            return
-            
-        # Tally responses in this room
-        answers_dict = active_room_answers.get(room_code, {}).get(question_id, {})
-        total_in_room = len(answers_dict)
-        correct_in_room = sum(1 for a in answers_dict.values() if a.get("is_correct"))
-        
-        room_correct_pct = int(round((correct_in_room / total_in_room) * 100)) if total_in_room > 0 else 50
-        room_incorrect_pct = 100 - room_correct_pct
-        
-        # Get live room leaderboard
-        room_leaderboard = LeaderboardService.get_room_leaderboard(room_code)
-        
-        emit("reveal_feedback", {
-            "question_id": question_id,
-            "correct_answer": real_q["answer"],
-            "explanation": real_q["explanation"],
-            "room_stats": {
-                "total_answered": total_in_room,
-                "correct_pct": room_correct_pct,
-                "incorrect_pct": room_incorrect_pct,
-                "display": f"{room_correct_pct}% CORRECT | {room_incorrect_pct}% INCORRECT"
-            },
-            "leaderboard": room_leaderboard
-        }, to=room_code)
+        reveal_question(room_code, question_id)
 
     @socketio.on("next_room_question")
     def handle_next_room_question(data):
@@ -276,6 +303,7 @@ def register_multiplayer_events(socketio):
             
             final_leaderboard = LeaderboardService.get_room_leaderboard(room_code)
             emit("room_game_over", {
+                "room_code": room_code,
                 "leaderboard": final_leaderboard
             }, to=room_code)
             return

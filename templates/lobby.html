@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
 <style>
   .lobby-locked-stage {
     position: relative;
@@ -68,6 +69,7 @@
     width: 100%;
     text-align: center;
     box-shadow: 0 16px 45px rgba(0, 0, 0, 0.65), 0 0 35px rgba(124, 58, 237, 0.2);
+    box-sizing: border-box;
   }
 
   /* Red Multiplayer Lobby Tagline */
@@ -89,7 +91,7 @@
     line-height: 1.15;
   }
 
-  /* Red Room Code Badge (Changed from blue to red per user instruction) */
+  /* Red Room Code Badge */
   .lobby-room-badge {
     display: inline-block;
     background: rgba(225, 29, 72, 0.15);
@@ -232,8 +234,8 @@
       </a>
     </div>
 
-    <!-- Lobby Card (Zero Scroll on Mobile, Red Room Code & Red Title) -->
-    <div class="lobby-card">
+    <!-- Lobby Card & Dynamic Arena -->
+    <div class="lobby-card" id="multiplayerArena">
       <span class="lobby-tagline-red">MULTIPLAYER LOBBY</span>
       <h1 class="lobby-heading">Share with Your Friends</h1>
 
@@ -268,9 +270,15 @@
         </div>
       </div>
 
-      <button type="button" class="btn-start-match" id="btnStartFriendMatch">
+      <!-- Host Action Button -->
+      <button type="button" class="btn-start-match" id="btnStartFriendMatch" style="display:none;">
         START CHALLENGE MATCH ▶
       </button>
+
+      <!-- Friend Waiting Status Indicator -->
+      <div id="friendWaitingStatus" style="display:none; width:100%; padding:0.88rem 1.4rem; font-size:1.02rem; font-weight:800; background:rgba(124, 58, 237, 0.2); border:1.5px solid #a855f7; border-radius:var(--radius-pill); color:#c4b5fd; text-align:center;">
+        ⏳ WAITING FOR HOST TO START...
+      </div>
     </div>
   </div>
 </section>
@@ -283,50 +291,62 @@
   document.addEventListener("DOMContentLoaded", () => {
     const roomCode = "{{ room_code }}";
     const mp = new MultiplayerManager("lobby", roomCode);
+    window.activeMp = mp;
     mp.init();
 
-    const btnCopy = document.getElementById("btnCopyCode");
-    const btnShare = document.getElementById("btnShareLink");
-    const btnQr = document.getElementById("btnToggleQr");
-    const qrWrap = document.getElementById("qrDropdownWrap");
-    const btnStart = document.getElementById("btnStartFriendMatch");
+    function setupLobbyButtons() {
+      const btnCopy = document.getElementById("btnCopyCode");
+      const btnShare = document.getElementById("btnShareLink");
+      const btnQr = document.getElementById("btnToggleQr");
+      const qrWrap = document.getElementById("qrDropdownWrap");
+      const btnStart = document.getElementById("btnStartFriendMatch");
 
-    const joinUrl = `${window.location.origin}/join/${roomCode}`;
+      const joinUrl = `${window.location.origin}/lobby/${roomCode}`;
 
-    if (btnCopy) {
-      btnCopy.addEventListener("click", () => {
-        navigator.clipboard.writeText(roomCode);
-        window.showToast("Room code copied!");
-      });
+      if (btnCopy) {
+        btnCopy.onclick = () => {
+          navigator.clipboard.writeText(roomCode);
+          if (typeof window.showToast === "function") window.showToast("Room code copied!");
+        };
+      }
+
+      if (btnShare) {
+        btnShare.onclick = () => {
+          if (navigator.share) {
+            navigator.share({
+              title: "Join my AI vs ASLI squad!",
+              text: `Join my AI vs ASLI challenge room: ${roomCode}`,
+              url: joinUrl
+            }).catch(() => {});
+          } else {
+            navigator.clipboard.writeText(joinUrl);
+            if (typeof window.showToast === "function") window.showToast("Join link copied to clipboard!");
+          }
+        };
+      }
+
+      if (btnQr && qrWrap) {
+        btnQr.onclick = () => {
+          qrWrap.style.display = qrWrap.style.display === "none" ? "block" : "none";
+        };
+      }
+
+      if (btnStart) {
+        btnStart.onclick = () => {
+          if (window.soundFx && typeof window.soundFx.click === "function") {
+            window.soundFx.click();
+          }
+          btnStart.disabled = true;
+          btnStart.textContent = "Launching Arena...";
+          if (mp && mp.socket) {
+            mp.socket.emit("start_room_game", { room_code: roomCode });
+          }
+        };
+      }
     }
 
-    if (btnShare) {
-      btnShare.addEventListener("click", () => {
-        if (navigator.share) {
-          navigator.share({
-            title: "Join my AI vs ASLI squad!",
-            text: `Join my AI vs ASLI challenge room: ${roomCode}`,
-            url: joinUrl
-          }).catch(() => {});
-        } else {
-          navigator.clipboard.writeText(joinUrl);
-          window.showToast("Join link copied to clipboard!");
-        }
-      });
-    }
-
-    if (btnQr && qrWrap) {
-      btnQr.addEventListener("click", () => {
-        qrWrap.style.display = qrWrap.style.display === "none" ? "block" : "none";
-      });
-    }
-
-    if (btnStart) {
-      btnStart.addEventListener("click", () => {
-        window.soundFx.click();
-        window.location.href = `/game/host/${roomCode}`;
-      });
-    }
+    setupLobbyButtons();
+    window.setupLobbyButtons = setupLobbyButtons;
   });
 </script>
 {% endblock %}

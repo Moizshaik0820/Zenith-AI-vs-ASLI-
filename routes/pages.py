@@ -49,28 +49,49 @@ def solo_game():
 
 @pages_bp.route("/lobby/<room_code>")
 def lobby(room_code):
+    clean_code = room_code.strip().upper()
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM rooms WHERE code = ?", (clean_code,))
+    room = cursor.fetchone()
+    conn.close()
+    
+    room_mode = room["mode"] if room else "friends"
     return render_template(
         "lobby.html",
-        title=f"Room {room_code.upper()} Lobby | AI vs ASLI",
-        room_code=room_code.upper()
+        title=f"Room {clean_code} Lobby | AI vs ASLI",
+        room_code=clean_code,
+        room_mode=room_mode
     )
 
 @pages_bp.route("/game/host/<room_code>")
 def host_game(room_code):
+    clean_code = room_code.strip().upper()
     return render_template(
         "game.html",
-        title=f"Big Screen Host [{room_code.upper()}] | AI vs ASLI",
+        title=f"Big Screen Host [{clean_code}] | AI vs ASLI",
         mode="host",
-        room_code=room_code.upper()
+        room_code=clean_code
     )
 
 @pages_bp.route("/join/<room_code>")
 def join_room(room_code):
+    clean_code = room_code.strip().upper()
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM rooms WHERE code = ?", (clean_code,))
+    room = cursor.fetchone()
+    conn.close()
+    
+    # If it's a known friends room, take them directly into the shared friends lobby
+    if room and room["mode"] == "friends":
+        return redirect(url_for("pages.lobby", room_code=clean_code))
+        
     return render_template(
         "game.html",
-        title=f"Playing in Room {room_code.upper()} | AI vs ASLI",
+        title=f"Playing in Room {clean_code} | AI vs ASLI",
         mode="room_player",
-        room_code=room_code.upper()
+        room_code=clean_code
     )
 
 @pages_bp.route("/results/<session_id>")
